@@ -60,15 +60,18 @@ Each bundle directory is a complete Harbor task: `task.toml` is the runner manif
 ## Cite
 
 ```bibtex
-@misc{wisteriasamples,
-  title = {wisteria: samples}
+@misc{wisteria2026,
+  title        = {wisteria: Harbor-format terminal tasks across the DevOps cycle},
+  author       = {{Ethara AI}},
+  year         = {2026},
+  howpublished = {\url{https://github.com/EtharaOrion/wisteria}}
 }
 ```
 
 ## License
 
-See the license of the repository that publishes this lane.
+wisteria is released under the [MIT License](LICENSE).
 
 ## Contact
 
-[Ethara AI on GitHub](https://github.com/Ethara-Ai), [SECURITY.md](SECURITY.md) for a private report, and [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution route.
+[Ethara AI on GitHub](https://github.com/Ethara-Ai), [SECURITY.md](SECURITY.md) for a private report to security@ethara.ai, and [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution route.
