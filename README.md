@@ -77,3 +77,5 @@ Copyright (c) 2026 Green Rider Technology LLP (Ethara AI). All rights reserved.
 ## Contact
 
 [Ethara AI on GitHub](https://github.com/Ethara-Ai), [SECURITY.md](SECURITY.md) for a private report to security@ethara.ai, and [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution route.
+
+Copyright (c) 2026 Green Rider Technology LLP (Ethara AI). All rights reserved.
