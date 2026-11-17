@@ -1,0 +1,20 @@
+# Deny the whole build context, then admit only what tests/Dockerfile copies.
+*
+**
+!/Dockerfile
+!/.build
+!/.build/rewardkit.lock
+!/.build/rewardkit.sh
+!/.build/litellm_model_map.py
+!/grader
+!/grader/**
+!/pool
+!/pool/**
+!/test.sh
+!/test_output.py
+!/reward.toml
+!/reward.deterministic.toml
+!/judge.toml
+!/reference
+!/reference/**
+!/cheat-checks.json

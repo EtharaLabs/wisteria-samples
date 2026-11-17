@@ -1,0 +1,88 @@
+use anyhow::Result;
+use openraft::Config;
+use openraft::RaftLogReader;
+use openraft::type_config::TypeConfigExt;
+use openraft_memstore::BlockOperation;
+use openraft_memstore::TypeConfig;
+
+use crate::fixtures::RaftRouter;
+use crate::fixtures::log_id;
+use crate::fixtures::timeout;
+use crate::fixtures::ut_harness;
+
+/// Replication blocks purge, but it should not purge for ever.
+/// Every new replication action should avoid using a log that is scheduled to be purged.
+///
+/// - Bring up one leader and two isolated learners. The leader keeps trying replicating logs to
+///   learners.
+/// - Trigger snapshot on the leader, logs should be able to be purged. Because replication should
+///   avoid using a log id `i` that is `RaftState.last_purged_log_id() <= i <=
+///   RaftState.purge_upto()`.
+#[tracing::instrument]
+#[test_harness::test(harness = ut_harness)]
+async fn replication_does_not_block_purge() -> Result<()> {
+    let max_keep = 2;
+
+    let config = Config {
+        max_in_snapshot_log_to_keep: max_keep,
+        purge_batch_size: 1,
+        enable_tick: false,
+        ..Default::default()
+    };
+
+    let mut router = RaftRouter::new(config)?;
+    let mut log_index = router.new_cluster([0], [1, 2]).await?;
+
+    let leader = router.get_raft_handle(&0)?;
+
+    router.set_network_error(1, true);
+    router.set_network_error(2, true);
+
+    tracing::info!(log_index, "--- build snapshot on leader, check purged log");
+    {
+        let written = router.client_request_many(0, "0", 10).await?;
+        log_index += written.count;
+
+        // `flush_metrics` runs on the next core loop, after `PurgeLog` returns.
+        // Holding the gate keeps both the snapshot metric and `purged` unpublished
+        // until this test releases it.
+        let gate = {
+            let (_log, sm) = router.get_storage_handle(&0)?;
+            sm.block.pause(BlockOperation::PurgeLog)
+        };
+
+        leader.trigger().snapshot().await?;
+        TypeConfig::timeout(timeout().unwrap(), gate.entered()).await?;
+
+        let (mut sto0, _sm0) = router.get_storage_handle(&0)?;
+        let logs_before = sto0.try_get_log_entries(..).await?;
+        assert!(
+            logs_before.len() > max_keep as usize,
+            "purge has not removed logs while the gate is held"
+        );
+
+        gate.release();
+
+        let purged_index = log_index - max_keep;
+        let purged = log_id(1, 0, purged_index);
+        leader.wait(timeout()).snapshot(log_id(1, 0, log_index), "built snapshot").await?;
+        leader.wait(timeout()).purged(Some(purged), "purged after snapshot").await?;
+
+        let logs = sto0.try_get_log_entries(..).await?;
+        let mut got = Vec::new();
+        for entry in &logs {
+            got.push(entry.log_id);
+        }
+
+        let first = log_index + 1 - max_keep;
+        let mut want = Vec::new();
+        let mut index = first;
+        while index <= log_index {
+            want.push(log_id(1, 0, index));
+            index += 1;
+        }
+        assert_eq!(want, got, "leader's local logs are purged");
+    }
+
+    Ok(())
+}

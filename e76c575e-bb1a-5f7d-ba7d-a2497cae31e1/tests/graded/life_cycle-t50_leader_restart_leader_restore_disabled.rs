@@ -1,0 +1,82 @@
+use openraft::Config;
+use openraft::RaftLogReader;
+use openraft::ServerState;
+use openraft::Vote;
+
+use crate::fixtures::Node;
+use crate::fixtures::RaftRouter;
+use crate::fixtures::ut_harness;
+
+/// With `enable_leader_restore=false`, a restarted leader must not restore leadership
+/// from the persisted committed vote. It restarts as a follower and re-acquires
+/// leadership through an explicitly triggered election at a higher term.
+#[tracing::instrument]
+#[test_harness::test(harness = ut_harness)]
+async fn leader_restart_leader_restore_disabled() -> anyhow::Result<()> {
+    let config = Config {
+        enable_tick: false,
+        enable_heartbeat: false,
+        enable_elect: false,
+        enable_leader_restore: Some(false),
+        ..Default::default()
+    };
+
+    let mut router = RaftRouter::new(config)?;
+
+    tracing::info!("--- bring up cluster of 1 node");
+    let mut log_index = router.new_cluster([0], []).await?;
+
+    tracing::info!(log_index, "--- write 1 log");
+    {
+        let response = router.client_request(0, "foo", 0).await?;
+        log_index = response.log_id.index();
+    }
+
+    tracing::info!(log_index, "--- stop and restart node-0");
+    {
+        let Node {
+            log_store: ls,
+            state_machine: sm,
+            ..
+        } = router.stop_node(0).await?;
+
+        router.new_raft_node_with_sto(0, ls, sm).await?;
+    }
+
+    tracing::info!(
+        log_index,
+        "--- disabled restore leaves node-0 passive and preserves its durable vote"
+    );
+    {
+        router.wait(&0).state(ServerState::Follower, "no startup election").await?;
+        let metrics = router.get_metrics(&0)?;
+        let want = Vote::new_committed(1, 0);
+        assert_eq!(want, metrics.vote);
+        assert_eq!(Some(log_index), metrics.last_log_index);
+
+        let (mut ls, _) = router.get_storage_handle(&0)?;
+        let vote = ls.read_vote().await?;
+        let want = Some(Vote::new_committed(1, 0));
+        assert_eq!(want, vote);
+    }
+
+    tracing::info!(
+        log_index,
+        "--- an explicit election can restore leadership with automatic election disabled"
+    );
+    {
+        let node = router.get_raft_handle(&0)?;
+        node.trigger().elect(false).await?;
+        router.wait(&0).state(ServerState::Leader, "leader again via election").await?;
+
+        // Term 2 proves a real election happened: restoring leadership would have
+        // kept the committed vote at term 1.
+        router.wait(&0).vote(Vote::new_committed(2, 0), "vote moved to term 2").await?;
+
+        // The new leader appends a blank log entry for its term.
+        log_index += 1;
+        router.wait(&0).applied_index(Some(log_index), "logs re-applied, plus the noop").await?;
+    }
+
+    Ok(())
+}

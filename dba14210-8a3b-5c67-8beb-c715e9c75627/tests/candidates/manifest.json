@@ -1,0 +1,332 @@
+{
+  "base_archive": "base-module.tar.gz",
+  "buggy_id": "buggy",
+  "candidate_order": [
+    "buggy",
+    "gold",
+    "cor-A1",
+    "cor-A3",
+    "cor-A4",
+    "cor-A5",
+    "cor-R3e1f",
+    "inc-I2",
+    "inc-I3a",
+    "inc-I4",
+    "inc-I7",
+    "inc-I9",
+    "inc-I10",
+    "inc-I11",
+    "inc-I13",
+    "inc-I15",
+    "inc-R8f2c",
+    "inc-R51da",
+    "inc-I3br",
+    "inc-I3cr",
+    "inc-I14r",
+    "inc-I8r",
+    "inc-I16",
+    "inc-I17",
+    "inc-I18",
+    "inc-I19",
+    "inc-I20",
+    "inc-I21",
+    "inc-I22",
+    "inc-I23",
+    "inc-I24",
+    "inc-I25"
+  ],
+  "candidates": {
+    "buggy": {
+      "class": "buggy",
+      "files": [],
+      "source_tree": "base (canonical, no override)"
+    },
+    "cor-A1": {
+      "class": "correct",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/A1"
+    },
+    "cor-A3": {
+      "class": "correct",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/A3"
+    },
+    "cor-A4": {
+      "class": "correct",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/A4"
+    },
+    "cor-A5": {
+      "class": "correct",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/A5"
+    },
+    "cor-R3e1f": {
+      "class": "correct",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/R3e1f"
+    },
+    "gold": {
+      "class": "gold",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "build/gold"
+    },
+    "inc-I10": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I10"
+    },
+    "inc-I11": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I11"
+    },
+    "inc-I13": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I13"
+    },
+    "inc-I14r": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I14r"
+    },
+    "inc-I15": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I15"
+    },
+    "inc-I16": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I16"
+    },
+    "inc-I17": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I17"
+    },
+    "inc-I18": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I18"
+    },
+    "inc-I19": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I19"
+    },
+    "inc-I2": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I2"
+    },
+    "inc-I20": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I20"
+    },
+    "inc-I21": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I21"
+    },
+    "inc-I22": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I22"
+    },
+    "inc-I23": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I23"
+    },
+    "inc-I24": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I24"
+    },
+    "inc-I25": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I25"
+    },
+    "inc-I3a": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I3a"
+    },
+    "inc-I3br": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I3br"
+    },
+    "inc-I3cr": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I3cr"
+    },
+    "inc-I4": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I4"
+    },
+    "inc-I7": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I7"
+    },
+    "inc-I8r": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I8r"
+    },
+    "inc-I9": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/I9"
+    },
+    "inc-R51da": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/R51da"
+    },
+    "inc-R8f2c": {
+      "class": "incorrect",
+      "files": [
+        "internal/kube/client.go",
+        "internal/kube/kube.go"
+      ],
+      "source_tree": "pool/members/R8f2c"
+    }
+  },
+  "digests": {
+    "base_archive": "b23f3d7f0277a4e8700ed9ab75f34c566076fabd7f314218d3b894b33fe878c3",
+    "buggy": "f25d0e55a400d4e94055df4204903602369c3e7e3c25e4175454d098acfc9601",
+    "cor-A1": "20a32b037db8080b3d6a68c55fdf2b158f38c9659620c18d19ca0f901e4f757d",
+    "cor-A3": "7dc32b58a121652b8b30329fb8111b1aa57d9f014fb133f0ef354de0edf34777",
+    "cor-A4": "1249e585d7a54f4030638b027c478c9c699c6c7758786bf221b95e34aa35a82a",
+    "cor-A5": "e058705eb97e21026c507f60348a7a69a73e600b1e2bad14d6c9a8ff04f88f49",
+    "cor-R3e1f": "9f714d944adea71f523781e1baa7cd9d440c8c14880b14b338dc285bb468706f",
+    "gold": "ee7e7b1d5f5c1300d6051e74cb2a9d761ee8fbc27d670a6a54e9ad0d8a0f2b3d",
+    "inc-I10": "ec71cd5997b391b1d63544278e1f7b28805146901815afd4242576b7a459971c",
+    "inc-I11": "f79b04f17ce8d4a609ec48e5930c223220a88d74e5e63bbcf55ef10b7542790f",
+    "inc-I13": "be0d5f5d47871cfc596271daa1452f5a1ab6faa8e9a2e97f9885c3a63a32ac41",
+    "inc-I14r": "ae2dfb347a81e60d897b781ac5c288f458cba7812ea98a52505bbdf280f97ff0",
+    "inc-I15": "4e17ac73f083341b81075216299f00736e6131d2742749fd6ef090ff0fdd5904",
+    "inc-I16": "3d5db3cecaccda700abc3209e5a2a848e2475d116c5eaa872717dbdfce3d11b1",
+    "inc-I17": "824fcb0e8d2738c77a3c11faff728fc3b955ae8e07589f2ed7cb731fd4b75fad",
+    "inc-I18": "9c052d006897a740350111811213862fef7a0474b9ce9c00d57320cac528d9af",
+    "inc-I19": "6f1bc1cfd63edbc3da4bad7ac8f5f8500cf4cc181f481b4a533438210801cffa",
+    "inc-I2": "da85260d83cbdd7a54692e73a3e4a3aa4f9cf05854d4ab9eb533f8bc182c6b00",
+    "inc-I20": "52b3f3daa6e97b65c1ed4bab1b8859ce8cadc65e7f4711560b830c21e10eeedc",
+    "inc-I21": "03a3eb5a2c861495ae7bba981ca1bd108e34567227860c8059790ebe18884697",
+    "inc-I22": "5b9c1ac7de23a70279ec98ac0fbbb037e5938f011b6fe5de245ea1cbd0ea76af",
+    "inc-I23": "c87558f681d153ab87bd3cd4bb857504c170a7b85082de80a51c77e645994c2e",
+    "inc-I24": "7139524c49bb5bf0919da66dd0220a1bc8893ecb678b0604e6431afdf8acbfba",
+    "inc-I25": "8ae7a6978983dd1c4bb49646b543c46b639f01f00000c111888e54294d97d22b",
+    "inc-I3a": "de6715387fa47539277f144797cc087acad3812c6744f423ea8d9aedbd0e6329",
+    "inc-I3br": "b0d0aa3b5a16c380a7dfec4ac3bdb53d6c76cc4cf1bc1b60970eee06fe473a0e",
+    "inc-I3cr": "00e73f690711faa93f199aa1f4bdcac55222f7dbb0de50139745c042a9e3f746",
+    "inc-I4": "095247f9ca7a8fecd9da18447cda3f8db2fc81125fdf323d437462252910df94",
+    "inc-I7": "0ed182538b903d80e12e13a35484d217a314e1d29b52b78ac9f407b053d6773d",
+    "inc-I8r": "12c47be81c3bf569799cb72699ab6a61f0f2e42e7579e680747670d7be148a2a",
+    "inc-I9": "c5e6f40c67079148950fe3ca3e6cdf88b4fa5cd00a68e8c3d32fa9ea95592221",
+    "inc-R51da": "429e2bc2ebd3e5453539373706472e63688816bcd064ef5d866565a84e43a874",
+    "inc-R8f2c": "df72ed122a3a7fd6b35b06d14a42256fa0684dd0347464294e3eea6011921d49"
+  },
+  "gold_id": "gold",
+  "module_relpath": "processor/k8sattributesprocessor",
+  "package_relpath": "internal/kube",
+  "schema": "kube-testgen.candidate-manifest/v1"
+}

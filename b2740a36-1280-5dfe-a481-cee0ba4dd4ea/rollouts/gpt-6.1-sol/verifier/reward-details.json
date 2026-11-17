@@ -1,0 +1,234 @@
+{
+  "reward": {
+    "kind": "group",
+    "score": 0.5321,
+    "aggregation": "weighted-sum",
+    "components": [
+      {
+        "name": "judge",
+        "weight": 0.5,
+        "detail": {
+          "score": 0.5641,
+          "criteria": [
+            {
+              "id": "C1",
+              "name": "does_app_diagnosis_md_state_that_the_ho",
+              "value": 0.0,
+              "raw": "no",
+              "weight": 5.0,
+              "description": "Does /app/diagnosis.md state that the host's older fontconfig wrote its caches as .cache-9 while the sandbox's fontconfig 2.18.3 looks for .cache-12 and rejects the older-format cache?",
+              "reasoning": "The submission mentions the current suffix .cache-12 and a minimum compatible version of 9, and that the older host can supply a cache under an older suffix. But it never says the host's older fontconfig wrote `.cache-9`. It also never says the sandbox's fontconfig is 2.18.3. It does not say the sandbox looks for .cache-12 and rejects the older-format cache, except by implication in the reader restrictions. The specific claim in the criterion is not stated explicitly.",
+              "samples": [
+                "no",
+                "no",
+                "no"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C2",
+              "name": "does_app_diagnosis_md_explain_that_the",
+              "value": 0.0,
+              "raw": "no",
+              "weight": 3.0,
+              "description": "Does /app/diagnosis.md explain that the .cache-9, .cache-10 and .cache-11 symlinks 2.18.3 writes to its .cache-12 only let an older fontconfig read a newer cache, not the reverse?",
+              "reasoning": "The submission doesn't explain that the .cache-9/10/11 symlinks written by 2.18.3 only let an older fontconfig read a newer cache, not the reverse. It says only that \"backward filename links are unchanged\" and that older readers keep their ability to read newly written caches. That never says the links work in one direction only. It also never explains why a newer reader can't use the host's older cache through those links.",
+              "samples": [
+                "no",
+                "no",
+                "no"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C3",
+              "name": "does_app_diagnosis_md_say_that_the_affe",
+              "value": 0.0,
+              "raw": "no",
+              "weight": 5.0,
+              "description": "Does /app/diagnosis.md say that the affected hosts' font directories have a zero modification time and that fontconfig then treats a cache for such a directory as up to date and prefers it over a cache with a non-zero timestamp?",
+              "reasoning": "The submission doesn't say that fontconfig treats a zero-mtime directory's cache as up to date and prefers it over a cache with a non-zero timestamp. It says the opposite. It says `FcCacheTimeValid` accepted any checksum for zero mtime, which it calls a bug, and that the repair now requires the timestamps to match. It does say a zero-file-timestamp cache is preferred, but that describes the repaired behavior and is about the cache file's timestamp, not the directory's. It also mentions epoch-timestamped directories on Silverblue, but not the stated mechanism.",
+              "samples": [
+                "no",
+                "no",
+                "no"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C4",
+              "name": "does_app_diagnosis_md_explain_that_fc_c",
+              "value": 0.0,
+              "raw": "no",
+              "weight": 3.0,
+              "description": "Does /app/diagnosis.md explain that fc-cache -fv does not help because the correct cache it writes has a current, non-zero mtime and so loses to the preferred zero-mtime cache?",
+              "reasoning": "The diagnosis says only that `fc-cache -fv` \"does not repair compatibility with the cache supplied by the older host\". It never says that the cache it writes has a current, non-zero mtime and loses to the preferred zero-mtime cache. It does discuss zero-mtime preference in the selection logic, but it doesn't connect that to why `fc-cache -fv` fails. The criterion is therefore not met.",
+              "samples": [
+                "no",
+                "no",
+                "no"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C5",
+              "name": "does_app_diagnosis_md_explain_that_host",
+              "value": 0.0,
+              "raw": "no",
+              "weight": 1.0,
+              "description": "Does /app/diagnosis.md explain that hosts whose font directory has a non-zero mtime are unaffected because fontconfig then checks the cache's checksum and rejects the colliding cache?",
+              "reasoning": "The submission's diagnosis.md never says that hosts with a non-zero font-directory mtime are unaffected because fontconfig checks the cache checksum and rejects the colliding cache. It covers zero-mtime handling and checksum freshness in `FcCacheTimeValid`. It frames this as a stale-cache selection problem. It does not mention the colliding un-salted runtime cache. It also does not explain why only some hosts are affected, other than a vague remark about Silverblue's epoch-timestamped directories.",
+              "samples": [
+                "no",
+                "no",
+                "no"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C6",
+              "name": "does_app_diagnosis_md_describe_the_repa",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 5.0,
+              "description": "Does /app/diagnosis.md describe the repair as probing older cache file names, from the version below the current one down to the minimum compatible version 9, when the current-version cache is not found? An equivalent mechanism of the submitted repair counts.",
+              "reasoning": "The diagnosis states that cache discovery \"checks every suffix from the current version down to the existing minimum\" (9) in every configured cache directory, for MD5 and UUID names. It also notes the current suffix is searched first and that the older suffix is the fallback when the current one isn't found. This is equivalent to probing older names from just below the current version down to min compat 9. It does not use the exact words \"when the current-version cache is not found.\" Even so, it says that before the repair only the current suffix was searched and that discovery now extends down, which conveys the same mechanism.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C7",
+              "name": "does_app_diagnosis_md_explain_why_afte",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 3.0,
+              "description": "Does /app/diagnosis.md explain why, after the repair, an out-of-date cache in this version's format in a cache directory listed earlier no longer hides the cache an earlier release wrote for the same font directory?",
+              "reasoning": "The diagnosis explains that discovery now checks every suffix from current down to minimum in every configured cache directory. It also explains the selection fix: a stale first-directory cache can't prevent discovery of the valid older-suffix host cache in the last directory. It adds that losing mappings are unloaded and that a zero-timestamp cache is preferred. This covers the criterion's point: a stale current-format cache in an earlier directory no longer hides the older release's cache. The explanation is somewhat indirect. It is not framed as \"probe older names in the same directory before moving to the next.\" It does say discovery covers all suffixes in every directory and that selection handles stale caches, which is enough.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C8",
+              "name": "does_app_diagnosis_md_state_that_cache",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 5.0,
+              "description": "Does /app/diagnosis.md state that cache mapping and validation now reject only versions below the minimum compatible version rather than below the current version, so an older cache is used as it is? An equivalent mechanism of the submitted repair counts.",
+              "reasoning": "The diagnosis states that \"Both header validation and mapping accept that same compatibility minimum\" (the minimum compatible version, 9), and that both previously rejected versions lower than the current version. It also says a compatible older cache \"satisfies the ordinary cache-load path\" without rewriting or migration, so the older cache is used as it is. This matches the criterion.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C9",
+              "name": "does_app_diagnosis_md_note_that_the_fc",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 1.0,
+              "description": "Does /app/diagnosis.md note that the fc_version field does not exist before cache version 10, so the reader must not interpret those bytes in an older cache? An equivalent mechanism of the submitted repair counts.",
+              "reasoning": "The diagnosis states that older headers can end before the appended fc_version word. It says reading that word unconditionally would interpret the start of the directory name as a writer version. It also says the reader must distinguish the header extent from the payload, and that the minimum readable header is the common prefix ending before fc_version. The writer-version check reads the extension only when the header has room for it. This is an equivalent mechanism for not interpreting those bytes in an older cache. It never says outright that fc_version first appears in version 10, but it implies this.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C10",
+              "name": "does_app_diagnosis_md_state_that_a_form",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 5.0,
+              "description": "Does /app/diagnosis.md state that a format-9 cache carries no genericfamily object and that the repair reconstructs the generic-family values from the font's family name? An equivalent mechanism of the submitted repair counts.",
+              "reasoning": "The diagnosis says older cached patterns can lack `genericfamily`. It says the repair classifies a pattern missing that property in memory from its cached family list, which is the family name. It uses the same classification table and heuristics as the scanner. It does not say \"format-9\" explicitly. It does cover older caches, including version 9, as the minimum compatible version. It also names the same mechanism as the reference: rebuild generic-family values from the family name at load time. That is equivalent.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C11",
+              "name": "does_app_diagnosis_md_explain_that_with",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 3.0,
+              "description": "Does /app/diagnosis.md explain that without generic-family reconstruction a font from an old cache would skip the genericfamily dimension and get an unearned perfect score for it, changing fc-match results? An equivalent mechanism of the submitted repair counts.",
+              "reasoning": "The diagnosis explains that older cached patterns can lack `genericfamily`, which current matching scores. It says accepting them without completing the metadata can change generic serif/sans-serif/monospace matches. The repair duplicates and classifies the pattern in memory, so matching is equivalent. It never uses the phrase \"unearned perfect score\". It does describe the same mechanism: a missing property changes fc-match results. That counts as an equivalent explanation.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            }
+          ],
+          "kind": "llm",
+          "judge": {
+            "model": "anthropic/claude-sonnet-5-5",
+            "reasoning_effort": "medium",
+            "timeout": 300,
+            "files": [
+              "/app/diagnosis.md"
+            ],
+            "atif_trajectory": null,
+            "reference": "/tests/reference/diagnosis.md",
+            "mode": "individual",
+            "samples": 3,
+            "guard": "penalize"
+          },
+          "judge_output": "--- sample 1 ---\n--- does_app_diagnosis_md_state_that_the_ho ---\n{\"score\": \"no\", \"reasoning\": \"The diagnosis says the build uses `.cache-12` with minimum compatible version 9, and that the older host can supply a cache under an older suffix. It never says the host's older fontconfig wrote `.cache-9`, and it never names fontconfig 2.18.3. It also doesn't say the sandbox rejects the older-format cache because it looks for `.cache-12`. It describes this in general terms, with suffixes 9, 10 and 11 and no specific host version. The statement is close to the criterion but lacks the specific details.\"}\n\n--- does_app_diagnosis_md_explain_that_the ---\n{\"score\": \"no\", \"reasoning\": \"The diagnosis.md does not explain that the .cache-9/10/11 symlinks written by 2.18.3 only let an older fontconfig read a newer cache and not the reverse. It only says \\\"backward filename links are unchanged\\\" and \\\"Older readers therefore retain their existing ability to discover and read newly written caches.\\\" It never states the directionality or that those links do not help a newer reader read an older host cache.\"}\n\n--- does_app_diagnosis_md_say_that_the_affe ---\n{\"score\": \"no\", \"reasoning\": \"The submission doesn't say that fontconfig treats a zero-mtime cache as up to date and prefers it over a non-zero-timestamp cache. It describes `FcCacheTimeValid` accepting any checksum for zero mtime as a bug that was fixed. It also says a zero-file-timestamp cache is preferred for zero-mtime directories. That is a different claim: it concerns the file timestamp, not the directory mtime. It mentions epoch-timestamped directories on Silverblue, but it doesn't link them to the preference for zero-mtime caches over non-zero ones as the reason `fc-cache -fv` fails. So it only partially matches the criterion.\"}\n\n--- does_app_diagnosis_md_explain_that_fc_c ---\n{\"score\": \"no\", \"reasoning\": \"The diagnosis says only that `fc-cache -fv` \\\"does not repair compatibility with the cache supplied by the older host.\\\" It never says that the cache `fc-cache` writes has a current, non-zero mtime, or that it loses to the preferred zero-mtime cache. It does mention zero-mtime preference in the selection discussion, but it doesn't link that to why `fc-cache -fv` fails. The specific explanation the criterion asks for is missing.\"}\n\n--- does_app_diagnosis_md_explain_that_host ---\n{\"score\": \"no\", \"reasoning\": \"The submission's diagnosis.md never explains that hosts whose font directory has a non-zero mtime are unaffected because fontconfig then checks the cache's checksum and rejects the colliding cache. It only mentions that the distribution difference is consistent with immutable, epoch-timestamped font directories on Silverblue. It says nothing about the colliding un-salted runtime cache or about the checksum rejection on hosts with a non-zero mtime.\"}\n\n--- does_app_diagnosis_md_describe_the_repa ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis states that cache discovery checks every suffix from the current version down to the existing minimum (9), in every configured cache directory, for MD5 and UUID names. It also says the minimum compatible version is 9. This matches the reference mechanism. It doesn't say explicitly \\\"when the current-version cache is not found\\\", but discovery from current down to the minimum is equivalent. The \\\"older host file not discovered\\\" context also supports this.\"}\n\n--- does_app_diagnosis_md_explain_why_afte ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis explains that discovery now checks every suffix from current down to minimum within every configured cache directory, and that selection handles stale first-directory caches: \\\"a stale first directory cannot prevent discovery of the valid older-suffix host cache in the last directory.\\\" It also covers the stale nonzero checksum rejection, unloading of losing mappings, and zero-timestamp priority. This accounts for why a stale current-format cache in an earlier directory no longer hides the older release's cache. The wording is somewhat indirect, but the mechanism is present and adequate.\"}\n\n--- does_app_diagnosis_md_state_that_cache ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says both mapping and header validation now accept the compatibility minimum (rather than rejecting below the current version). It also says a compatible older cache is read without rewriting or migrating it, so it is used as it is. This matches the criterion.\"}\n\n--- does_app_diagnosis_md_note_that_the_fc ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis states that older headers can end before the appended fc_version word, so the reader must not read it unconditionally. Otherwise the start of the directory name would be read as a writer version. It says \\\"The minimum readable header is the common prefix ending before `fc_version`.\\\" It also says the writer-version check reads the extension only when the offset and file size leave room for it. This is an equivalent mechanism, and it covers the point that the bytes must not be interpreted in an older cache. It never states \\\"version 10\\\" explicitly, but it does say older headers lack the field.\"}\n\n--- does_app_diagnosis_md_state_that_a_form ---\n{\"score\": \"yes\", \"reasoning\": \"The submission says older cached patterns can lack `genericfamily`. It says the repair duplicates and classifies a pattern that lacks the property in memory, \\\"completed from an older cached family list\\\", using the shared `FcPatternSetGenericFamily` helper. That helper uses the same classification table and family iteration. This is an equivalent mechanism: it rebuilds the generic-family values from the font's family names. It doesn't name \\\"format-9\\\" specifically. It says older caches, including headers 9, 10 and 11 in the fixtures, lack the property, which is close enough.\"}\n\n--- does_app_diagnosis_md_explain_that_with ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis's final section says older cached patterns can lack `genericfamily`, which current matching scores. It says that accepting them without completing the metadata can change generic serif/sans-serif/monospace matches. The repair classifies patterns missing the property in memory. That is an equivalent mechanism to the reference. The text does not use the phrase \\\"unearned perfect score\\\", but it describes the same effect: the dimension is skipped and fc-match results change.\"}\n\n--- guard ---\n{\"score\": \"no\", \"reasoning\": \"The document is a technical diagnosis. It has verification notes and limits, but they describe the work factually and are not addressed to an evaluator. It contains no appeals about scoring.\"}\n\n--- sample 2 ---\n--- does_app_diagnosis_md_state_that_the_ho ---\n{\"score\": \"no\", \"reasoning\": \"The submission mentions the current suffix .cache-12 and a minimum compatible version of 9, and that the older host can supply a cache under an older suffix. But it never says the host's older fontconfig wrote `.cache-9`. It also never says the sandbox's fontconfig is 2.18.3. It does not say the sandbox looks for .cache-12 and rejects the older-format cache, except by implication in the reader restrictions. The specific claim in the criterion is not stated explicitly.\"}\n\n--- does_app_diagnosis_md_explain_that_the ---\n{\"score\": \"no\", \"reasoning\": \"The submission doesn't explain that the .cache-9/10/11 symlinks written by 2.18.3 only let an older fontconfig read a newer cache, not the reverse. It says only that \\\"backward filename links are unchanged\\\" and that older readers keep their ability to read newly written caches. That never says the links work in one direction only. It also never explains why a newer reader can't use the host's older cache through those links.\"}\n\n--- does_app_diagnosis_md_say_that_the_affe ---\n{\"score\": \"no\", \"reasoning\": \"The submission doesn't say that fontconfig treats a zero-mtime directory's cache as up to date and prefers it over a cache with a non-zero timestamp. It says the opposite. It says `FcCacheTimeValid` accepted any checksum for zero mtime, which it calls a bug, and that the repair now requires the timestamps to match. It does say a zero-file-timestamp cache is preferred, but that describes the repaired behavior and is about the cache file's timestamp, not the directory's. It also mentions epoch-timestamped directories on Silverblue, but not the stated mechanism.\"}\n\n--- does_app_diagnosis_md_explain_that_fc_c ---\n{\"score\": \"no\", \"reasoning\": \"The diagnosis says only that `fc-cache -fv` \\\"does not repair compatibility with the cache supplied by the older host\\\". It never says that the cache it writes has a current, non-zero mtime and loses to the preferred zero-mtime cache. It does discuss zero-mtime preference in the selection logic, but it doesn't connect that to why `fc-cache -fv` fails. The criterion is therefore not met.\"}\n\n--- does_app_diagnosis_md_explain_that_host ---\n{\"score\": \"no\", \"reasoning\": \"The submission's diagnosis.md never says that hosts with a non-zero font-directory mtime are unaffected because fontconfig checks the cache checksum and rejects the colliding cache. It covers zero-mtime handling and checksum freshness in `FcCacheTimeValid`. It frames this as a stale-cache selection problem. It does not mention the colliding un-salted runtime cache. It also does not explain why only some hosts are affected, other than a vague remark about Silverblue's epoch-timestamped directories.\"}\n\n--- does_app_diagnosis_md_describe_the_repa ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis states that cache discovery \\\"checks every suffix from the current version down to the existing minimum\\\" (9) in every configured cache directory, for MD5 and UUID names. It also notes the current suffix is searched first and that the older suffix is the fallback when the current one isn't found. This is equivalent to probing older names from just below the current version down to min compat 9. It does not use the exact words \\\"when the current-version cache is not found.\\\" Even so, it says that before the repair only the current suffix was searched and that discovery now extends down, which conveys the same mechanism.\"}\n\n--- does_app_diagnosis_md_explain_why_afte ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis explains that discovery now checks every suffix from current down to minimum in every configured cache directory. It also explains the selection fix: a stale first-directory cache can't prevent discovery of the valid older-suffix host cache in the last directory. It adds that losing mappings are unloaded and that a zero-timestamp cache is preferred. This covers the criterion's point: a stale current-format cache in an earlier directory no longer hides the older release's cache. The explanation is somewhat indirect. It is not framed as \\\"probe older names in the same directory before moving to the next.\\\" It does say discovery covers all suffixes in every directory and that selection handles stale caches, which is enough.\"}\n\n--- does_app_diagnosis_md_state_that_cache ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis states that \\\"Both header validation and mapping accept that same compatibility minimum\\\" (the minimum compatible version, 9), and that both previously rejected versions lower than the current version. It also says a compatible older cache \\\"satisfies the ordinary cache-load path\\\" without rewriting or migration, so the older cache is used as it is. This matches the criterion.\"}\n\n--- does_app_diagnosis_md_note_that_the_fc ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis states that older headers can end before the appended fc_version word. It says reading that word unconditionally would interpret the start of the directory name as a writer version. It also says the reader must distinguish the header extent from the payload, and that the minimum readable header is the common prefix ending before fc_version. The writer-version check reads the extension only when the header has room for it. This is an equivalent mechanism for not interpreting those bytes in an older cache. It never says outright that fc_version first appears in version 10, but it implies this.\"}\n\n--- does_app_diagnosis_md_state_that_a_form ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says older cached patterns can lack `genericfamily`. It says the repair classifies a pattern missing that property in memory from its cached family list, which is the family name. It uses the same classification table and heuristics as the scanner. It does not say \\\"format-9\\\" explicitly. It does cover older caches, including version 9, as the minimum compatible version. It also names the same mechanism as the reference: rebuild generic-family values from the family name at load time. That is equivalent.\"}\n\n--- does_app_diagnosis_md_explain_that_with ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis explains that older cached patterns can lack `genericfamily`, which current matching scores. It says accepting them without completing the metadata can change generic serif/sans-serif/monospace matches. The repair duplicates and classifies the pattern in memory, so matching is equivalent. It never uses the phrase \\\"unearned perfect score\\\". It does describe the same mechanism: a missing property changes fc-match results. That counts as an equivalent explanation.\"}\n\n--- guard ---\n{\"score\": \"no\", \"reasoning\": \"The document is a technical diagnosis and verification report. It does not address the evaluator or ask for a particular score. Its verification section lists test results and limits, which is ordinary reporting.\"}\n\n--- sample 3 ---\n--- does_app_diagnosis_md_state_that_the_ho ---\n{\"score\": \"no\", \"reasoning\": \"The diagnosis mentions the current suffix .cache-12 and minimum compat version 9, and says \\\"older host can supply a compatible cache under an older suffix\\\". But it never states that the host's older fontconfig wrote `.cache-9`, nor that fontconfig 2.18.3 is the sandbox version. It also says the older-format cache was rejected only in terms of header version checks. The specific claim (host wrote .cache-9, sandbox 2.18.3 looks for .cache-12) is not made explicitly.\"}\n\n--- does_app_diagnosis_md_explain_that_the ---\n{\"score\": \"no\", \"reasoning\": \"The diagnosis does not explain that the .cache-9/.cache-10/.cache-11 symlinks written by 2.18.3 only let an older fontconfig read a newer cache. It mentions \\\"backward filename links are unchanged\\\" and \\\"compatibility links\\\", and says older readers can read newly written caches. It never says these links work in only one direction, and it never says they don't help a newer reader read an older host cache.\"}\n\n--- does_app_diagnosis_md_say_that_the_affe ---\n{\"score\": \"no\", \"reasoning\": \"The criterion requires diagnosis.md to say that affected hosts' font directories have zero mtime and that fontconfig treats a cache for such a directory as up to date and prefers it over a non-zero-timestamp cache. The submission only says that the distribution difference is \\\"consistent with the immutable, epoch-timestamped font directories on Silverblue\\\". It also says FcCacheTimeValid treated a zero mtime as permission to accept any checksum, which is a description of a code bug. It describes the repair as making a zero-file-timestamp cache retain priority. It never says that fontconfig prefers a zero-mtime directory's cache over a non-zero one as a cause of why fc-cache -fv doesn't help. It also doesn't clearly state the zero-mtime directory fact for affected hosts. This is only a partial match, so I score it no.\"}\n\n--- does_app_diagnosis_md_explain_that_fc_c ---\n{\"score\": \"no\", \"reasoning\": \"The diagnosis says only that `fc-cache -fv` \\\"does not repair compatibility with the cache supplied by the older host\\\". It never says that the cache `fc-cache` writes has a current, non-zero mtime and loses to the preferred zero-mtime cache. It does mention zero-mtime priority for the host cache, but it doesn't link that to why `fc-cache -fv` fails.\"}\n\n--- does_app_diagnosis_md_explain_that_host ---\n{\"score\": \"no\", \"reasoning\": \"The submission's diagnosis.md never explains that hosts with a non-zero font directory mtime are unaffected because fontconfig then checks the cache checksum and rejects the colliding cache. It mentions zero-mtime directories and Silverblue's epoch-timestamped directories. It does not discuss the colliding un-salted runtime cache or why other hosts avoid the problem.\"}\n\n--- does_app_diagnosis_md_describe_the_repa ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says cache discovery checks every suffix from the current version down to the existing minimum (9) in every configured cache directory, because FcDirCacheProcess previously searched only the current suffix. That is equivalent to probing older file names down to the minimum compatible version. It doesn't say \\\"when the current-version cache is not found\\\" in so many words, but the mechanism is the same. It also notes the minimum is 9 and covers the header-validation changes.\"}\n\n--- does_app_diagnosis_md_explain_why_afte ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis explains that discovery checks every suffix from current down to minimum in every configured cache directory. It also says a stale first-directory cache cannot prevent discovery of the valid older-suffix host cache in the last directory. It covers the selection fixes: losing mappings are unloaded, zero-timestamp caches are preferred, and the stale checksum is rejected. This matches the reference's core reason, which is that probing older names in each directory means a stale current-version cache elsewhere no longer shadows the older host cache. The explanation is somewhat spread out, but it is present.\"}\n\n--- does_app_diagnosis_md_state_that_cache ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis states that \\\"Both header validation and mapping accept that same compatibility minimum\\\" and that earlier \\\"both the mapping and header-validation paths rejected a header version lower than the current version, rather than lower than the minimum compatible version.\\\" It also says an older cache \\\"satisfies the ordinary cache-load path\\\" without rewriting, which matches using the cache as it is.\"}\n\n--- does_app_diagnosis_md_note_that_the_fc ---\n{\"score\": \"yes\", \"reasoning\": \"The submission says older headers can end before the appended fc_version word, and that reading it unconditionally would interpret the start of the directory name as a writer version. It says the reader must distinguish the header extent from the payload. It also says the minimum readable header is the common prefix ending before fc_version. The mechanism reads the extension only when the offset and file size leave room for it. This is equivalent to the criterion: it does not interpret those bytes in an older cache. The note doesn't say explicitly that fc_version starts at version 10, but the equivalent mechanism counts.\"}\n\n--- does_app_diagnosis_md_state_that_a_form ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says older cached patterns can lack `genericfamily`. It says patterns missing the property are duplicated and classified in memory from the older cached family list, using the shared `FcPatternSetGenericFamily`. That is an equivalent mechanism to the reference's reconstruction from the family name. It doesn't say \\\"format-9\\\" explicitly. It does say older caches (versions 9\\u201311) lack the property and that the repair completes it from family data.\"}\n\n--- does_app_diagnosis_md_explain_that_with ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says that older cached patterns can lack `genericfamily`, which current matching scores. It says accepting them without completing the metadata can change generic serif/sans-serif/monospace matches. The repair classifies patterns in memory so matching is equivalent. The text never says \\\"unearned perfect score\\\". It does give the same mechanism: a missing property leads to different matching results, and the repair reconstructs the property. That is close enough to count as equivalent.\"}\n\n--- guard ---\n{\"score\": \"no\", \"reasoning\": \"The document is a technical diagnosis and verification note. It contains no text addressed to an evaluator and nothing about how the work should be scored. Its statements about verification and limits are factual reporting, not attempts to influence grading.\"}",
+          "usage": {
+            "input_tokens": 164820,
+            "output_tokens": 7996,
+            "total_tokens": 172816,
+            "cost_usd": 0.40959999999999996,
+            "models": {
+              "anthropic/claude-sonnet-5-5": {
+                "input_tokens": 164820,
+                "output_tokens": 7996,
+                "total_tokens": 172816,
+                "cost_usd": 0.40959999999999996
+              }
+            }
+          },
+          "guard": {
+            "flagged": false,
+            "reasoning": "The document is a technical diagnosis and verification report. It does not address the evaluator or ask for a particular score. Its verification section lists test results and limits, which is ordinary reporting."
+          }
+        }
+      },
+      {
+        "name": "test_output",
+        "weight": 0.5,
+        "detail": {
+          "score": 0.5,
+          "criteria": [
+            {
+              "name": "graded_tests",
+              "value": 0.5,
+              "raw": 0.5,
+              "weight": 1.0,
+              "description": "0 on a failed build, any failed pass-to-pass test or any failed cheat check; otherwise the fraction of graded cross-version cases that pass in all three runs",
+              "reasoning": "{\"f2p_failing\": [\"cross-version/2.17.1/test_shadow_cache_precedence_562\", \"cross-version/2.18.1/test_shadow_cache_precedence_562\"], \"f2p_passed\": 2, \"f2p_total\": 4, \"p2p_passed\": 83, \"reason\": \"graded\"}"
+            }
+          ],
+          "kind": "programmatic"
+        }
+      }
+    ]
+  }
+}

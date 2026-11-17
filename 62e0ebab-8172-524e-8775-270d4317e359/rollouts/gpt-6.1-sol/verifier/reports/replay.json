@@ -1,0 +1,73 @@
+{
+  "ok": true,
+  "reason": "",
+  "step": "replay",
+  "topologies": {
+    "n1": {
+      "checks": {
+        "c1_flow_control_active": true,
+        "c2_not_recreated": true,
+        "c3_duplicate_refused": true,
+        "c4_stored_unchanged": true,
+        "exactly_once_mirror": true,
+        "exactly_once_source": true,
+        "mirror_last_seq": true,
+        "no_deleted": true
+      },
+      "failed_preconditions": [],
+      "mirror": {
+        "deleted": [],
+        "digest_mismatch": [],
+        "duplicates": [],
+        "extra": [],
+        "last_seq": 21,
+        "missing": []
+      },
+      "nodes": 1,
+      "origin_last_seq": 21,
+      "pass": true,
+      "source": {
+        "deleted": [],
+        "digest_mismatch": [],
+        "duplicates": [],
+        "extra": [],
+        "last_seq": 21,
+        "missing": []
+      },
+      "timeline": "stale-after-reset-1n"
+    },
+    "n3": {
+      "checks": {
+        "c1_flow_control_active": true,
+        "c2_not_recreated": true,
+        "c3_duplicate_refused": true,
+        "c4_stored_unchanged": true,
+        "exactly_once_mirror": true,
+        "exactly_once_source": true,
+        "mirror_last_seq": true,
+        "no_deleted": true
+      },
+      "failed_preconditions": [],
+      "mirror": {
+        "deleted": [],
+        "digest_mismatch": [],
+        "duplicates": [],
+        "extra": [],
+        "last_seq": 21,
+        "missing": []
+      },
+      "nodes": 3,
+      "origin_last_seq": 21,
+      "pass": true,
+      "source": {
+        "deleted": [],
+        "digest_mismatch": [],
+        "duplicates": [],
+        "extra": [],
+        "last_seq": 21,
+        "missing": []
+      },
+      "timeline": "stale-after-reset"
+    }
+  }
+}

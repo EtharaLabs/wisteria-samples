@@ -1,0 +1,85 @@
+schema_version = "1.4"
+reward_type = "bounded_continuous"
+
+[task]
+name = "ethara/b2740a36-1280-5dfe-a481-cee0ba4dd4ea"
+version = "1.2.2"
+description = "Repair fontconfig so that it uses font caches written by earlier releases from 2.17.0 on as they are, without rewriting them, so that host fonts cached by an older fontconfig are listed inside a Flatpak sandbox running a newer one, with generic-family matching unchanged."
+authors = [{ name = "dinesh.kumar", email = "dinesh.kumar@ethara.ai" }]
+keywords = ["c", "fontconfig", "cache", "compatibility", "flatpak", "fonts", "bug-fix"]
+
+[metadata]
+category = "software-engineering"
+null_floor = 0.0
+discrimination_weight = 0.5
+platforms = ["linux/amd64", "linux/arm64"]
+
+[metadata.contamination]
+public_source = "gitlab.freedesktop.org/fontconfig/fontconfig"
+public_reference = "merge request 581 (merge commit f477dc2185135a0c0eae3f56f17d9dd08d0c3afc)"
+note = "The reference solution derives from this public upstream change. The working environment has no network access to it."
+
+[upstream_provenance]
+origin = "original"
+source_kind = "public_repository"
+provenance_date = "2026-10-05"
+
+[upstream_provenance.source]
+canonical_repo = "gitlab.freedesktop.org/fontconfig/fontconfig"
+fork_ancestry_digest = "sha256:05835b13f9d77d6559b75fec83004501a8a1e7aed7df5b39e979aec54c428cbd"
+base_commit = "c8b9654feda3612f65eb70c4f8db8910d1a7daf1"
+event_timestamp = "2026-10-05T08:05:42Z"
+
+[agent]
+timeout_sec = 10800.0
+user = "10001:10001"
+# Only the model APIs; the environment itself has no network.
+network_mode = "allowlist"
+allowed_hosts = ["api.openai.com", "api.anthropic.com"]
+
+[environment]
+build_timeout_sec = 3600.0
+cpus = 4
+memory_mb = 8192
+storage_mb = 30720
+gpus = 0
+network_mode = "no-network"
+
+[verifier]
+# Covers the tests' worst case plus the judge's retries.
+timeout_sec = 21600.0
+environment_mode = "separate"
+# tests/test.sh runs as root and builds and tests the submission as the sandbox uid 20002.
+user = "root"
+# Only the judge API is reachable.
+network_mode = "allowlist"
+allowed_hosts = ["api.anthropic.com", "api.openai.com"]
+
+[verifier.env]
+# Endpoints and keys come from the runner's environment. ANTHROPIC_API_KEY selects the Anthropic
+# judge; with it empty, OPENAI_API_KEY selects an OpenAI judge; with neither, no judge is called.
+ANTHROPIC_BASE_URL = "${ANTHROPIC_BASE_URL:-https://api.anthropic.com}"
+ANTHROPIC_API_KEY = "${ANTHROPIC_API_KEY:-}"
+OPENAI_BASE_URL = "${OPENAI_BASE_URL:-https://api.openai.com/v1}"
+OPENAI_API_KEY = "${OPENAI_API_KEY:-}"
+# litellm reads only its packaged model map, which tests/Dockerfile patches.
+LITELLM_LOCAL_MODEL_COST_MAP = "${LITELLM_LOCAL_MODEL_COST_MAP:-True}"
+# Reward Kit always sends reasoning_effort; drop it for models litellm does not list as reasoning models.
+LITELLM_DROP_PARAMS = "True"
+LITELLM_LOCAL_ANTHROPIC_BETA_HEADERS = "True"
+
+[verifier.environment]
+network_mode = "allowlist"
+allowed_hosts = ["api.anthropic.com", "api.openai.com"]
+build_timeout_sec = 3600.0
+cpus = 4
+memory_mb = 8192
+storage_mb = 30720
+gpus = 0
+
+# The verifier reads the solver's source tree and diagnosis.md from /logs/artifacts/app, or from /app.
+[[artifacts]]
+source = "/app/fontconfig"
+
+[[artifacts]]
+source = "/app/diagnosis.md"

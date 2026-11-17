@@ -1,0 +1,7 @@
+{
+  "class": "gold",
+  "files": {
+    "internal/kube/client.go": "17f69d8be4cc413985ba9ebe0dc6f4488653282d7d329db4670ab44c72d6c955",
+    "internal/kube/kube.go": "e6dcfd74a15c24229f431a7a825af9aad496ac793afff2a50056a0bb5798f5a5"
+  }
+}

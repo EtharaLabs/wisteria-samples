@@ -1,0 +1,21 @@
+{
+  "results": {
+    "tool": {
+      "name": "fontconfig-cheat-checks"
+    },
+    "tests": [
+      {
+        "name": "cheat_test_files_untouched",
+        "status": "passed"
+      },
+      {
+        "name": "cheat_no_process_exit",
+        "status": "passed"
+      },
+      {
+        "name": "cheat_no_external_network",
+        "status": "passed"
+      }
+    ]
+  }
+}

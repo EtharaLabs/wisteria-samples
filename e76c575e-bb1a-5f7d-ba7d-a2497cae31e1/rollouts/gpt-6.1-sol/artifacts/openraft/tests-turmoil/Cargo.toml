@@ -1,0 +1,46 @@
+[package]
+name = "tests-turmoil"
+description = "Turmoil simulation tests for openraft"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(tokio_unstable)"] }
+
+[features]
+# Run the cluster with `ThresholdMembership` instead of the default `Membership`.
+threshold-membership = []
+
+[[bin]]
+name = "fuzz"
+path = "src/bin/fuzz.rs"
+
+[dependencies]
+openraft-membership = { path = "../membership", version = "0.10.0-alpha.37" }
+openraft = { path = "../openraft", features = ["type-alias", "serde", "metrics-logids"] }
+openraft-rt = { path = "../rt" }
+openraft-rt-tokio = { path = "../rt-tokio" }
+
+clap = { version = "4", features = ["derive"] }
+bincode = "1.3"
+ctrlc = "3.4"
+futures = "0.3"
+rand = { package = "rand", version = "0.10" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.39", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+turmoil = "0.7.2"
+
+[dev-dependencies]
+test-harness = "0.3"
+
+# The fuzzer runs release-built so the simulation is not bottlenecked by
+# unoptimized code, but its purpose is to trip openraft's invariant checks,
+# which a stock release build would compile out.
+[profile.release]
+debug-assertions = true

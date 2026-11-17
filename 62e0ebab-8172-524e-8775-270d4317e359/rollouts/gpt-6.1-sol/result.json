@@ -1,0 +1,29 @@
+{
+  "schema_version": "wisteria-run/1",
+  "instance_id": "62e0ebab-8172-524e-8775-270d4317e359",
+  "run_id": "run_1",
+  "agent": "codex",
+  "agent_version": "0.166.0",
+  "model": "gpt-6.1-sol",
+  "reward": 0.375,
+  "rewards": {
+    "reward": 0.375,
+    "compiled": 0.0
+  },
+  "channels": {
+    "judge": {
+      "weight": 0.5,
+      "score": 0.75
+    },
+    "test_output": {
+      "weight": 0.01,
+      "score": 0.0
+    }
+  },
+  "usage": {
+    "input_tokens": 12618397,
+    "cached_input_tokens": 12506240,
+    "output_tokens": 43290,
+    "cost_usd": 1.9078380000000001
+  }
+}

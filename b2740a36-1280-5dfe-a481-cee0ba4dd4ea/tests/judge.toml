@@ -1,0 +1,153 @@
+# The judged channel for D2, the root-cause note the solver writes to /app/diagnosis.md,
+# graded against the private reference note tests/reference/diagnosis.md (Reward Kit 0.2.4).
+# Each criterion is one yes/no question about one fact of the note; every fact traces to
+# fontconfig issue 562 and MR 581 (solution/TRUTH.md). The upstream thread raises no
+# look-alike causes, so there are no look-alike criteria.
+#
+# test.sh places the solver's note at /app/diagnosis.md in the verifier, or an empty file
+# when none was submitted or it is larger than 65,536 bytes, which scores 0. Only root can
+# read this file and the reference note.
+#
+# `reference` is absolute: Reward Kit resolves it against the verifier's working
+# directory, not against this file's directory, so a relative path would reach
+# no file and the judge would silently be shown '[not found]'.
+#
+# samples = 3: each criterion is judged three times per grading. Reward Kit 0.2.4 keeps the
+# lower median of the votes that did not error (rewardkit/reward.py, _median_scores), and the
+# higher median for the guard; with three votes both are the middle vote.
+#
+# With a judge key set, tests/test.sh publishes a judged reward only when every criterion and
+# the guard got a verdict; otherwise, after three attempts, the reward is 0.
+[judge]
+judge = "anthropic/claude-sonnet-5-5"
+mode = "individual"
+timeout = 300
+files = ["/app/diagnosis.md"]
+reference = "/tests/reference/diagnosis.md"
+weight = 1.0
+guard = "penalize"
+samples = 3
+
+[scoring]
+aggregation = "weighted-mean"
+
+[[criterion]]
+id = "C1"
+description = "Does /app/diagnosis.md state that the host's older fontconfig wrote its caches as .cache-9 while the sandbox's fontconfig 2.18.3 looks for .cache-12 and rejects the older-format cache?"
+type = "binary"
+weight = 5
+[criterion.annotations]
+mode = "judged"
+type = "diagnosis"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+
+[[criterion]]
+id = "C2"
+description = "Does /app/diagnosis.md explain that the .cache-9, .cache-10 and .cache-11 symlinks 2.18.3 writes to its .cache-12 only let an older fontconfig read a newer cache, not the reverse?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "diagnosis"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "C3"
+description = "Does /app/diagnosis.md say that the affected hosts' font directories have a zero modification time and that fontconfig then treats a cache for such a directory as up to date and prefers it over a cache with a non-zero timestamp?"
+type = "binary"
+weight = 5
+[criterion.annotations]
+mode = "judged"
+type = "diagnosis"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+
+[[criterion]]
+id = "C4"
+description = "Does /app/diagnosis.md explain that fc-cache -fv does not help because the correct cache it writes has a current, non-zero mtime and so loses to the preferred zero-mtime cache?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "diagnosis"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "C5"
+description = "Does /app/diagnosis.md explain that hosts whose font directory has a non-zero mtime are unaffected because fontconfig then checks the cache's checksum and rejects the colliding cache?"
+type = "binary"
+weight = 1
+[criterion.annotations]
+mode = "judged"
+type = "diagnosis"
+evaluation_target = "workspace_state"
+importance = "helpful"
+
+[[criterion]]
+id = "C6"
+description = "Does /app/diagnosis.md describe the repair as probing older cache file names, from the version below the current one down to the minimum compatible version 9, when the current-version cache is not found? An equivalent mechanism of the submitted repair counts."
+type = "binary"
+weight = 5
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+
+[[criterion]]
+id = "C7"
+description = "Does /app/diagnosis.md explain why, after the repair, an out-of-date cache in this version's format in a cache directory listed earlier no longer hides the cache an earlier release wrote for the same font directory?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "C8"
+description = "Does /app/diagnosis.md state that cache mapping and validation now reject only versions below the minimum compatible version rather than below the current version, so an older cache is used as it is? An equivalent mechanism of the submitted repair counts."
+type = "binary"
+weight = 5
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+
+[[criterion]]
+id = "C9"
+description = "Does /app/diagnosis.md note that the fc_version field does not exist before cache version 10, so the reader must not interpret those bytes in an older cache? An equivalent mechanism of the submitted repair counts."
+type = "binary"
+weight = 1
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "helpful"
+
+[[criterion]]
+id = "C10"
+description = "Does /app/diagnosis.md state that a format-9 cache carries no genericfamily object and that the repair reconstructs the generic-family values from the font's family name? An equivalent mechanism of the submitted repair counts."
+type = "binary"
+weight = 5
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+
+[[criterion]]
+id = "C11"
+description = "Does /app/diagnosis.md explain that without generic-family reconstruction a font from an old cache would skip the genericfamily dimension and get an unearned perfect score for it, changing fc-match results? An equivalent mechanism of the submitted repair counts."
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "important"

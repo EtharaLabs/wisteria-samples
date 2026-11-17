@@ -1,0 +1,18 @@
+{
+ "left_out": [],
+ "source": "/app/server/stree",
+ "staged": [
+  {
+   "name": "literal_wildcards_test.go",
+   "sha256": "f93d4fe7e6b2fa7d400064694a6397f720acf48829c80640301efb42b54ea398",
+   "shown_bytes": 7797,
+   "size": 7797,
+   "truncated": false
+  }
+ ],
+ "target": "/var/lib/grader-judge/server/stree",
+ "unchanged": [
+  "helper_test.go",
+  "stree_test.go"
+ ]
+}

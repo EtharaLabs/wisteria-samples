@@ -1,0 +1,24 @@
+{
+  "schema_version": "wisteria-run/1",
+  "instance_id": "dba14210-8a3b-5c67-8beb-c715e9c75627",
+  "run_id": "run_1",
+  "agent": "codex",
+  "agent_version": "0.166.0",
+  "model": "gpt-6.1-sol",
+  "reward": 0.5806,
+  "rewards": {
+    "reward": 0.5806
+  },
+  "channels": {
+    "test_output": {
+      "weight": 1.0,
+      "score": 0.5806
+    }
+  },
+  "usage": {
+    "input_tokens": 339894,
+    "cached_input_tokens": 308992,
+    "output_tokens": 3299,
+    "cost_usd": 0.1256932
+  }
+}

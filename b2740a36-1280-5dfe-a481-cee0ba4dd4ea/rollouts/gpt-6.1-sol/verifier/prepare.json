@@ -1,0 +1,36 @@
+{
+  "added_ignored": 0,
+  "deleted_ignored": [],
+  "ok": true,
+  "out": "/var/lib/grade/submission",
+  "refused": [],
+  "source": "/app/fontconfig",
+  "status": "ok",
+  "taken": [
+    {
+      "base_sha256": "b76aabfa2e803188cafb5a09222109df2e296aa8df045a54d34f516f863d50b5",
+      "path": "src/fccache.c",
+      "sha256": "567d5d0b04c68550b392f5edc171626c30c46436e45874ce923a9afad6a6da48"
+    },
+    {
+      "base_sha256": "ece8c637a45d30624488386322775d379a64c4e254f50f7486271848a51879ef",
+      "path": "src/fccfg.c",
+      "sha256": "0fbbc4914491ffaccab1ae5c2b44853204cc8bb38051af81ce685f58c8399848"
+    },
+    {
+      "base_sha256": "c21604ee952e5ea22bd0757389f499b159cd4a791738bac5dc38fa469e75342a",
+      "path": "src/fcfreetype.c",
+      "sha256": "92105fd3c31c7755f77743ac1b97403bbdd5e7b5e1cff10f61d53e505f90313c"
+    },
+    {
+      "base_sha256": "11aecefde833d44700a85b6aec72f42492de1d137f84d0ce8732d128990a0e88",
+      "path": "src/fcgenericalias.c",
+      "sha256": "726c5a5fdfc9ffc7c7a1307f13d26efcf6eab1d5f9ab1198c301410a67ab1d12"
+    },
+    {
+      "base_sha256": "823d454c84c136be67166ed0edadc516177194f8ab875cdbf2d2921c21ce5a19",
+      "path": "src/fcint.h",
+      "sha256": "ce40b2f7073aae3adbb5212f2d18d5efc6ea9c91b64d487036c34b170ff24cee"
+    }
+  ]
+}

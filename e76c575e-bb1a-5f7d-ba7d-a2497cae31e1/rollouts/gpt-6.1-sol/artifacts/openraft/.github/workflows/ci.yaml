@@ -1,0 +1,755 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  schedule: [cron: '40 1 * * *']
+
+# Superseded runs keep occupying runner slots, and this workflow alone queues
+# 41 jobs against 20 concurrent runners. Cancel outdated pull-request runs, but
+# let main and scheduled runs finish so history stays complete.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  test-release-build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      matrix:
+        include:
+          - toolchain: 'nightly'
+            features: 'bench,serde,bt,single-threaded'
+
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v4
+
+      - name: Pin nightly from rust-toolchain
+        if: matrix.toolchain == 'nightly'
+        run: echo "PIN=$(cat rust-toolchain)" >> "$GITHUB_ENV"
+
+      - name: Setup | Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain == 'nightly' && env.PIN || matrix.toolchain }}
+
+      - name: Build | Release Mode
+        run: cargo build --release --features "${{ matrix.features }}" --manifest-path openraft/Cargo.toml
+
+  openraft-test-bench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      matrix:
+        include:
+          - toolchain: 'nightly'
+
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v4
+
+      - name: Pin nightly from rust-toolchain
+        if: matrix.toolchain == 'nightly'
+        run: echo "PIN=$(cat rust-toolchain)" >> "$GITHUB_ENV"
+
+      - name: Setup | Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain == 'nightly' && env.PIN || matrix.toolchain }}
+
+      - name: Test build for benchmark
+        run: cargo bench --features bench nothing-to-run --manifest-path openraft/Cargo.toml
+
+  # Test crate `openraft/` and `macros/`
+  test-openraft-core-crates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - toolchain: 'stable'
+            features: ''
+
+          - toolchain: 'nightly'
+            features: ''
+
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v4
+
+      - name: Pin nightly from rust-toolchain
+        if: matrix.toolchain == 'nightly'
+        run: echo "PIN=$(cat rust-toolchain)" >> "$GITHUB_ENV"
+
+      - name: Setup | Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain == 'nightly' && env.PIN || matrix.toolchain }}
+
+      - name: Install cargo-expand
+        run: cargo install cargo-expand
+
+      - name: Test crate `macros/`
+        run: cargo test --features "${{ matrix.features }}" --manifest-path macros/Cargo.toml
+        env:
+          RUST_LOG: debug
+          RUST_BACKTRACE: full
+
+      - name: Test crate `membership/`
+        run: make test-membership
+        env:
+          RUST_LOG: debug
+          RUST_BACKTRACE: full
+
+      - name: Test crate `openraft/`
+        run: cargo test --features "${{ matrix.features }}" --manifest-path openraft/Cargo.toml
+        env:
+          RUST_LOG: debug
+          RUST_BACKTRACE: full
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: 'ut-openraft-${{ matrix.toolchain }}-${{ matrix.features }}'
+          path: |
+            openraft/_log/
+
+  # Run integration test `tests/`.
+  test-crate-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - toolchain: 'stable'
+            send_delay: '0'
+            features: ''
+
+          # With network delay
+          - toolchain: 'nightly'
+            send_delay: '30'
+            features: ''
+
+          # Feature-flag: Standard raft term
+          - toolchain: 'nightly'
+            send_delay: '0'
+            features: 'single-term-leader'
+
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v4
+
+      - name: Pin nightly from rust-toolchain
+        if: matrix.toolchain == 'nightly'
+        run: echo "PIN=$(cat rust-toolchain)" >> "$GITHUB_ENV"
+
+      - name: Setup | Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain == 'nightly' && env.PIN || matrix.toolchain }}
+
+      - name: Test crate `tests/`
+        run: cargo test --features "${{ matrix.features }}" --manifest-path tests/Cargo.toml
+        env:
+          # Parallel tests block each other and result in timeout.
+          RUST_TEST_THREADS: 2
+          RUST_LOG: debug
+          RUST_BACKTRACE: full
+          OPENRAFT_NETWORK_SEND_DELAY: ${{ matrix.send_delay }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: 'ut-tests-${{ matrix.toolchain }}-${{ matrix.features }}-${{ matrix.send_delay }}'
+          path: |
+            tests/_log/
+
+  stores:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - store: 'stores/memstore'
+          - store: 'stores/memstore-custom-node-id'
+
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup | Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      # - A store with defensive checks returns error when unexpected accesses are sent to RaftStore.
+      # - Raft should not depend on defensive error to work correctly.
+      - name: Unit Tests, with defensive store
+        run: cargo test --manifest-path "${{ matrix.store }}/Cargo.toml"
+        env:
+          # Parallel tests block each other and result in timeout.
+          RUST_TEST_THREADS: 2
+          RUST_LOG: debug
+          RUST_BACKTRACE: full
+          OPENRAFT_STORE_DEFENSIVE: on
+
+  # Test external crate.
+  # benchmarks/minimal is a standalone crate for benchmarking openraft cluster.
+  bench-minimal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - crate: 'benchmarks/minimal'
+
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup | Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Unit Tests
+        run: cargo test --tests nothing --manifest-path "${{ matrix.crate }}/Cargo.toml"
+        env:
+          RUST_LOG: debug
+          RUST_BACKTRACE: full
+
+  # Test external crate.
+  rt-monoio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup | Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Unit Tests
+        run: cargo test --tests --manifest-path "rt-monoio/Cargo.toml"
+        env:
+          RUST_LOG: debug
+          RUST_BACKTRACE: full
+
+  rt-compio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup | Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Unit Tests
+        run: cargo test --tests --manifest-path "rt-compio/Cargo.toml"
+        env:
+          RUST_LOG: debug
+          RUST_BACKTRACE: full
+
+  metrics-otel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup | Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Unit Tests
+        run: cargo test --manifest-path "metrics-otel/Cargo.toml"
+        env:
+          RUST_LOG: debug
+          RUST_BACKTRACE: full
+
+  # Feature "serde" will be enabled if one of the member crates enables
+  # "serde", such as `memstore`, when building a cargo workspace.
+  #
+  # To test openraft with "serde" off, it must not build other crates.
+  #
+  # This job only tests crate `openraft`.
+  openraft-feature-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Default feature set (includes "tokio-rt" and "clap")
+          - toolchain: 'nightly'
+            extra_args: ''
+            features: ''
+
+          # Without "clap": drops clap and byte-unit deps; tokio-rt added
+          # back so the runtime is still wired up
+          - toolchain: 'nightly'
+            extra_args: '--no-default-features'
+            features: 'tokio-rt'
+
+          # Enable "serde"
+          - toolchain: 'nightly'
+            extra_args: ''
+            features: 'serde'
+
+          - toolchain: 'nightly'
+            extra_args: ''
+            features: 'serde,single-threaded'
+
+          - toolchain: 'nightly'
+            extra_args: ''
+            features: 'metrics-logids'
+
+          - toolchain: 'nightly'
+            extra_args: ''
+            features: 'metrics-logids,serde'
+
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v4
+
+      - name: Pin nightly from rust-toolchain
+        if: matrix.toolchain == 'nightly'
+        run: echo "PIN=$(cat rust-toolchain)" >> "$GITHUB_ENV"
+
+      - name: Setup | Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain == 'nightly' && env.PIN || matrix.toolchain }}
+
+      - name: Check isolated feature builds
+        if: matrix.features == '' && matrix.extra_args == ''
+        run: make feature-check
+
+      - name: Test crate `openraft/`
+        run: cargo test ${{ matrix.extra_args }} --features "${{ matrix.features }}" --manifest-path openraft/Cargo.toml
+        env:
+          # Parallel tests block each other and result in timeout.
+          RUST_TEST_THREADS: 2
+          RUST_LOG: debug
+          RUST_BACKTRACE: full
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: openraft-feature-test
+          path: |
+            openraft/_log/
+
+  # Integration tests with various features.
+  tests-feature-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - toolchain: 'nightly'
+            features: ''
+
+          - toolchain: 'nightly'
+            features: 'single-term-leader'
+
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v4
+
+      - name: Pin nightly from rust-toolchain
+        if: matrix.toolchain == 'nightly'
+        run: echo "PIN=$(cat rust-toolchain)" >> "$GITHUB_ENV"
+
+      - name: Setup | Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain == 'nightly' && env.PIN || matrix.toolchain }}
+
+      - name: Test crate `tests/`
+        run: cargo test --features "${{ matrix.features }}" --manifest-path tests/Cargo.toml
+        env:
+          # Parallel tests block each other and result in timeout.
+          RUST_TEST_THREADS: 2
+          RUST_LOG: debug
+          RUST_BACKTRACE: full
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: tests-feature-test
+          path: |
+            tests/_log/
+
+  # Test the simulated runtime: an external crate, like rt-monoio and rt-compio.
+  rt-sim:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup | Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: clippy
+
+      - name: Clippy
+        run: cargo clippy --no-deps --manifest-path "rt-sim/Cargo.toml" --all-targets --features sim-log -- -D warnings
+
+      - name: Unit Tests
+        run: cargo test --tests --manifest-path "rt-sim/Cargo.toml" --features sim-log
+        env:
+          RUST_BACKTRACE: full
+
+  # Run crate `tests/` on rt-sim. Then run the `t24_append_membership` tests in
+  # each of two processes with the same seed, and require byte-identical full
+  # OpenRaft logs. One of them must also write the same lines alone as after
+  # another test in the same process.
+  tests-rt-sim:
+    name: Tests on simulated runtime
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: clippy
+
+      - name: Clippy
+        run: cargo clippy --no-deps --manifest-path tests/Cargo.toml --all-targets --features rt-sim -- -D warnings
+
+      - name: Test
+        run: cargo test --manifest-path tests/Cargo.toml --features rt-sim
+        env:
+          RUST_BACKTRACE: full
+
+      - name: Same seed, same log
+        run: |
+          for run in a b; do
+            OPENRAFT_SIM_LOG="$RUNNER_TEMP/$run.log" cargo test --manifest-path tests/Cargo.toml --features rt-sim \
+              --test membership -- --test-threads=1 t24_append_membership::
+          done
+          test -s "$RUNNER_TEMP/a.log"
+          diff "$RUNNER_TEMP/a.log" "$RUNNER_TEMP/b.log"
+
+          # `follower_answers_forward_to_leader` ran after another t24 test above.
+          # Alone, it must write the same lines. Each line names its test span.
+          OPENRAFT_SIM_LOG="$RUNNER_TEMP/alone.log" cargo test --manifest-path tests/Cargo.toml --features rt-sim \
+            --test membership -- --exact t24_append_membership::follower_answers_forward_to_leader
+          span=membership::t24_append_membership@follower_answers_forward_to_leader
+          grep -F "$span" "$RUNNER_TEMP/a.log" > "$RUNNER_TEMP/after-others.log"
+          grep -F "$span" "$RUNNER_TEMP/alone.log" > "$RUNNER_TEMP/alone-only.log"
+          test -s "$RUNNER_TEMP/alone-only.log"
+          diff "$RUNNER_TEMP/after-others.log" "$RUNNER_TEMP/alone-only.log"
+        env:
+          OPENRAFT_RT_SIM_SEED: 9
+          OPENRAFT_NETWORK_SEND_DELAY: 30
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: tests-rt-sim
+          path: |
+            tests/_log/
+
+  # Deterministic simulation test with turmoil.
+  detsim:
+    name: Deterministic simulation test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          # tests-turmoil is excluded from the root workspace, so the default
+          # cache misses its target dir and the fuzz binary recompiles cold
+          # every run. Cache this workspace so warm runs skip the compile.
+          cache-workspaces: tests-turmoil
+          # The action exports RUSTFLAGS="-D warnings" by default, and any
+          # RUSTFLAGS env var overrides the `--cfg tokio_unstable` rustflags
+          # from tests-turmoil/.cargo/config.toml. Keep RUSTFLAGS unset so
+          # the config applies.
+          rustflags: ""
+
+      - name: Run Turmoil unit and regression tests
+        shell: bash
+        run: make test-turmoil-default 2>&1 | tee "$RUNNER_TEMP/turmoil-tests.log"
+
+      - name: Replay log ID reuse regression (seed 812)
+        if: success() || failure()
+        shell: bash
+        run: |
+          cd tests-turmoil
+          cargo run --release --bin fuzz -- --reproduce 812 --max-steps 10000 --storage lossy \
+            --crash-file "$RUNNER_TEMP/turmoil-seed812.json" 2>&1 | tee "$RUNNER_TEMP/turmoil-seed812.log"
+        env:
+          RUST_LOG: info
+          RUST_BACKTRACE: full
+
+      - name: Run deterministic simulation
+        if: success() || failure()
+        shell: bash
+        run: |
+          cd tests-turmoil
+          cargo run --release --bin fuzz -- --iterations 5 --max-steps 10000 --storage lossy \
+            --crash-file "$RUNNER_TEMP/turmoil-random.json" 2>&1 | tee "$RUNNER_TEMP/turmoil-random.log"
+        env:
+          RUST_LOG: info
+          RUST_BACKTRACE: full
+
+      - name: Upload simulation failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: turmoil-default
+          path: ${{ runner.temp }}/turmoil-*
+
+  # The same simulation with `ThresholdMembership` and random read and write sizes.
+  detsim-threshold:
+    name: Deterministic simulation test with ThresholdMembership
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          # See the `detsim` job for both settings.
+          cache-workspaces: tests-turmoil
+          rustflags: ""
+
+      - name: Run Turmoil unit and regression tests with ThresholdMembership
+        shell: bash
+        run: make test-turmoil-threshold 2>&1 | tee "$RUNNER_TEMP/turmoil-tests.log"
+
+      - name: Run deterministic simulation with ThresholdMembership
+        if: success() || failure()
+        shell: bash
+        run: |
+          cd tests-turmoil
+          cargo run --release --bin fuzz --features threshold-membership -- --iterations 5 --max-steps 10000 --storage lossy \
+            --crash-file "$RUNNER_TEMP/turmoil-random.json" 2>&1 | tee "$RUNNER_TEMP/turmoil-random.log"
+        env:
+          RUST_LOG: info
+          RUST_BACKTRACE: full
+
+      - name: Upload simulation failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: turmoil-threshold
+          path: ${{ runner.temp }}/turmoil-*
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: rustfmt, clippy
+
+      - name: Format
+        run: cargo fmt --all -- --check
+
+      - name: Format tests-turmoil
+        run: cargo fmt --manifest-path tests-turmoil/Cargo.toml -- --check
+
+      - name: clippy
+        shell: bash
+        run: |
+          cargo clippy --no-deps --workspace --all-targets                -- -D warnings
+          cargo clippy --no-deps --workspace --all-targets --features "bt,serde,bench,compat" -- -D warnings
+          cargo clippy --no-deps --workspace --all-targets --features "metrics-logids,serde" -- -D warnings
+
+      - name: clippy tests-turmoil
+        # Run from inside tests-turmoil so its .cargo/config.toml is read, and
+        # override the job-wide RUSTFLAGS="-D warnings" (set by the toolchain
+        # action), which would otherwise replace the config's rustflags and
+        # drop `--cfg tokio_unstable`. Warnings still fail via clippy's own
+        # `-D warnings` argument.
+        run: |
+          cd tests-turmoil
+          cargo clippy --no-deps --all-targets -- -D warnings
+          cargo clippy --no-deps --all-targets --features threshold-membership -- -D warnings
+        env:
+          RUSTFLAGS: --cfg tokio_unstable
+
+      # Documentation build, doctests, and the repository-link check. Run
+      # through the Make target so contributors gate on the same command.
+      - name: Docs
+        run: make docs-check
+
+      # The four SVGs in assets/logo are written by the two scripts beside
+      # them. Regenerate and fail on a diff, so an edited script that was never
+      # re-run, or a hand-edited SVG, cannot reach main. Both scripts write next
+      # to __file__, so the checkout root is the right working directory.
+      - name: Logo assets
+        run: |
+          python3 assets/logo/generate_mark.py
+          python3 assets/logo/generate_banner.py
+          git diff --exit-code assets/logo
+
+      - name: Install cargo-audit
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-audit
+
+      - name: Audit dependencies
+        shell: bash
+        # if: "!contains(github.event.head_commit.message, 'skip audit')"
+        run: cargo audit --db ./target/advisory-db
+
+  examples:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # RocksDB-backed examples (log-rocks, raft-kv-rocksdb, sm-rocks) were the slowest CI
+    # jobs because librocksdb-sys compiles bundled RocksDB (8.10) C++ from
+    # source. Link the system librocksdb instead so it is not compiled at all;
+    # ROCKSDB_INCLUDE_DIR points bindgen at the system headers so the generated
+    # bindings match the installed lib version (no ABI skew).
+    env:
+      ROCKSDB_LIB_DIR: /usr/lib/x86_64-linux-gnu
+      ROCKSDB_INCLUDE_DIR: /usr/include
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain:
+          - 'stable'
+          - 'nightly'
+        example:
+          - 'dir-transfer'
+          - 'log-mem'
+          - 'log-rocks'
+          - 'log-wal'
+          - 'sm-rocks'
+          - 'raft-kv-log-wal-sm-mem'
+          - 'raft-kv-memstore'
+          - 'raft-kv-memstore-grpc'
+          - 'raft-kv-memstore-network-v1'
+          - 'raft-kv-memstore-opendal-snapshot-data'
+          - 'raft-kv-memstore-single-threaded'
+          - 'raft-kv-rocksdb'
+          - 'multi-raft-kv'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pin nightly from rust-toolchain
+        if: matrix.toolchain == 'nightly'
+        run: echo "PIN=$(cat rust-toolchain)" >> "$GITHUB_ENV"
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain == 'nightly' && env.PIN || matrix.toolchain }}
+          components: rustfmt, clippy
+          # Examples are separate workspaces; the default cache only covers the
+          # repo-root target, so examples/*/target was never cached. Point the
+          # cache at this example's own workspace.
+          cache-workspaces: examples/${{ matrix.example }}
+
+      - name: Install system RocksDB
+        if: matrix.example == 'log-rocks' || matrix.example == 'raft-kv-rocksdb' || matrix.example == 'sm-rocks'
+        run: sudo apt-get update && sudo apt-get install -y librocksdb-dev
+
+      # Run the following steps in the exmple dir in order to reuse the `./target` dir.
+
+      - name: Test examples/${{ matrix.example }}
+        shell: bash
+        run: |
+          cd examples/${{ matrix.example }}
+          cargo test
+        env:
+          RUST_LOG: debug
+
+      - name: Test demo script of examples/${{ matrix.example }}
+        # The script is not meant for testing. Just to ensure it works but do not
+        # rely on it. Skip if test-cluster.sh doesn't exist.
+        if: ${{ matrix.toolchain == 'stable' }}
+
+        shell: bash
+        run: |
+          cd examples/${{ matrix.example }}
+          if [ -f test-cluster.sh ]; then
+            ./test-cluster.sh
+          else
+            echo "No test-cluster.sh found, skipping"
+          fi
+
+      - name: Format
+        # clippy/format produces different result with stable and nightly. Only with nightly.
+        if: ${{ matrix.toolchain == 'nightly' }}
+
+        shell: bash
+        run: |
+          cd examples/${{ matrix.example }}
+          cargo fmt --all -- --check
+
+      - name: Clippy
+        # clippy/format produces different result with stable and nightly. Only with nightly.
+        if: ${{ matrix.toolchain == 'nightly' }}
+
+        shell: bash
+        run: |
+          cd examples/${{ matrix.example }}
+          cargo clippy --no-deps --all-targets -- -D warnings
+
+  # The jepsen test app is a standalone workspace built only inside the jepsen
+  # workflow's docker image, and that workflow runs on push to main only.
+  # Check the crate here so a pull request cannot silently break it.
+  jepsen-app:
+    name: jepsen app
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Same system-RocksDB shortcut as the examples job: link the system
+    # librocksdb instead of compiling the bundled RocksDB C++ from source.
+    env:
+      ROCKSDB_LIB_DIR: /usr/lib/x86_64-linux-gnu
+      ROCKSDB_INCLUDE_DIR: /usr/include
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: rustfmt, clippy
+          # The app is excluded from the root workspace, so the default cache
+          # misses its target dir. Cache its own workspace.
+          cache-workspaces: jepsen/openraft-test-app
+
+      - name: Install system RocksDB
+        run: sudo apt-get update && sudo apt-get install -y librocksdb-dev
+
+      - name: Format
+        run: cargo fmt --manifest-path jepsen/openraft-test-app/Cargo.toml -- --check
+
+      - name: Clippy
+        run: cargo clippy --no-deps --manifest-path jepsen/openraft-test-app/Cargo.toml --all-targets -- -D warnings

@@ -1,0 +1,1008 @@
+{
+  "build": {
+    "ok": true,
+    "steps": [
+      {
+        "exit": 0,
+        "seconds": 2.6,
+        "step": "setup"
+      },
+      {
+        "exit": 0,
+        "seconds": 15.8,
+        "step": "compile"
+      }
+    ]
+  },
+  "fail_to_pass": {
+    "cross-version/2.17.1/test_discovery_backward_compat": {
+      "runs": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "cross-version/2.17.1/test_shadow_cache_precedence_562": {
+      "runs": [
+        "failure",
+        "failure",
+        "failure"
+      ],
+      "verdict": "failure"
+    },
+    "cross-version/2.18.1/test_discovery_backward_compat": {
+      "runs": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "cross-version/2.18.1/test_shadow_cache_precedence_562": {
+      "runs": [
+        "failure",
+        "failure",
+        "failure"
+      ],
+      "verdict": "failure"
+    }
+  },
+  "infra_fault": false,
+  "observed": {
+    "cross-version/2.17.1/test_binary_format_forward_compat": [
+      "pass",
+      "pass",
+      "pass"
+    ],
+    "cross-version/2.17.1/test_discovery_backward_compat": [
+      "pass",
+      "pass",
+      "pass"
+    ],
+    "cross-version/2.17.1/test_discovery_forward_compat": [
+      "pass",
+      "pass",
+      "pass"
+    ],
+    "cross-version/2.17.1/test_genericfamily_backfill_contract": [
+      "pass",
+      "pass",
+      "pass"
+    ],
+    "cross-version/2.17.1/test_match_equivalence_backward_compat": [
+      "pass",
+      "pass",
+      "pass"
+    ],
+    "cross-version/2.17.1/test_shadow_cache_precedence_562": [
+      "failure",
+      "failure",
+      "failure"
+    ],
+    "cross-version/2.18.1/test_binary_format_forward_compat": [
+      "pass",
+      "pass",
+      "pass"
+    ],
+    "cross-version/2.18.1/test_discovery_backward_compat": [
+      "pass",
+      "pass",
+      "pass"
+    ],
+    "cross-version/2.18.1/test_discovery_forward_compat": [
+      "pass",
+      "pass",
+      "pass"
+    ],
+    "cross-version/2.18.1/test_genericfamily_backfill_contract": [
+      "pass",
+      "pass",
+      "pass"
+    ],
+    "cross-version/2.18.1/test_match_equivalence_backward_compat": [
+      "skipped",
+      "skipped",
+      "skipped"
+    ],
+    "cross-version/2.18.1/test_shadow_cache_precedence_562": [
+      "failure",
+      "failure",
+      "failure"
+    ],
+    "meson/fontconfig:test_appfont": [
+      "pass"
+    ],
+    "meson/fontconfig:test_bz106618": [
+      "pass"
+    ],
+    "meson/fontconfig:test_bz106632": [
+      "pass"
+    ],
+    "meson/fontconfig:test_bz131804": [
+      "pass"
+    ],
+    "meson/fontconfig:test_bz1744377": [
+      "pass"
+    ],
+    "meson/fontconfig:test_bz89617": [
+      "pass"
+    ],
+    "meson/fontconfig:test_bz96676": [
+      "pass"
+    ],
+    "meson/fontconfig:test_const_name": [
+      "pass"
+    ],
+    "meson/fontconfig:test_crbug1004254": [
+      "pass"
+    ],
+    "meson/fontconfig:test_family_matching": [
+      "pass"
+    ],
+    "meson/fontconfig:test_issue107": [
+      "pass"
+    ],
+    "meson/fontconfig:test_issue180": [
+      "pass"
+    ],
+    "meson/fontconfig:test_mt_appfontclear_race": [
+      "pass"
+    ],
+    "meson/fontconfig:test_mt_cache_stress": [
+      "pass"
+    ],
+    "meson/fontconfig:test_mt_fccfg": [
+      "pass"
+    ],
+    "meson/fontconfig:test_mt_fcinit": [
+      "skipped"
+    ],
+    "meson/fontconfig:test_mt_fontlist_race": [
+      "pass"
+    ],
+    "meson/fontconfig:test_mt_fontmatch_race": [
+      "pass"
+    ],
+    "meson/fontconfig:test_mt_fontsort_race": [
+      "pass"
+    ],
+    "meson/fontconfig:test_name_parse": [
+      "pass"
+    ],
+    "meson/fontconfig:test_ostest": [
+      "pass"
+    ],
+    "meson/fontconfig:test_pthread": [
+      "pass"
+    ],
+    "meson/fontconfig:test_ptrlist": [
+      "pass"
+    ],
+    "meson/fontconfig:test_rwlock": [
+      "pass"
+    ],
+    "meson/fontconfig:test_versioned_conf": [
+      "pass"
+    ],
+    "meson/fontconfig:test_y2038": [
+      "pass"
+    ],
+    "pytest/test_basic.py::test_basic": [
+      "pass"
+    ],
+    "pytest/test_basic.py::test_keep_mtime": [
+      "pass"
+    ],
+    "pytest/test_basic.py::test_multiple_caches": [
+      "pass"
+    ],
+    "pytest/test_basic.py::test_new_file_with_out_of_date_cache": [
+      "pass"
+    ],
+    "pytest/test_basic.py::test_subdir": [
+      "pass"
+    ],
+    "pytest/test_basic.py::test_subdir_with_cache": [
+      "pass"
+    ],
+    "pytest/test_basic.py::test_subdir_with_out_of_date_cache": [
+      "pass"
+    ],
+    "pytest/test_basic.py::test_with_complicated_dir_structure": [
+      "pass"
+    ],
+    "pytest/test_basic.py::test_with_dotdir": [
+      "pass"
+    ],
+    "pytest/test_basic.py::test_with_dotfiles": [
+      "pass"
+    ],
+    "pytest/test_basic.py::test_xdg_cache_home": [
+      "pass"
+    ],
+    "pytest/test_cache_charset_validation.py::test_validation_broken_leaf_offset": [
+      "pass"
+    ],
+    "pytest/test_cache_charset_validation.py::test_validation_broken_leaves_offset": [
+      "pass"
+    ],
+    "pytest/test_cache_charset_validation.py::test_validation_broken_numbers_offset": [
+      "pass"
+    ],
+    "pytest/test_cache_charset_validation.py::test_validation_non_constant_charset": [
+      "pass"
+    ],
+    "pytest/test_cache_charset_validation.py::test_validation_out_of_bounds_charset": [
+      "pass"
+    ],
+    "pytest/test_cache_charset_validation.py::test_validation_out_of_bounds_positive_leaf_offset": [
+      "pass"
+    ],
+    "pytest/test_cache_charset_validation.py::test_validation_valid_negative_leaf_offset": [
+      "pass"
+    ],
+    "pytest/test_cache_compat.py::test_cache_newer_version_loadable": [
+      "pass"
+    ],
+    "pytest/test_cache_compat.py::test_langset_backward_compat": [
+      "pass"
+    ],
+    "pytest/test_cache_compat.py::test_langset_forward_compat": [
+      "pass"
+    ],
+    "pytest/test_cache_compat.py::test_langset_map_size_in_cache": [
+      "pass"
+    ],
+    "pytest/test_cache_file.py::test_cache_suffix": [
+      "pass"
+    ],
+    "pytest/test_cache_type_validation.py::test_charset_declared_as_integer_is_rejected": [
+      "pass"
+    ],
+    "pytest/test_cache_type_validation.py::test_family_declared_as_integer_is_rejected": [
+      "pass"
+    ],
+    "pytest/test_cache_type_validation.py::test_wellformed_cache_is_accepted": [
+      "pass"
+    ],
+    "pytest/test_conf.py::test_json[test-appfont.json]": [
+      "pass"
+    ],
+    "pytest/test_conf.py::test_json[test-filter.json]": [
+      "pass"
+    ],
+    "pytest/test_conf.py::test_json[test-genericfamily.json]": [
+      "pass"
+    ],
+    "pytest/test_conf.py::test_json[test-issue-286.json]": [
+      "pass"
+    ],
+    "pytest/test_conf.py::test_json[test-issue-525-2.json]": [
+      "pass"
+    ],
+    "pytest/test_conf.py::test_json[test-issue-525.json]": [
+      "pass"
+    ],
+    "pytest/test_conf.py::test_json[test-issue-539.json]": [
+      "pass"
+    ],
+    "pytest/test_conf.py::test_json[test-locale.json]": [
+      "pass"
+    ],
+    "pytest/test_conf.py::test_json[test-namedinstance.json]": [
+      "pass"
+    ],
+    "pytest/test_conf.py::test_json[test-style-match.json]": [
+      "pass"
+    ],
+    "pytest/test_conf.py::test_pair_of_conf_and_json[45-generic.conf-test-45-generic.json]": [
+      "pass"
+    ],
+    "pytest/test_conf.py::test_pair_of_conf_and_json[48-guessfamily.conf-test-48-guessfamily.json]": [
+      "pass"
+    ],
+    "pytest/test_conf.py::test_pair_of_conf_and_json[49-sansserif.conf-test-49-sansserif.json]": [
+      "pass"
+    ],
+    "pytest/test_conf.py::test_pair_of_conf_and_json[60-generic.conf-test-60-generic.json]": [
+      "pass"
+    ],
+    "pytest/test_conf.py::test_pair_of_conf_and_json[60-latin.conf-test-60-latin.json]": [
+      "pass"
+    ],
+    "pytest/test_conf.py::test_pair_of_conf_and_json[70-no-bitmaps-and-emoji.conf-test-70-no-bitmaps-and-emoji.json]": [
+      "pass"
+    ],
+    "pytest/test_conf.py::test_pair_of_conf_and_json[70-no-bitmaps-except-emoji.conf-test-70-no-bitmaps-except-emoji.json]": [
+      "pass"
+    ],
+    "pytest/test_conf.py::test_pair_of_conf_and_json[90-synthetic.conf-test-90-synthetic.json]": [
+      "pass"
+    ],
+    "pytest/test_fontations_ft_query.py::test_fontations_freetype_fcquery_equal[None]": [
+      "skipped"
+    ],
+    "pytest/test_fontations_ft_query.py::test_fontations_freetype_fcquery_equal_broken_fonts[broken_cff_major.otf]": [
+      "pass"
+    ],
+    "pytest/test_fontations_ft_query.py::test_fontations_freetype_fcquery_equal_broken_fonts[no_family_name.ttf]": [
+      "pass"
+    ],
+    "pytest/test_fontations_ft_query.py::test_fontations_freetype_fcquery_equal_broken_fonts[no_family_name_serif.ttf]": [
+      "pass"
+    ],
+    "pytest/test_fontations_ft_query.py::test_fontations_freetype_fcquery_equal_type1[None]": [
+      "skipped"
+    ],
+    "pytest/test_fontations_ft_query.py::test_fontations_freetype_fcquery_equal_woff2[None]": [
+      "skipped"
+    ],
+    "pytest/test_genconf.py::test_genconf[None]": [
+      "skipped"
+    ],
+    "pytest/test_glob_cwd.py::test_absolute_glob_is_cwd_independent[/]": [
+      "pass"
+    ],
+    "pytest/test_glob_cwd.py::test_absolute_glob_is_cwd_independent[/tmp]": [
+      "pass"
+    ],
+    "pytest/test_glob_cwd.py::test_absolute_glob_is_cwd_independent[None]": [
+      "pass"
+    ],
+    "pytest/test_glob_home.py::test_glob_home_unexpandable": [
+      "pass"
+    ],
+    "pytest/test_issue547.py::test_issue547": [
+      "pass"
+    ],
+    "pytest/test_sandbox.py::test_bz106618": [
+      "skipped"
+    ],
+    "pytest/test_sandbox.py::test_different_content": [
+      "skipped"
+    ],
+    "pytest/test_sandbox.py::test_gen_testcache": [
+      "skipped"
+    ],
+    "pytest/test_sandbox.py::test_gen_testcache_no_check": [
+      "skipped"
+    ],
+    "pytest/test_sandbox.py::test_md5_consistency": [
+      "skipped"
+    ],
+    "pytest/test_sysroot.py::test_sysroot": [
+      "pass"
+    ]
+  },
+  "pass_to_pass": {
+    "cross-version/2.17.1/test_binary_format_forward_compat": {
+      "runs": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "cross-version/2.17.1/test_discovery_forward_compat": {
+      "runs": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "cross-version/2.17.1/test_genericfamily_backfill_contract": {
+      "runs": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "cross-version/2.17.1/test_match_equivalence_backward_compat": {
+      "runs": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "cross-version/2.18.1/test_binary_format_forward_compat": {
+      "runs": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "cross-version/2.18.1/test_discovery_forward_compat": {
+      "runs": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "cross-version/2.18.1/test_genericfamily_backfill_contract": {
+      "runs": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_appfont": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_bz106618": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_bz106632": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_bz131804": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_bz1744377": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_bz89617": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_bz96676": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_const_name": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_crbug1004254": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_family_matching": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_issue107": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_issue180": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_mt_appfontclear_race": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_mt_cache_stress": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_mt_fccfg": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_mt_fontlist_race": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_mt_fontmatch_race": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_mt_fontsort_race": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_name_parse": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_ostest": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_pthread": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_ptrlist": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_rwlock": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_versioned_conf": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "meson/fontconfig:test_y2038": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_basic.py::test_basic": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_basic.py::test_keep_mtime": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_basic.py::test_multiple_caches": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_basic.py::test_subdir": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_basic.py::test_subdir_with_cache": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_basic.py::test_with_complicated_dir_structure": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_basic.py::test_with_dotdir": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_basic.py::test_with_dotfiles": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_basic.py::test_xdg_cache_home": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_cache_charset_validation.py::test_validation_broken_leaf_offset": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_cache_charset_validation.py::test_validation_broken_leaves_offset": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_cache_charset_validation.py::test_validation_broken_numbers_offset": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_cache_charset_validation.py::test_validation_non_constant_charset": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_cache_charset_validation.py::test_validation_out_of_bounds_charset": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_cache_charset_validation.py::test_validation_out_of_bounds_positive_leaf_offset": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_cache_charset_validation.py::test_validation_valid_negative_leaf_offset": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_cache_compat.py::test_cache_newer_version_loadable": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_cache_compat.py::test_langset_backward_compat": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_cache_compat.py::test_langset_forward_compat": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_cache_compat.py::test_langset_map_size_in_cache": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_cache_file.py::test_cache_suffix": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_cache_type_validation.py::test_charset_declared_as_integer_is_rejected": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_cache_type_validation.py::test_family_declared_as_integer_is_rejected": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_cache_type_validation.py::test_wellformed_cache_is_accepted": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_conf.py::test_json[test-appfont.json]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_conf.py::test_json[test-filter.json]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_conf.py::test_json[test-genericfamily.json]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_conf.py::test_json[test-issue-286.json]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_conf.py::test_json[test-issue-525-2.json]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_conf.py::test_json[test-issue-525.json]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_conf.py::test_json[test-issue-539.json]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_conf.py::test_json[test-locale.json]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_conf.py::test_json[test-namedinstance.json]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_conf.py::test_json[test-style-match.json]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_conf.py::test_pair_of_conf_and_json[45-generic.conf-test-45-generic.json]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_conf.py::test_pair_of_conf_and_json[48-guessfamily.conf-test-48-guessfamily.json]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_conf.py::test_pair_of_conf_and_json[49-sansserif.conf-test-49-sansserif.json]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_conf.py::test_pair_of_conf_and_json[60-generic.conf-test-60-generic.json]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_conf.py::test_pair_of_conf_and_json[60-latin.conf-test-60-latin.json]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_conf.py::test_pair_of_conf_and_json[70-no-bitmaps-and-emoji.conf-test-70-no-bitmaps-and-emoji.json]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_conf.py::test_pair_of_conf_and_json[70-no-bitmaps-except-emoji.conf-test-70-no-bitmaps-except-emoji.json]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_conf.py::test_pair_of_conf_and_json[90-synthetic.conf-test-90-synthetic.json]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_fontations_ft_query.py::test_fontations_freetype_fcquery_equal_broken_fonts[broken_cff_major.otf]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_fontations_ft_query.py::test_fontations_freetype_fcquery_equal_broken_fonts[no_family_name.ttf]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_fontations_ft_query.py::test_fontations_freetype_fcquery_equal_broken_fonts[no_family_name_serif.ttf]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_glob_cwd.py::test_absolute_glob_is_cwd_independent[/]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_glob_cwd.py::test_absolute_glob_is_cwd_independent[/tmp]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_glob_cwd.py::test_absolute_glob_is_cwd_independent[None]": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_glob_home.py::test_glob_home_unexpandable": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_issue547.py::test_issue547": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    },
+    "pytest/test_sysroot.py::test_sysroot": {
+      "runs": [
+        "pass"
+      ],
+      "verdict": "pass"
+    }
+  },
+  "prepare": {
+    "added_ignored": 0,
+    "deleted_ignored": 0,
+    "ok": true,
+    "refused": [],
+    "status": "ok",
+    "taken": [
+      "src/fccache.c",
+      "src/fccfg.c",
+      "src/fcfreetype.c",
+      "src/fcgenericalias.c",
+      "src/fcint.h"
+    ]
+  },
+  "runs": [
+    {
+      "attempt": 1,
+      "cases": 26,
+      "exit": 0,
+      "killed": false,
+      "not_passed": [
+        "fontconfig:test_mt_fcinit"
+      ],
+      "seconds": 10.7,
+      "suite": "meson-test"
+    },
+    {
+      "attempt": 1,
+      "cases": 62,
+      "exit": 0,
+      "killed": false,
+      "not_passed": [
+        "test_fontations_ft_query.py::test_fontations_freetype_fcquery_equal[None]",
+        "test_fontations_ft_query.py::test_fontations_freetype_fcquery_equal_type1[None]",
+        "test_fontations_ft_query.py::test_fontations_freetype_fcquery_equal_woff2[None]",
+        "test_genconf.py::test_genconf[None]",
+        "test_sandbox.py::test_bz106618",
+        "test_sandbox.py::test_different_content",
+        "test_sandbox.py::test_gen_testcache",
+        "test_sandbox.py::test_gen_testcache_no_check",
+        "test_sandbox.py::test_md5_consistency"
+      ],
+      "seconds": 4.9,
+      "suite": "pytest"
+    },
+    {
+      "attempt": 1,
+      "cases": 6,
+      "exit": 1,
+      "killed": false,
+      "not_passed": [
+        "test_cache_cross_version.py::test_shadow_cache_precedence_562"
+      ],
+      "seconds": 0.3,
+      "suite": "xv-2.17.1-run1"
+    },
+    {
+      "attempt": 1,
+      "cases": 6,
+      "exit": 1,
+      "killed": false,
+      "not_passed": [
+        "test_cache_cross_version.py::test_shadow_cache_precedence_562"
+      ],
+      "seconds": 0.3,
+      "suite": "xv-2.17.1-run2"
+    },
+    {
+      "attempt": 1,
+      "cases": 6,
+      "exit": 1,
+      "killed": false,
+      "not_passed": [
+        "test_cache_cross_version.py::test_shadow_cache_precedence_562"
+      ],
+      "seconds": 0.3,
+      "suite": "xv-2.17.1-run3"
+    },
+    {
+      "attempt": 1,
+      "cases": 6,
+      "exit": 1,
+      "killed": false,
+      "not_passed": [
+        "test_cache_cross_version.py::test_match_equivalence_backward_compat",
+        "test_cache_cross_version.py::test_shadow_cache_precedence_562"
+      ],
+      "seconds": 0.9,
+      "suite": "xv-2.18.1-run1"
+    },
+    {
+      "attempt": 1,
+      "cases": 6,
+      "exit": 1,
+      "killed": false,
+      "not_passed": [
+        "test_cache_cross_version.py::test_match_equivalence_backward_compat",
+        "test_cache_cross_version.py::test_shadow_cache_precedence_562"
+      ],
+      "seconds": 0.3,
+      "suite": "xv-2.18.1-run2"
+    },
+    {
+      "attempt": 1,
+      "cases": 6,
+      "exit": 1,
+      "killed": false,
+      "not_passed": [
+        "test_cache_cross_version.py::test_match_equivalence_backward_compat",
+        "test_cache_cross_version.py::test_shadow_cache_precedence_562"
+      ],
+      "seconds": 0.3,
+      "suite": "xv-2.18.1-run3"
+    }
+  ],
+  "schema": "fontconfig-grader.test-report/v1"
+}

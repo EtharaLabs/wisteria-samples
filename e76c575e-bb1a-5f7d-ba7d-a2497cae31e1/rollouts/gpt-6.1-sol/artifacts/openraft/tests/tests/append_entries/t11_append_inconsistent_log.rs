@@ -1,0 +1,118 @@
+use std::time::Duration;
+
+use anyhow::Result;
+use openraft::Config;
+use openraft::RaftLogReader;
+use openraft::ServerState;
+use openraft::Vote;
+use openraft::storage::RaftLogStorage;
+use openraft::storage::RaftLogStorageExt;
+use openraft::testing::blank_ent;
+
+use crate::fixtures::Node;
+use crate::fixtures::RaftRouter;
+use crate::fixtures::ut_harness;
+
+/// Too many inconsistent log should not block replication.
+///
+/// Reproduce the bug that when append-entries, if there are more than 50 inconsistent logs the
+/// conflict is always set to `last_log`, which blocks replication for ever.
+/// https://github.com/drmingdrmer/openraft/blob/79a39970855d80e1d3b761fadbce140ecf1da59e/async-raft/src/core/append_entries.rs#L131-L154
+///
+/// - fake a cluster of node 0,1,2. R0 has ~100 uncommitted log at term 2. R2 has ~100 uncommitted
+///   log at term 3.
+///
+/// ```
+/// R0 ... 2,99 2,100
+/// R1
+/// R2 ... 3,99 3,100
+/// ```
+///
+/// - Start the cluster and node 2 start to replicate logs.
+/// - test the log should be replicated to node 0.
+#[tracing::instrument]
+#[test_harness::test(harness = ut_harness)]
+async fn append_inconsistent_log() -> Result<()> {
+    // Setup test dependencies.
+    let config = Config {
+        enable_heartbeat: false,
+        ..Default::default()
+    };
+    let mut router = RaftRouter::new(config)?;
+
+    let mut log_index = router.new_cluster([0, 1, 2], []).await?;
+
+    tracing::info!(log_index, "--- remove all nodes and fake the logs");
+
+    let Node {
+        log_store: mut sto0,
+        state_machine: sm0,
+        ..
+    } = router.stop_node(0).await?;
+    let Node {
+        log_store: sto1,
+        state_machine: sm1,
+        ..
+    } = router.stop_node(1).await?;
+    let Node {
+        log_store: mut sto2,
+        state_machine: sm2,
+        ..
+    } = router.stop_node(2).await?;
+
+    for i in log_index + 1..=100 {
+        sto0.blocking_append([blank_ent::<openraft_memstore::TypeConfig>(2, 1, i)]).await?;
+        sto2.blocking_append([blank_ent::<openraft_memstore::TypeConfig>(3, 3, i)]).await?;
+    }
+
+    sto0.save_vote(&Vote::new(4, 1)).await?;
+    sto2.save_vote(&Vote::new(3, 3)).await?;
+
+    log_index = 100;
+
+    tracing::info!(
+        log_index,
+        "--- restart node 1 and isolate. To let node-2 to become leader, node-1 should not vote for node-0"
+    );
+    {
+        router.new_raft_node_with_sto(1, sto1.clone(), sm1.clone()).await?;
+        router.set_network_error(1, true);
+    }
+
+    tracing::info!(log_index, "--- restart node 0 and 2");
+    {
+        router.new_raft_node_with_sto(0, sto0.clone(), sm0.clone()).await?;
+        router.new_raft_node_with_sto(2, sto2.clone(), sm2.clone()).await?;
+    }
+
+    // leader appends at least one blank log. There may be more than one transient leaders
+    log_index += 1;
+
+    tracing::info!(log_index, "--- wait for node states");
+    {
+        router
+            .wait_with_timeout(&0, Duration::from_millis(2000))
+            .state(ServerState::Follower, "node 0 become follower")
+            .await?;
+
+        router
+            .wait_with_timeout(&2, Duration::from_millis(5000))
+            .state(ServerState::Leader, "node 2 become leader")
+            .await?;
+    }
+
+    router
+        .wait_with_timeout(&0, Duration::from_millis(2000))
+        // leader appends at least one blank log. There may be more than one transient leaders
+        .applied_index_at_least(Some(log_index), "sync log to node 0")
+        .await?;
+
+    let logs = sto0.try_get_log_entries(60..=60).await?;
+    assert_eq!(
+        3,
+        logs.first().unwrap().log_id.committed_leader_id().term,
+        "log is overridden by leader logs"
+    );
+
+    Ok(())
+}

@@ -1,0 +1,38 @@
+[package]
+name = "openraft-legacy"
+readme = "README.md"
+
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+categories.workspace = true
+description = "Legacy compatibility layer for deprecated Openraft APIs"
+documentation.workspace = true
+homepage.workspace = true
+keywords.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+openraft = { path = "../openraft", version = "0.10.0-alpha.37", default-features = false }
+openraft-macros = { path = "../macros", version = "0.10.0-alpha.37" }
+
+anyerror = { workspace = true }
+derive_more = { workspace = true }
+display-more = { workspace = true }
+futures = { workspace = true }
+serde = { workspace = true, optional = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["io-util", "sync"] }
+tracing = { workspace = true }
+
+[dev-dependencies]
+openraft = { path = "../openraft", version = "0.10.0-alpha.37", default-features = false, features = ["tokio-rt"] }
+serde_json = { workspace = true }
+
+[features]
+default = []
+serde = ["dep:serde", "openraft/serde"]
+
+[package.metadata.docs.rs]
+all-features = true

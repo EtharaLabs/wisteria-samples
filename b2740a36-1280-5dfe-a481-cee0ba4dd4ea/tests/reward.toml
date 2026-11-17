@@ -1,0 +1,29 @@
+# Two dimensions, each already in [0, 1], scored independently with no gate between them:
+# - test_output (tests/test_output.py): one criterion, 0 when the build fails, any pass-to-pass test
+#   does not pass or any cheat check failed; otherwise the fraction of fail-to-pass tests that pass.
+# - judge (tests/judge.toml): the weighted mean of the D2 note's criteria, each the median of its
+#   three samples (Reward Kit 0.2.4 keeps the lower median when an even number of samples voted).
+# reward = 0.5 test_output + 0.5 judge. Each graded unit costs only its own share: a failing test
+# lowers only the tests half, and a missing or wrong note only the judge half.
+# compiled = test_output alone: the part of the reward that needs no judge. tests/test.sh publishes
+# it as the reward only when no judge key is set; with a key set and no clean verdict on every
+# criterion after three attempts, the reward is 0.
+
+[scoring.test_output]
+aggregation = "weighted-mean"
+
+[[reward]]
+name = "reward"
+aggregation = "weighted-sum"
+
+[reward.weights]
+test_output = 0.5
+judge = 0.5
+
+[[reward]]
+name = "compiled"
+aggregation = "weighted-sum"
+
+[reward.weights]
+test_output = 1.0
+judge = 0.0

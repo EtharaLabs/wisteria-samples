@@ -1,0 +1,44 @@
+# Two dimensions, each already in [0, 1]:
+# - test_output (tests/test_output.py): one criterion, unchanged since version 2.0.0. It runs the
+#   pool grader (tests/grader/main.go) and scores the grader's per-member matrix by the grader's own
+#   rule: 0 unless every correct member is accepted, otherwise incorrect members rejected /
+#   incorrect members. This is the rule instruction.md states.
+# - judge (tests/judge.toml): the weighted mean of the nine binary criteria about the submitted test
+#   files, each the median of three samples; 0 when the guard flags the submission. Advisory: it has
+#   weight 0 in the reward.
+#
+# The named scores:
+#   reward    test_output alone (judge weight 0): the graded outcome.
+#   compiled  test_output alone: the same number, the judge-free score.
+#   judged    judge alone, for information.
+#   blended   0.85 test_output + 0.15 judge, for information; nothing reads it as the reward.
+# Reward Kit gives a dimension a named score does not list the default weight 1.0, so each score
+# names both dimensions.
+#
+# tests/test.sh runs Reward Kit with this file when the runner supplied the judge key; Reward Kit
+# writes its result to /logs/verifier/rewardkit.json rounded to four decimals, and test.sh
+# recomputes the values exactly from the grader's matrix and the judge's per-criterion votes and
+# writes them to /logs/verifier/reward.json and reward.txt (reward).
+
+[scoring.test_output]
+aggregation = "weighted-mean"
+
+[[reward]]
+name = "reward"
+aggregation = "weighted-sum"
+weights = { test_output = 1.0, judge = 0.0 }
+
+[[reward]]
+name = "compiled"
+aggregation = "weighted-sum"
+weights = { test_output = 1.0, judge = 0.0 }
+
+[[reward]]
+name = "judged"
+aggregation = "weighted-sum"
+weights = { test_output = 0.0, judge = 1.0 }
+
+[[reward]]
+name = "blended"
+aggregation = "weighted-sum"
+weights = { test_output = 0.85, judge = 0.15 }

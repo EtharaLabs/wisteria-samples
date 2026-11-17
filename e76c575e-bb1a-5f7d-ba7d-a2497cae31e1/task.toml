@@ -1,0 +1,86 @@
+schema_version = "1.4"
+reward_type = "bounded_continuous"
+
+[task]
+name = "ethara/e76c575e-bb1a-5f7d-ba7d-a2497cae31e1"
+version = "1.1.2"
+description = "Make an Openraft node that was leader before a crash regain leadership only through a fresh election in a higher term, so that a log id lost from its unflushed log is never reused for a different entry and followers cannot silently diverge."
+authors = [{ name = "dinesh.kumar", email = "dinesh.kumar@ethara.ai" }]
+keywords = ["rust", "openraft", "raft", "consensus", "crash-recovery", "leader-election", "bug-fix"]
+
+[metadata]
+category = "software-engineering"
+null_floor = 0.0
+discrimination_weight = 0.5
+platforms = ["linux/amd64", "linux/arm64"]
+
+[metadata.contamination]
+public_source = "github.com/databendlabs/openraft"
+public_reference = "pull request 2236 (merge commit 401ea02d3f10ab405bed509916a808e276743fe9)"
+note = "The reference solution derives from this public upstream change. The working environment has no network access to it."
+
+[upstream_provenance]
+origin = "original"
+source_kind = "public_repository"
+provenance_date = "2026-10-30"
+
+[upstream_provenance.source]
+canonical_repo = "github.com/databendlabs/openraft"
+fork_ancestry_digest = "sha256:c433a65edb33a0043543dd395488e71f61a0491506d278a0f4a994f8a529bbe8"
+base_commit = "3c0144e34d156ed1f8e7c6f6940ef1dbb063cfb3"
+event_timestamp = "2026-10-30T04:45:17Z"
+
+[agent]
+timeout_sec = 10800.0
+user = "10001:10001"
+# Only the model APIs; the task environment itself has no network.
+network_mode = "allowlist"
+allowed_hosts = ["api.openai.com", "api.anthropic.com"]
+
+[environment]
+build_timeout_sec = 3600.0
+cpus = 4
+memory_mb = 8192
+storage_mb = 30720
+gpus = 0
+network_mode = "no-network"
+
+[verifier]
+# Covers the test steps (prepare, graded, cheat) plus three judged attempts at their worst case.
+timeout_sec = 21600.0
+environment_mode = "separate"
+# tests/test.sh runs as root and runs the submission's builds and tests as the sandbox uid 20002.
+user = "root"
+# Only the judge APIs are reachable (Anthropic, or OpenAI when only an OpenAI key is set).
+network_mode = "allowlist"
+allowed_hosts = ["api.anthropic.com", "api.openai.com"]
+
+[verifier.env]
+# Endpoints and key come from the runner's environment.
+ANTHROPIC_BASE_URL = "${ANTHROPIC_BASE_URL:-https://api.anthropic.com}"
+ANTHROPIC_API_KEY = "${ANTHROPIC_API_KEY:-}"
+OPENAI_BASE_URL = "${OPENAI_BASE_URL:-https://api.openai.com/v1}"
+OPENAI_API_KEY = "${OPENAI_API_KEY:-}"
+# litellm reads only its packaged model map, which tests/Dockerfile patches.
+LITELLM_LOCAL_MODEL_COST_MAP = "${LITELLM_LOCAL_MODEL_COST_MAP:-True}"
+# Reward Kit always sends reasoning_effort; drop it for models litellm does not list as reasoning models.
+LITELLM_DROP_PARAMS = "True"
+LITELLM_LOCAL_ANTHROPIC_BETA_HEADERS = "True"
+
+[verifier.environment]
+network_mode = "allowlist"
+allowed_hosts = ["api.anthropic.com", "api.openai.com"]
+build_timeout_sec = 3600.0
+cpus = 4
+memory_mb = 8192
+storage_mb = 30720
+gpus = 0
+
+# Harbor collects each source path after the agent finishes and restores it in the verifier.
+[[artifacts]]
+# The repaired source tree.
+source = "/app/openraft"
+
+[[artifacts]]
+# The root-cause note, judged against the private reference.
+source = "/app/diagnosis.md"

@@ -1,0 +1,8 @@
+{
+  "schema": "openraft.cheat-checks/v1",
+  "ids": [
+    "cheat_test_files_untouched",
+    "cheat_no_process_exit",
+    "cheat_no_external_network"
+  ]
+}

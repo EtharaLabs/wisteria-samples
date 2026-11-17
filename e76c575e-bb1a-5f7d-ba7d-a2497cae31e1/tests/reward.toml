@@ -1,0 +1,29 @@
+# Two dimensions, folded with fixed weights and no gate of any kind.
+#
+#   test_output  tests/test_output.py: one criterion whose score is already in [0, 1]: 0 when the
+#                build fails, any cheat check failed or any pass-to-pass test fails; otherwise the
+#                share of the 7 fail-to-pass tests that pass in all 3 of their runs.
+#   judge        tests/judge.toml: the note at /app/diagnosis.md, judged against the private
+#                reference; the weighted mean of its yes/no criteria, in [0, 1].
+#
+# The named scores Reward Kit 0.2.4 writes to /logs/verifier/reward.json:
+#
+#   reward    0.5 * test_output + 0.5 * judge (weighted-sum). Only a run perfect on both
+#             reaches 1.0. Neither dimension gates the other.
+#   compiled  test_output alone on a 0-1 scale, with the judge pinned to 0.0: the judge-free number.
+#
+# Reward Kit gives a dimension a named score does not list the default weight 1.0, so each score
+# names both dimensions.
+
+[scoring.test_output]
+aggregation = "weighted-mean"
+
+[[reward]]
+name = "reward"
+aggregation = "weighted-sum"
+weights = { test_output = 0.5, judge = 0.5 }
+
+[[reward]]
+name = "compiled"
+aggregation = "weighted-sum"
+weights = { test_output = 1.0, judge = 0.0 }

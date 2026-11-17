@@ -1,0 +1,1105 @@
+(ns jepsen.openraft.nemesis.membership
+  (:require [clojure.tools.logging :refer [info]]
+            [jepsen [checker :as checker]
+             [generator :as gen]
+             [nemesis :as nemesis]
+             [random :as random]]
+            [jepsen.openraft.await :as await]
+            [jepsen.openraft [client :as client]
+             [checker :as openraft-checker]
+             [cluster :as cluster]
+             [db :as openraft-db]]
+            [jepsen.openraft.nemesis.outcome :as outcome]
+            [jepsen.openraft.quorum :as quorum]))
+
+(def change-seconds 10)
+(def minimum-voters 3)
+(def learner-wait-timeout-ms 60000)
+
+(def ^:private membership-error-arm-limit 8)
+(def ^:private membership-error-arm-name-limit 128)
+(def ^:private evidence-keys
+  [:error-variant :error-shape :error-arm-count :error-arm-names])
+(def ^:private status-reasons
+  {:indeterminate :request-result-unknown
+   :in-progress :membership-change-in-progress
+   :learner-unreachable :learner-unreachable
+   :no-supported-leader :no-supported-leader
+   :node-starting :node-starting})
+(def ^:private clearable-pending-keys
+  (into [:target :status :reason :stage] evidence-keys))
+
+(defn- select-node [test candidates]
+  (->> (:nodes test)
+       (filter (set candidates))
+       random/shuffle
+       first))
+
+(defn- voter-ids [test voters]
+  (->> (:nodes test)
+       (filter (set voters))
+       (mapv client/node-host)))
+
+(defn- request-leader! [test leader-endpoint request]
+  (client/with-leader!
+    leader-endpoint
+    (mapv #(client/api-endpoint test %) (:nodes test))
+    request))
+
+(defn- ambiguous-request-error? [e]
+  (let [{:keys [kind status]} (ex-data e)]
+    (or (#{:request-timeout
+           :transport-error
+           :invalid-json
+           :invalid-response} kind)
+        (and (= :http-error kind)
+             (or (nil? status)
+                 (<= 500 status 599))))))
+
+(defn- leader-routing-error? [e]
+  (let [{:keys [kind error]} (ex-data e)]
+    (or (= :unreachable kind)
+        (contains? error :ForwardToLeader))))
+
+(defn- change-membership-error [e]
+  (let [error (:error (ex-data e))]
+    (when (and (map? error)
+               (contains? error :ChangeMembershipError))
+      {:payload (:ChangeMembershipError error)})))
+
+(defn- bounded-arm-name [arm]
+  (let [arm-name (if (keyword? arm) (name arm) (str arm))]
+    (subs arm-name 0 (min membership-error-arm-name-limit
+                          (count arm-name)))))
+
+(defn- malformed-membership-error-evidence [e]
+  (when-let [{:keys [payload]} (change-membership-error e)]
+    (when-not (and (map? payload) (= 1 (count payload)))
+      {:error-shape (if (map? payload) :map :not-map)
+       :error-arm-count (when (map? payload) (count payload))
+       :error-arm-names (if (map? payload)
+                          (->> (keys payload)
+                               (take membership-error-arm-limit)
+                               (map bounded-arm-name)
+                               sort
+                               vec)
+                          [])})))
+
+(defn- membership-error-variant [e]
+  (let [payload (:payload (change-membership-error e))]
+    (when (and (map? payload) (= 1 (count payload)))
+      (ffirst payload))))
+
+;; `UncommittedLeaderLog` refuses a change the way `InProgress` does: it writes
+;; nothing, and the change can start once the new leader commits its blank log.
+(defn- membership-change-in-progress? [e]
+  (contains? #{:InProgress :UncommittedLeaderLog} (membership-error-variant e)))
+
+(defn- unexpected-membership-error-outcome [e]
+  (when-let [evidence (malformed-membership-error-evidence e)]
+    (outcome/indeterminate :unexpected-sut-response evidence)))
+
+(defn- await-reachable-learner! [test node]
+  (cluster/await-node-metrics! test node learner-wait-timeout-ms))
+
+(defn- membership-change-result! [target-voters request]
+  (try
+    (request)
+    :completed
+    (catch Exception e
+      (let [unexpected (unexpected-membership-error-outcome e)]
+        (cond
+          (leader-routing-error? e)
+          :no-supported-leader
+
+          unexpected
+          unexpected
+
+          (ambiguous-request-error? e)
+          (do
+            (info "OpenRaft membership change result is indeterminate"
+                  {:target-voters target-voters
+                   :error (ex-message e)})
+            :indeterminate)
+
+          (membership-change-in-progress? e)
+          (do
+            (info "OpenRaft membership change is already in progress"
+                  {:target-voters target-voters
+                   :error (ex-message e)})
+            :in-progress)
+
+          :else
+          (throw e))))))
+
+(defn- request-membership-change! [test leader-endpoint target-voters]
+  (membership-change-result!
+   target-voters
+   #(request-leader!
+     test leader-endpoint
+     (fn [endpoint] (client/change-membership! endpoint (voter-ids test target-voters))))))
+
+(defn- request-direct-membership-change! [test endpoint target-voters]
+  (info "Requesting OpenRaft double-shrink membership change"
+        {:endpoint endpoint :target-voters target-voters})
+  (membership-change-result!
+   target-voters
+   #(client/change-membership! endpoint (voter-ids test target-voters))))
+
+(def ^:private restoration-outcome-kind ::restoration-outcome)
+
+(defn- closed-outcome? [value]
+  (contains? #{:installed :skipped :indeterminate} (:status value)))
+
+(defn- restoration-context [pending]
+  (let [status (:status pending)
+        reason (get status-reasons status)]
+    (atom
+     (cond-> (merge {:attempted? (= :indeterminate status)}
+                    (select-keys pending (into [:stage] evidence-keys)))
+       (= :indeterminate status)
+       (assoc :reason (or (:reason pending) reason))
+       (and reason (not= :indeterminate status))
+       (assoc :skip-reason reason)))))
+
+(defn- return-restoration-outcome! [value]
+  (throw (ex-info "OpenRaft membership restoration has a modeled outcome"
+                  {:kind restoration-outcome-kind
+                   :outcome value})))
+
+(defn- note-restoration-request!
+  [context stage result details]
+  (let [status (if (map? result) (:status result) result)
+        evidence (when (map? result)
+                   (select-keys result (into [:reason] evidence-keys)))]
+    (case status
+      :completed
+      (swap! context assoc
+             :attempted? true
+             :stage stage)
+
+      :indeterminate
+      (swap! context
+             #(merge %
+                     evidence
+                     {:attempted? true
+                      :reason (or (:reason evidence)
+                                  (get status-reasons status))
+                      :stage stage}))
+
+      :in-progress
+      (swap! context assoc
+             :skip-reason (get status-reasons status)
+             :stage stage)
+
+      :no-supported-leader
+      (let [{:keys [attempted? reason]
+             prior-stage :stage} @context
+            details (assoc details :stage (or prior-stage stage))]
+        (return-restoration-outcome!
+         (if attempted?
+           (outcome/indeterminate
+            (or reason :membership-recovery-unconfirmed)
+            details)
+           (outcome/skipped (get status-reasons status) details))))
+
+      nil))
+  result)
+
+(defn- restoration-timeout-outcome [context e]
+  (let [{:keys [attempted? reason skip-reason] :as state} @context
+        details (merge {:condition (:condition (ex-data e))
+                        :message (ex-message e)}
+                       (select-keys state
+                                    (into [:stage] evidence-keys)))]
+    (if attempted?
+      (outcome/indeterminate
+       (or reason :membership-recovery-unconfirmed)
+       details)
+      (outcome/skipped (or skip-reason :membership-not-ready)
+                       details))))
+
+(defn- request-membership-change-when-ready!
+  [test leader-endpoint target-voters context]
+  (let [waiting-for-stable? (atom false)]
+    (await/until!
+     :membership-change-request-ready
+     #(let [waiting? @waiting-for-stable?
+            status (when waiting? (cluster/membership-status test))]
+        (cond
+          (and waiting? (not (:stable? status)))
+          (await/retry! :membership-change-request-ready
+                        {:target-voters target-voters
+                         :status status})
+
+          (and waiting? (= target-voters (:voters status)))
+          status
+
+          :else
+          (do
+            (reset! waiting-for-stable? false)
+            (let [result (request-membership-change! test
+                                                     leader-endpoint
+                                                     target-voters)]
+              (note-restoration-request! context
+                                         :change-membership
+                                         result
+                                         {:target-voters target-voters})
+              (cond
+                (closed-outcome? result)
+                (return-restoration-outcome!
+                 (assoc result :stage :change-membership))
+
+                (= :in-progress result)
+                (do
+                  (reset! waiting-for-stable? true)
+                  (await/retry! :membership-change-request-ready
+                                {:target-voters target-voters}))
+
+                :else
+                result)))))
+     {:log-message "Waiting to retry an OpenRaft membership change"
+      :timeout learner-wait-timeout-ms})))
+
+(defn- complete-joint-membership!
+  [test {:keys [leader effective-voter-configs]} context]
+  (let [target-voters (peek effective-voter-configs)
+        leader-endpoint (atom (client/api-endpoint test leader))
+        result (request-membership-change-when-ready! test
+                                                      leader-endpoint
+                                                      target-voters
+                                                      context)]
+    (info "Completing an existing joint OpenRaft membership"
+          {:configs effective-voter-configs
+           :target-voters target-voters})
+    (if (map? result)
+      result
+      (cluster/await-stable-membership! test target-voters))))
+
+(defn- stable-membership!
+  [test context]
+  (let [{:keys [stable?] :as status}
+        (cluster/await-committed-membership! test)]
+    (if stable?
+      status
+      (complete-joint-membership! test status context))))
+
+(defn- change-membership-and-await!
+  [test leader-endpoint target-voters context]
+  (let [result (request-membership-change-when-ready! test
+                                                      leader-endpoint
+                                                      target-voters
+                                                      context)]
+    (if (map? result)
+      result
+      (try
+        (cluster/await-stable-membership! test target-voters)
+        (catch Exception e
+          (when-not (await/condition-timeout? e :stable-membership)
+            (throw e))
+          (let [status (stable-membership! test context)]
+            (if (= target-voters (:voters status))
+              status
+              (throw e))))))))
+
+(defn- await-observed-learner! [test node]
+  (cluster/await-observed-learner! test node learner-wait-timeout-ms))
+
+(defn- unexpected-add-learner-error-variant [e]
+  (let [variant (membership-error-variant e)]
+    (when (#{:LearnerNotFound :EmptyMembership} variant)
+      variant)))
+
+(defn- request-add-learner!
+  [test leader-endpoint node]
+  (let [{:keys [node-id api-addr raft-addr]} (cluster/node-info test node)]
+    (try
+      (request-leader!
+       test
+       leader-endpoint
+       #(client/add-learner! % node-id api-addr raft-addr))
+      :completed
+      (catch Exception e
+        (let [unexpected (unexpected-membership-error-outcome e)]
+          (cond
+            (leader-routing-error? e)
+            :no-supported-leader
+
+            unexpected
+            unexpected
+
+            (ambiguous-request-error? e)
+            (do
+              (info "OpenRaft learner addition result is indeterminate"
+                    {:node node
+                     :error (ex-message e)})
+              :indeterminate)
+
+            (membership-change-in-progress? e)
+            (do
+              (info "OpenRaft learner addition found a membership change in progress"
+                    {:node node
+                     :error (ex-message e)})
+              :in-progress)
+
+            (unexpected-add-learner-error-variant e)
+            (let [variant (unexpected-add-learner-error-variant e)]
+              (info "OpenRaft learner addition returned an unexpected error"
+                    {:node node
+                     :error-variant variant})
+              (outcome/indeterminate :unexpected-sut-response
+                                     {:error-variant variant}))
+
+            :else
+            (throw e)))))))
+
+(defn- request-add-learner-when-ready!
+  [test leader-endpoint node context]
+  (let [waiting-for-stable? (atom false)]
+    (await/until!
+     :add-learner-request-ready
+     #(let [waiting? @waiting-for-stable?
+            status (when waiting? (cluster/membership-status test))]
+        (cond
+          (and waiting? (not (:stable? status)))
+          (await/retry! :add-learner-request-ready
+                        {:node node
+                         :status status})
+
+          (and waiting?
+               (or (contains? (:learners status) node)
+                   (contains? (:voters status) node)))
+          status
+
+          :else
+          (do
+            (reset! waiting-for-stable? false)
+            (let [result (request-add-learner! test
+                                               leader-endpoint
+                                               node)]
+              (note-restoration-request! context
+                                         :add-learner
+                                         result
+                                         {:node node})
+              (cond
+                (closed-outcome? result)
+                (return-restoration-outcome! (assoc result
+                                                    :stage
+                                                    :add-learner))
+
+                (= :in-progress result)
+                (do
+                  (reset! waiting-for-stable? true)
+                  (await/retry! :add-learner-request-ready {:node node}))
+
+                :else
+                result)))))
+     {:log-message (str "Waiting to retry adding OpenRaft learner " node)
+      :timeout learner-wait-timeout-ms})))
+
+(defn- add-learner-and-confirm!
+  [test leader-endpoint node context]
+  (let [result (request-add-learner-when-ready! test
+                                                leader-endpoint
+                                                node
+                                                context)]
+    (if (= :indeterminate result)
+      (await-observed-learner! test node)
+      result)))
+
+(defn- grow! [database test context]
+  (let [{:keys [leader voters learners non-members metrics]}
+        (stable-membership! test context)
+        source (if (seq learners) :learner :non-member)
+        node (select-node test
+                          (if (= :learner source)
+                            learners
+                            non-members))]
+    (if-not node
+      :membership-full
+      (let [leader-endpoint (atom (client/api-endpoint test leader))
+            target-voters (conj voters node)]
+        (when (= :non-member source)
+          (openraft-db/start-empty-node! database test node))
+        (when (and (= :learner source)
+                   (not (contains? metrics node)))
+          (await-reachable-learner! test node))
+
+        (info "Adding OpenRaft learner"
+              {:node node
+               :source source
+               :leader leader})
+        (let [learner-status
+              (add-learner-and-confirm!
+               test
+               leader-endpoint
+               node
+               context)]
+
+          (info "Growing OpenRaft membership"
+                {:node node
+                 :before voters
+                 :after target-voters})
+
+          (let [final-status
+                (if (and (map? learner-status)
+                         (= target-voters (:voters learner-status)))
+                  learner-status
+                  (change-membership-and-await!
+                   test
+                   leader-endpoint
+                   target-voters
+                   context))]
+            {:node node
+             :source source
+             :leader (:leader final-status)
+             :before voters
+             :after (:voters final-status)}))))))
+
+(defn- shrink-candidates [{:keys [voters metrics]}]
+  (let [reachable (set (keys metrics))]
+    (filter
+     (fn [node]
+       (let [target-voters (disj voters node)]
+         (quorum/quorum? [target-voters] reachable)))
+     voters)))
+
+(defn- complete-pending-change!
+  [pending-change pending leader]
+  (reset! pending-change nil)
+  (-> (apply dissoc pending clearable-pending-keys)
+      (assoc :leader leader
+             :after (:target pending))))
+
+(defn- retain-pending-change!
+  [pending-change pending result]
+  (let [current @pending-change
+        status (if (map? result) (:status result) result)
+        reason (if (map? result)
+                 (:reason result)
+                 (get status-reasons status))
+        evidence (when (map? result)
+                   (select-keys result evidence-keys))
+        retained (if (= :indeterminate (:status current))
+                   current
+                   (cond-> (merge pending evidence {:status status})
+                     reason (assoc :reason reason)))]
+    (reset! pending-change retained)
+    retained))
+
+(defn- request-pending-membership-change!
+  [pending-change test status pending]
+  (let [result (request-membership-change!
+                test
+                (atom (client/api-endpoint test (:leader status)))
+                (:target pending))]
+    (if (= :completed result)
+      (complete-pending-change! pending-change pending (:leader status))
+      (retain-pending-change! pending-change pending result))))
+
+(defn- request-grow-change!
+  [pending-change test status pending]
+  (let [{:keys [node target]} pending
+        leader-endpoint (atom (client/api-endpoint test (:leader status)))]
+    (info "Adding OpenRaft learner"
+          {:node node
+           :source (:source pending)
+           :leader (:leader status)})
+    (let [learner-result (request-add-learner!
+                          test
+                          leader-endpoint
+                          node)]
+      (if-not (= :completed learner-result)
+        (retain-pending-change! pending-change
+                                (assoc pending :stage :add-learner)
+                                learner-result)
+        (let [current @pending-change
+              pending (assoc pending :stage :change-membership)
+              pending (if (and (= :indeterminate (:status current))
+                               (= :add-learner (:stage current)))
+                        (apply dissoc pending
+                               (into [:status :reason] evidence-keys))
+                        pending)]
+          (when current
+            (reset! pending-change pending))
+          (info "Growing OpenRaft membership"
+                {:node node
+                 :before (:before pending)
+                 :after target})
+          (request-pending-membership-change!
+           pending-change
+           test
+           status
+           pending))))))
+
+(defn- request-grow! [database pending-change test status]
+  (let [{:keys [leader voters learners non-members metrics]} status
+        source (if (seq learners) :learner :non-member)
+        node (select-node test
+                          (if (= :learner source)
+                            learners
+                            non-members))]
+    (if-not node
+      :membership-full
+      (let [pending {:change :grow
+                     :node node
+                     :source source
+                     :leader leader
+                     :before voters
+                     :target (conj voters node)}]
+        (cond
+          (and (= :learner source)
+               (not (contains? metrics node)))
+          (retain-pending-change!
+           pending-change
+           pending
+           :learner-unreachable)
+
+          (and (= :non-member source)
+               (not (contains? metrics node)))
+          (do
+            (openraft-db/start-empty-node-without-wait!
+             database
+             test
+             node)
+            (retain-pending-change!
+             pending-change
+             pending
+             :node-starting))
+
+          :else
+          (request-grow-change!
+           pending-change
+           test
+           status
+           pending))))))
+
+(defn- resolve-pending-grow!
+  [pending-change test status]
+  (let [{:keys [node target] :as pending} @pending-change]
+    (cond
+      (and (:stable? status)
+           (= target (:voters status)))
+      (complete-pending-change! pending-change pending (:leader status))
+
+      (not (:stable? status))
+      (request-pending-membership-change!
+       pending-change
+       test
+       status
+       pending)
+
+      (contains? (:metrics status) node)
+      (request-grow-change! pending-change test status pending)
+
+      :else
+      (retain-pending-change!
+       pending-change
+       pending
+       (if (contains? (:learners status) node)
+         :learner-unreachable
+         :node-starting)))))
+
+(defn- request-shrink! [database pending-change test status]
+  (let [{:keys [leader voters learners]} status]
+    (cond
+      (seq learners)
+      :learner-pending
+
+      (<= (count voters) minimum-voters)
+      :minimum-membership
+
+      :else
+      (if-let [node (select-node test (shrink-candidates status))]
+        (let [leader-endpoint (atom (client/api-endpoint test leader))
+              target-voters (disj voters node)
+              pending {:change :shrink
+                       :node node
+                       :leader leader
+                       :before voters
+                       :target target-voters}]
+          (info "Shrinking OpenRaft membership"
+                {:node node
+                 :before voters
+                 :after target-voters})
+          (let [result (request-membership-change!
+                        test
+                        leader-endpoint
+                        target-voters)]
+            (if (= :completed result)
+              (do
+                (openraft-db/stop-and-wipe-node! database test node)
+                (-> pending
+                    (dissoc :target)
+                    (assoc :after target-voters)))
+              (retain-pending-change! pending-change
+                                      (assoc pending
+                                             :stage :change-membership)
+                                      result))))
+        :no-quorum-safe-shrink))))
+
+(defn- stop-removed-nodes! [database test pending]
+  (doseq [node (or (:removed-nodes pending) [(:node pending)])]
+    (openraft-db/stop-and-wipe-node! database test node)))
+
+(defn- resolve-pending-removal!
+  [database pending-change test status]
+  (let [{:keys [target] :as pending} @pending-change
+        completed? (and (:stable? status)
+                        (= target (:voters status)))
+        result (if completed?
+                 :completed
+                 (request-membership-change!
+                  test
+                  (atom (client/api-endpoint test (:leader status)))
+                  target))]
+    (if (= :completed result)
+      (do
+        (stop-removed-nodes! database test pending)
+        (complete-pending-change!
+         pending-change
+         pending
+         (:leader status)))
+      (retain-pending-change! pending-change pending result))))
+
+(defn- continue-shrink-twice! [database pending-change test status]
+  (let [{:keys [node second-node target] :as pending} @pending-change]
+    (cond
+      (not= node (:leader status))
+      (resolve-pending-removal! database pending-change test status)
+
+      (not (and (:stable? status)
+                (= target (:voters status))
+                (not (contains? (:learners status) node))))
+      (retain-pending-change! pending-change pending :in-progress)
+
+      :else
+      (let [evidence (select-keys status [:leader :voters :learners :stable?])
+            pending (-> pending
+                        (dissoc :status :reason)
+                        (assoc :stage :change-membership
+                               :intermediate target
+                               :removed-leader evidence
+                               :target (disj target second-node)
+                               :removed-nodes [node second-node]))]
+        ;; Recovery may finish this target through another leader, but only
+        ;; two acknowledged direct requests earn :shrink-twice coverage.
+        (reset! pending-change pending)
+        (let [result (request-direct-membership-change!
+                      test (client/api-endpoint test node)
+                      (:target pending))]
+          (if (= :completed result)
+            (do
+              (stop-removed-nodes! database test pending)
+              (assoc (complete-pending-change! pending-change pending node)
+                     :change :shrink-twice))
+            (retain-pending-change! pending-change pending result)))))))
+
+(defn- request-shrink-twice! [database pending-change test status]
+  (let [{:keys [leader voters learners metrics]} status
+        intermediate (disj voters leader)]
+    (cond
+      (seq learners) :learner-pending
+      (< (count voters) (+ minimum-voters 2)) :minimum-membership
+      (not (contains? voters leader)) :no-supported-leader
+      (not (quorum/quorum? [intermediate] (set (keys metrics)))) :no-quorum-safe-shrink
+      :else
+      (if-let [second-node (select-node test (shrink-candidates (assoc status :voters intermediate)))]
+        (let [pending {:change :shrink
+                       :node leader
+                       :second-node second-node
+                       :leader leader
+                       :before voters
+                       :target intermediate
+                       :stage :change-membership}]
+          (reset! pending-change pending)
+          (let [result (request-direct-membership-change!
+                        test (client/api-endpoint test leader)
+                        intermediate)]
+            (if (= :completed result)
+              (let [pending (assoc pending :stage :shrink-again)]
+                (reset! pending-change pending)
+                (if-let [status (cluster/membership-status test)]
+                  (continue-shrink-twice! database pending-change test status)
+                  (retain-pending-change! pending-change pending :no-supported-leader)))
+              (retain-pending-change! pending-change pending result))))
+        :no-quorum-safe-shrink))))
+
+(defn- complete-joint-once! [test status]
+  (let [target-voters (peek (:effective-voter-configs status))
+        result (request-membership-change!
+                test
+                (atom (client/api-endpoint test (:leader status)))
+                target-voters)]
+    (merge (if (map? result) result {:status result})
+           {:target target-voters
+            :voter-configs (:effective-voter-configs status)})))
+
+(defn- request-membership-operation!
+  [database pending-change test operation]
+  (if-let [status (cluster/membership-status test)]
+    (cond
+      @pending-change
+      (case (:change @pending-change)
+        :grow (resolve-pending-grow! pending-change test status)
+        :shrink (if (= :shrink-again (:stage @pending-change))
+                  (continue-shrink-twice! database pending-change test status)
+                  (resolve-pending-removal! database pending-change test status)))
+
+      (not (:stable? status))
+      (complete-joint-once! test status)
+
+      (= :grow operation)
+      (request-grow! database pending-change test status)
+
+      (= :shrink operation)
+      (request-shrink! database pending-change test status)
+
+      (= :shrink-twice operation)
+      (request-shrink-twice! database pending-change test status))
+    :no-supported-leader))
+
+(def ^:private skipped-results
+  #{:learner-pending
+    :membership-full
+    :minimum-membership
+    :no-quorum-safe-shrink
+    :no-supported-leader})
+
+(defn- normalize-membership-result [result]
+  (cond
+    (= :indeterminate result)
+    (outcome/indeterminate (get status-reasons result) {})
+
+    (contains? skipped-results result)
+    (outcome/skipped result {})
+
+    (map? result)
+    (let [status (:status result)
+          details (dissoc result :status :reason)]
+      (cond
+        (= :completed status)
+        (outcome/installed details)
+
+        (= :indeterminate status)
+        (outcome/indeterminate (or (:reason result)
+                                   (get status-reasons status))
+                               details)
+
+        (contains? status-reasons status)
+        (outcome/skipped (get status-reasons status) details)
+
+        (contains? result :after)
+        (outcome/installed (dissoc result :reason))
+
+        :else
+        (throw (ex-info "Unknown membership Nemesis result"
+                        {:result result}))))
+
+    :else
+    (throw (ex-info "Unknown membership Nemesis result"
+                    {:result result}))))
+
+(defn- membership-operation-outcome [operation result]
+  (let [normalized (normalize-membership-result result)
+        actual-change (when (map? result) (:change result))
+        indeterminate? (= :indeterminate (:status normalized))]
+    (cond
+      (and indeterminate?
+           actual-change
+           (not= operation actual-change))
+      (outcome/indeterminate (:reason normalized)
+                             {:pending-change normalized})
+
+      (and indeterminate?
+           (map? result)
+           (contains? result :voter-configs))
+      (outcome/indeterminate (:reason normalized)
+                             {:existing-change normalized})
+
+      (and actual-change (not= operation actual-change))
+      (outcome/skipped
+       :pending-membership-change
+       {(if (= :installed (:status normalized))
+          :resolved-change
+          :pending-change) normalized})
+
+      (and (map? result) (contains? result :voter-configs))
+      (outcome/skipped :membership-change-in-progress
+                       {:existing-change normalized})
+
+      :else
+      normalized)))
+
+(defn- restoration-outcome [result]
+  (if (closed-outcome? result)
+    result
+    (outcome/installed
+     (cond-> result
+       (:resolved-change result)
+       (update :resolved-change outcome/installed)))))
+
+(defn- complete-pending-removal-and-await!
+  [database pending-change test context]
+  (when-let [{:keys [target] :as pending} @pending-change]
+    (let [status (stable-membership! test context)
+          final-status (if (= target (:voters status))
+                         status
+                         (change-membership-and-await!
+                          test
+                          (atom (client/api-endpoint test (:leader status)))
+                          target
+                          context))]
+      (stop-removed-nodes! database test pending)
+      (reset! pending-change nil)
+      (-> pending
+          (dissoc :target)
+          (assoc :leader (:leader final-status)
+                 :after target)))))
+
+(defn- confirm-pending-grow-status!
+  [pending-change status]
+  (when-let [{:keys [change target] :as pending} @pending-change]
+    (when (and (= :grow change)
+               (= target (:voters status)))
+      (reset! pending-change nil)
+      (-> (apply dissoc pending clearable-pending-keys)
+          (assoc :leader (:leader status)
+                 :after target)))))
+
+(defn- confirm-pending-grow!
+  [pending-change test context]
+  (let [status (stable-membership! test context)]
+    (confirm-pending-grow-status! pending-change status)))
+
+(defn- complete-pending-change-and-await!
+  [database pending-change test context]
+  (case (:change @pending-change)
+    :grow (confirm-pending-grow! pending-change test context)
+    :shrink (complete-pending-removal-and-await!
+             database
+             pending-change
+             test
+             context)
+    nil nil))
+
+(defn- restore-membership! [database pending-change test context]
+  (let [resolved-change (complete-pending-change-and-await!
+                         database
+                         pending-change
+                         test
+                         context)
+        target-voters (set (:nodes test))]
+    (loop [status (stable-membership! test context)]
+      (if (= target-voters (:voters status))
+        (let [resolved-change (or resolved-change
+                                  (confirm-pending-grow-status!
+                                   pending-change
+                                   status))]
+          (cond-> {:leader (:leader status)
+                   :voters (:voters status)}
+            resolved-change
+            (assoc :resolved-change resolved-change)))
+        (let [result (grow! database test context)]
+          (when (keyword? result)
+            (return-restoration-outcome!
+             (outcome/skipped result
+                              {:status status
+                               :target-voters target-voters})))
+          (recur (stable-membership! test context)))))))
+
+(defn- restore-membership-outcome!
+  [database pending-change test]
+  (let [context (restoration-context @pending-change)]
+    (try
+      (restoration-outcome
+       (restore-membership! database pending-change test context))
+      (catch Exception e
+        (cond
+          (= restoration-outcome-kind (:kind (ex-data e)))
+          (:outcome (ex-data e))
+
+          (await/condition-timeout? e)
+          (restoration-timeout-outcome context e)
+
+          :else
+          (throw e))))))
+
+(defrecord MembershipNemesis [database pending-change]
+  nemesis/Nemesis
+  (setup! [_ _test]
+    (MembershipNemesis. database (atom nil)))
+
+  (invoke! [_ test op]
+    (case (:f op)
+      :grow
+      (let [result (request-membership-operation!
+                    database
+                    pending-change
+                    test
+                    :grow)]
+        (assoc op :value (membership-operation-outcome :grow result)))
+
+      :shrink
+      (let [result (request-membership-operation!
+                    database
+                    pending-change
+                    test
+                    :shrink)]
+        (assoc op :value (membership-operation-outcome :shrink result)))
+
+      :shrink-twice
+      (let [result (request-membership-operation!
+                    database pending-change test :shrink-twice)]
+        (assoc op :value (membership-operation-outcome :shrink-twice result)))
+
+      :restore-membership
+      (assoc op
+             :value (restore-membership-outcome!
+                     database
+                     pending-change
+                     test))))
+
+  (teardown! [_ _test])
+
+  nemesis/Reflection
+  (fs [_]
+    #{:grow :shrink :shrink-twice :restore-membership}))
+
+(defn membership-nemesis [database]
+  (MembershipNemesis. database (atom nil)))
+
+(defn- membership-generator [test]
+  (let [twice? (<= (+ minimum-voters 2) (count (:nodes test)))
+        changes (cond-> [:grow :shrink] twice? (conj :shrink-twice))]
+    (gen/phases
+     {:type :info :f :shrink}
+     (if twice?
+       (gen/on-update
+        (fn [this test context event]
+          ;; Starting a wiped node is only the first grow step. Keep this
+          ;; phase until the pending change finishes, so it cannot consume
+          ;; the following double-shrink operation.
+          (when-not (and (= :nemesis (:process event))
+                         (= :grow (:f event))
+                         (or (= :installed (get-in event [:value :status]))
+                             (= :membership-full (get-in event [:value :reason]))))
+            (update this :gen gen/update test context event)))
+        (repeat {:type :info :f :grow}))
+       {:type :info :f :grow})
+     (when twice? {:type :info :f :shrink-twice})
+     (gen/mix (mapv #(repeat {:type :info :f %}) changes)))))
+
+(defn- shrink-twice-evidence? [change]
+  (let [{:keys [node leader second-node before intermediate after removed-leader]} change]
+    (and (= node leader (:leader removed-leader))
+         (:stable? removed-leader)
+         (contains? (set before) node)
+         (= intermediate (disj (set before) node) (:voters removed-leader))
+         (set? (:learners removed-leader))
+         (not (contains? (:learners removed-leader) node))
+         (contains? intermediate second-node)
+         (= after (disj intermediate second-node))
+         (<= minimum-voters (count after)))))
+
+(defn- membership-change-installed? [change]
+  (and (= :installed (:status change))
+       (#{:grow :shrink :shrink-twice} (:change change))
+       (:node change)
+       (:leader change)
+       (coll? (:before change))
+       (coll? (:after change))
+       (not= (:before change) (:after change))
+       (or (not= :shrink-twice (:change change))
+           (shrink-twice-evidence? change))))
+
+(defn- membership-restored? [expected-voters value]
+  (and (= :installed (:status value))
+       (:leader value)
+       (= expected-voters (:voters value))))
+
+(defn- recovery-installed? [value]
+  (and (= :installed (:status value))
+       (:leader value)))
+
+(defn- coverage-checker []
+  (reify checker/Checker
+    (check [_ test history _opts]
+      (let [required-changes (cond-> #{:grow :shrink}
+                               (and (= :never (:removed-leader-step-down test))
+                                    (<= (+ minimum-voters 2) (count (:nodes test))))
+                               (conj :shrink-twice))
+            change-installed? membership-change-installed?
+            expected-voters (set (:nodes test))
+            membership-history (->> history
+                                    (filter
+                                     #(#{:grow
+                                         :shrink
+                                         :shrink-twice
+                                         :restore-membership} (:f %)))
+                                    vec)
+            ;; A restore reports the change it completed under
+            ;; :resolved-change, and its own value describes the restored
+            ;; membership rather than a change, so only change operations
+            ;; contribute their outer value. A :resolved-change becomes a
+            ;; candidate only when the key is present, so an outcome that
+            ;; carries no nested change is not mistaken for a malformed one.
+            change-values (->> membership-history
+                               (filter #(#{:grow :shrink :shrink-twice} (:f %)))
+                               (map :value))
+            resolved-changes (->> membership-history
+                                  (map :value)
+                                  (filter map?)
+                                  (filter #(contains? % :resolved-change))
+                                  (map :resolved-change))
+            change-candidates (concat change-values resolved-changes)
+            errors (->> membership-history
+                        (filter #(or (:error %)
+                                     (:exception %)))
+                        vec)
+            observed-changes (->> change-candidates
+                                  (keep
+                                   (fn [change]
+                                     (when (change-installed? change)
+                                       (:change change))))
+                                  set)
+            malformed (outcome/malformed-outcomes change-installed?
+                                                  change-candidates)
+            missing-changes (remove observed-changes
+                                    required-changes)
+            final-operation (peek membership-history)
+            restored? (and (= :restore-membership (:f final-operation))
+                           (membership-restored?
+                            expected-voters
+                            (:value final-operation)))
+            final-recovery (->> history
+                                (filter #(= :await-recovery (:f %)))
+                                last)
+            recovered? (boolean
+                        (recovery-installed? (:value final-recovery)))]
+        {:valid? (and (zero? malformed)
+                      (empty? errors)
+                      (empty? missing-changes)
+                      restored?
+                      recovered?)
+         :observed-changes (vec (sort observed-changes))
+         :missing-changes (vec (sort missing-changes))
+         :malformed-outcomes malformed
+         :restored? restored?
+         :recovered? recovered?
+         :error-count (count errors)
+         :errors (vec (take 10 errors))}))))
+
+(defn membership-package [database test]
+  (when (<= (count (:nodes test)) minimum-voters)
+    (throw (ex-info "Membership nemesis requires more than three nodes"
+                    {:minimum-voters minimum-voters
+                     :nodes (:nodes test)})))
+  {:name :membership
+   :interval change-seconds
+   :nemesis (membership-nemesis database)
+   :generator (membership-generator test)
+   :final-generator {:type :info
+                     :f :restore-membership}
+   :checker (openraft-checker/reject-checker-exceptions
+             (coverage-checker))})

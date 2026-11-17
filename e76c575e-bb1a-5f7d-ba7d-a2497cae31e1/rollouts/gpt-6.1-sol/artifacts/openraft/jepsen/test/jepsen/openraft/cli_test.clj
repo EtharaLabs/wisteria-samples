@@ -1,0 +1,388 @@
+(ns jepsen.openraft.cli-test
+  (:require [clojure.string :as str]
+            [clojure.test :refer [deftest is testing]]
+            [clojure.tools.cli :as tools-cli]
+            [jepsen.checker :as checker]
+            [jepsen.generator :as gen]
+            [jepsen.generator.test :as gen-test]
+            [jepsen.history :as history]
+            [jepsen.openraft.checker :as openraft-checker]
+            [jepsen.openraft.cli :as cli]
+            [jepsen.openraft.db :as openraft-db]
+            [jepsen.openraft.generator :as openraft-generator]
+            [jepsen.openraft.harness :as harness]
+            [jepsen.openraft.nemesis :as openraft-nemesis]
+            [jepsen.openraft.worker :as worker]
+            [jepsen.random :as random]))
+
+(deftest selects-liveness-without-safety-nemeses
+  (doseq [scenario ["bridge-partition" "two-leaf-partition"]]
+    (let [parsed (tools-cli/parse-opts [(str "--liveness=" scenario)] cli/cli-opts)]
+      (is (empty? (:errors parsed)))
+      (with-redefs [openraft-nemesis/compose-packages
+                    (fn [& _] (throw (AssertionError. "Safety nemesis selected")))]
+        (let [test (cli/openraft-test (assoc (:options parsed) :nodes ["n1" "n2" "n3" "n4" "n5"]))]
+          (if (= scenario "two-leaf-partition")
+            (do
+              (is (= ["n1" "n2" "n3"] (:client-nodes test)))
+              (is (instance? clojure.lang.Atom (:bootstrap-state test)))
+              (is (nil? @(:bootstrap-state test))))
+            (do
+              (is (nil? (:client-nodes test)))
+              (is (nil? (:bootstrap-state test)))))
+          (is (= (= scenario "two-leaf-partition") (boolean (:two-leaf-partition test))))))))
+  (doseq [args [["--liveness"] ["--liveness=unknown"] ["--liveness=all"]]]
+    (is (seq (:errors (tools-cli/parse-opts args cli/cli-opts))))))
+
+(deftest records-and-applies-the-random-seed
+  (testing "a generated seed is recorded and applied once"
+    (let [applied-seeds (atom [])
+          parsed (with-redefs [random/set-seed!
+                               #(swap! applied-seeds conj %)]
+                   (#'cli/prepare-options {:options {}}))]
+      (is (integer? (get-in parsed [:options :seed])))
+      (is (= [(get-in parsed [:options :seed])]
+             @applied-seeds))))
+
+  (testing "test construction does not restart an explicit seed"
+    (let [applied-seeds (atom [])
+          opts {:nemesis :partition
+                :seed 41
+                :time-limit 10}]
+      (with-redefs [random/set-seed! #(swap! applied-seeds conj %)]
+        (let [parsed (#'cli/prepare-options {:options opts})]
+          (cli/openraft-test (:options parsed))
+          (cli/openraft-test (:options parsed))))
+      (is (= [41] @applied-seeds)))))
+
+(deftest validates-the-random-seed
+  (testing "a malformed seed is rejected"
+    (let [parsed (tools-cli/parse-opts ["--seed" "12e5"] cli/cli-opts)]
+      (is (some #(re-find #"Must be an integer" %)
+                (:errors parsed)))))
+
+  (testing "the seed remains optional"
+    (is (empty? (:errors (tools-cli/parse-opts [] cli/cli-opts))))))
+
+(deftest validates-the-snapshot-threshold
+  (testing "the default applies snapshot pressure"
+    (is (= openraft-db/default-snapshot-threshold
+           (get-in (tools-cli/parse-opts [] cli/cli-opts)
+                   [:options :snapshot-threshold]))))
+
+  (testing "malformed and zero thresholds are rejected"
+    (doseq [value ["abc" "0"]]
+      (let [parsed (tools-cli/parse-opts ["--snapshot-threshold" value]
+                                         cli/cli-opts)]
+        (is (some #(re-find #"Must be a positive integer" %)
+                  (:errors parsed)))))))
+
+(deftest selects-removed-leader-policy-from-the-seed
+  (doseq [[seed policy] [[0 :default] [1 :never] [42 :default] [-1 :never]]]
+    (testing (str "seed " seed)
+      (let [opts {:nemesis :membership :nodes ["n1" "n2" "n3" "n4" "n5"]
+                  :time-limit 10 :seed seed}
+            first-run (#'cli/prepare-options {:options opts})
+            replay (#'cli/prepare-options {:options opts})]
+        (is (= policy (get-in first-run [:options :removed-leader-step-down])))
+        (is (= (:options first-run) (:options replay)))
+        (is (= policy (:removed-leader-step-down
+                       (cli/openraft-test (:options first-run)))))))))
+
+(deftest validates-liveness-options
+  (let [options {:liveness :bridge-partition
+                 :nodes ["n1" "n2" "n3" "n4" "n5"]
+                 :nemesis [:chaos]
+                 :time-limit 60}
+        prepare (fn [args overrides]
+                  (#'cli/prepare-options
+                   {:options (assoc (merge options overrides)
+                                    :argv (into ["test"] args))}))]
+    (testing "defaults are accepted"
+      (is (empty? (:errors (prepare ["--liveness=bridge-partition"] {})))))
+
+    (testing "liveness requires five distinct nodes"
+      (doseq [nodes [["n1" "n2" "n3" "n4"]
+                     ["n1" "n2" "n3" "n4" "n4"]]]
+        (is (some #(re-find #"five distinct nodes" %)
+                  (:errors (prepare ["--liveness=bridge-partition"] {:nodes nodes}))))))
+
+    (testing "explicit ordinary-mode options are rejected"
+      (doseq [[flag argv] [["--nemesis" ["--nemesis" "packet"]]
+                           ["--nemesis" ["--nemesis=chaos"]]
+                           ["--packet-mode" ["--packet-mode" "slow"]]
+                           ["--time-limit" ["--time-limit" "10"]]
+                           ["--time-limit" ["--time-limit=60"]]]]
+        (let [errors (:errors (prepare (into ["--liveness=bridge-partition"] argv) {}))]
+          (is (some #(and (str/includes? % flag)
+                          (str/includes? % "--liveness")) errors))
+          (is (not-any? #(str/includes? % "required for Packet") errors)))))))
+
+(deftest selects-composable-nemeses
+  (testing "chaos is the default"
+    (is (= [:partition :process :pause :membership :packet :clock]
+           (#'cli/normalize-nemeses nil))))
+
+  (testing "comma-separated faults are parsed and canonically ordered"
+    (is (= [:partition :process]
+           (#'cli/normalize-nemeses
+            (#'cli/parse-nemeses "process, partition")))))
+
+  (testing "chaos expands to every composable fault without duplicates"
+    (is (= [:partition :process :pause :membership :packet :clock]
+           (#'cli/normalize-nemeses [:chaos :partition]))))
+
+  (testing "membership can be combined with another fault"
+    (is (#'cli/valid-nemeses? [:membership :partition])))
+
+  (testing "packet is selectable by itself"
+    (is (= [:packet]
+           (#'cli/normalize-nemeses :packet)))))
+
+(deftest selects-clock-in-focused-and-chaos-runs
+  (is (= [:clock] (#'cli/normalize-nemeses :clock)))
+  (is (= [:partition :process :pause :membership :packet :clock]
+         (#'cli/normalize-nemeses :chaos))))
+
+(deftest validates-focused-packet-mode
+  (testing "slow and flaky are accepted"
+    (doseq [mode ["slow" "flaky"]]
+      (let [parsed (#'cli/prepare-options
+                    (tools-cli/parse-opts ["--nemesis" "packet"
+                                           "--packet-mode" mode]
+                                          cli/cli-opts))]
+        (is (empty? (:errors parsed))))))
+
+  (testing "unknown packet modes are rejected"
+    (let [parsed (tools-cli/parse-opts ["--packet-mode" "drop"]
+                                       cli/cli-opts)]
+      (is (some #(re-find #"Must be slow or flaky" %)
+                (:errors parsed)))))
+
+  (testing "unrelated parse errors do not add Packet selection errors"
+    (let [parsed (#'cli/prepare-options
+                  (tools-cli/parse-opts ["--nemesis" "packet"
+                                         "--packet-mode" "slow"
+                                         "--seed" "bad"]
+                                        cli/cli-opts))]
+      (is (= ["Failed to validate \"--seed bad\": Must be an integer."]
+             (:errors parsed)))))
+
+  (testing "option parsing requires an explicit mode"
+    (let [parsed (#'cli/prepare-options
+                  (tools-cli/parse-opts ["--nemesis" "packet"]
+                                        cli/cli-opts))]
+      (is (some #(re-find #"--packet-mode is required" %)
+                (:errors parsed)))))
+
+  (testing "direct test construction retains its guard"
+    (is (thrown-with-msg?
+         clojure.lang.ExceptionInfo
+         #"--packet-mode is required"
+         (cli/openraft-test {:nemesis :packet
+                             :nodes ["n1" "n2" "n3"]
+                             :time-limit 10}))))
+
+  (testing "focused packet runs accept an explicit mode"
+    (is (= "openraft linearizable registers packet"
+           (:name (cli/openraft-test {:nemesis :packet
+                                      :packet-mode :slow
+                                      :nodes ["n1" "n2" "n3"]
+                                      :time-limit 10}))))))
+
+(deftest validates-packet-mode-selection
+  (testing "the default chaos profile does not require --packet-mode"
+    (is (= "openraft linearizable registers partition,process,pause,membership,packet,clock"
+           (:name (cli/openraft-test {:nodes ["n1" "n2" "n3" "n4" "n5"]
+                                      :time-limit 10})))))
+
+  (testing "explicit Packet compositions accept an optional mode"
+    (doseq [args [["--nemesis" "packet,partition"]
+                  ["--nemesis" "packet,partition"
+                   "--packet-mode" "slow"]]]
+      (let [parsed (#'cli/prepare-options
+                    (tools-cli/parse-opts args cli/cli-opts))]
+        (is (empty? (:errors parsed)))))
+    (doseq [opts [{:nemesis [:packet :partition]}
+                  {:nemesis [:packet :partition]
+                   :packet-mode :slow}]]
+      (is (= "openraft linearizable registers partition,packet"
+             (:name (cli/openraft-test
+                     (merge {:nodes ["n1" "n2" "n3" "n4" "n5"]
+                             :time-limit 10}
+                            opts)))))))
+
+  (testing "packet mode is rejected without an explicit Packet selection"
+    (doseq [nemesis ["chaos" "partition"]]
+      (let [parsed (#'cli/prepare-options
+                    (tools-cli/parse-opts ["--nemesis" nemesis
+                                           "--packet-mode" "slow"]
+                                          cli/cli-opts))]
+        (is (some #(re-find #"--packet-mode requires an explicit Packet" %)
+                  (:errors parsed)))))))
+
+(deftest shares-one-harness-state-across-workers-and-generators
+  (let [failure-state (harness/failure-state)
+        wrapped-states (atom [])
+        stopped-states (atom [])
+        pending-states (atom [])
+        composition-states (atom [])
+        checker-states (atom [])
+        compose-packages openraft-nemesis/compose-packages
+        wrap (fn [source]
+               (fn [state delegate]
+                 (swap! wrapped-states conj [source state])
+                 delegate))
+        stop (fn [state generator]
+               (swap! stopped-states conj state)
+               generator)]
+    (with-redefs [harness/failure-state (constantly failure-state)
+                  openraft-nemesis/compose-packages
+                  (fn [state packages]
+                    (swap! composition-states conj state)
+                    (compose-packages state packages))
+                  worker/wrap-client (wrap :client)
+                  worker/wrap-nemesis (wrap :nemesis)
+                  openraft-checker/reject-harness-failures
+                  (fn [state delegate strict-checker-key]
+                    (swap! checker-states conj
+                           [state strict-checker-key])
+                    delegate)
+                  openraft-generator/stop-on-harness-failure stop
+                  openraft-generator/pending-on-harness-failure
+                  (fn [state generator]
+                    (swap! pending-states conj state)
+                    generator)]
+      (cli/openraft-test {:nemesis :partition
+                          :nodes ["n1" "n2" "n3"]
+                          :time-limit 10}))
+    (is (= [:client :nemesis] (mapv first @wrapped-states)))
+    (is (every? #(identical? failure-state (second %))
+                @wrapped-states))
+    (is (= 1 (count @stopped-states)))
+    (is (identical? failure-state (first @stopped-states)))
+    (is (= 1 (count @pending-states)))
+    (is (identical? failure-state (first @pending-states)))
+    (is (= 1 (count @composition-states)))
+    (is (identical? failure-state (first @composition-states)))
+    (is (= 1 (count @checker-states)))
+    (is (identical? failure-state (ffirst @checker-states)))
+    (is (= :exceptions (second (first @checker-states))))))
+
+(deftest reports-every-configured-checker
+  (let [test (cli/openraft-test {:nemesis [:membership :partition]
+                                 :nodes ["n1" "n2" "n3" "n4" "n5"]
+                                 :time-limit 10})
+        result (checker/check (:checker test) test (history/history []) {})]
+    (is (= #{:valid? :seed :stats :exceptions :crash :nemesis :workload}
+           (set (keys result))))
+    (is (= #{:valid? :fault-classes-executed :partition :membership}
+           (set (keys (:nemesis result)))))))
+
+(defn- lifecycle-test-generator [failure-state]
+  (#'cli/lifecycle-generator
+   failure-state
+   0.3
+   {:generator (gen/clients
+                (gen/delay 0.1 (repeat {:f :ordinary-workload})))
+    :final-generator (gen/clients [{:f :final-workload-1}
+                                   {:f :final-workload-2}])}
+   {:generator (gen/delay
+                 0.1
+                 (repeat {:type :info :f :ordinary-nemesis}))
+    :final-generator (gen/delay
+                       0.3
+                       [{:type :info :f :final-nemesis-1}
+                        {:type :info :f :final-nemesis-2}])}))
+
+(defn- simulate-lifecycle [failure-state failure-operation]
+  (let [operations (atom [])
+        failure-recorded? (atom false)
+        history (gen-test/simulate
+                 (lifecycle-test-generator failure-state)
+                 (fn [_context operation]
+                   (swap! operations conj (:f operation))
+                   (when (and (= failure-operation (:f operation))
+                              (compare-and-set! failure-recorded? false true))
+                     (harness/record-failure!
+                      failure-state
+                      :client
+                      {:operation operation}
+                      (RuntimeException. "client failed")))
+                   (-> operation
+                       (assoc :type (if (= :nemesis (:process operation))
+                                      :info
+                                      :ok))
+                       (update :time + 10))))]
+    {:history history
+     :operations @operations}))
+
+(deftest runs-the-full-lifecycle-without-a-harness-failure
+  (let [{:keys [history operations]}
+        (simulate-lifecycle (harness/failure-state) nil)
+        recovery-start (first (filter #(= :final-nemesis-1 (:f %)) history))
+        recovery-end (first (filter #(= :final-nemesis-2 (:f %)) history))]
+    (is (some #{:ordinary-workload} operations))
+    (is (some #{:ordinary-nemesis} operations))
+    (is (some (fn [operation]
+                (and (= :ordinary-workload (:f operation))
+                     (> (:time operation) (:time recovery-start))
+                     (< (:time operation) (:time recovery-end))))
+              history))
+    (is (= [:final-nemesis-1 :final-nemesis-2
+            :final-workload-1 :final-workload-2]
+           (filter #{:final-nemesis-1 :final-nemesis-2
+                     :final-workload-1
+                     :final-workload-2}
+                   operations)))))
+
+(deftest recovers-and-skips-final-workload-after-a-harness-failure
+  (let [failure-state (harness/failure-state)
+        {:keys [history operations]}
+        (simulate-lifecycle failure-state :ordinary-workload)
+        workload-completion-index
+        (first (keep-indexed (fn [index operation]
+                               (when (and (= :ordinary-workload
+                                             (:f operation))
+                                          (= :ok (:type operation)))
+                                 index))
+                             history))
+        recovery-index
+        (first (keep-indexed (fn [index operation]
+                               (when (= :final-nemesis-1 (:f operation))
+                                 index))
+                             history))]
+    (is (some? (harness/primary-failure failure-state)))
+    (is (< workload-completion-index recovery-index))
+    (is (= 1 (count (filter #{:ordinary-workload} operations))))
+    (is (= [:final-nemesis-1 :final-nemesis-2]
+           (filter #{:final-nemesis-1 :final-nemesis-2
+                     :final-workload-1
+                     :final-workload-2}
+                   operations)))))
+
+(deftest stops-final-workload-after-a-harness-failure
+  (let [failure-state (harness/failure-state)
+        {:keys [operations]}
+        (simulate-lifecycle failure-state :final-workload-1)]
+    (is (some? (harness/primary-failure failure-state)))
+    (is (= [:final-nemesis-1 :final-nemesis-2 :final-workload-1]
+           (filter #{:final-nemesis-1 :final-nemesis-2
+                     :final-workload-1
+                     :final-workload-2}
+                   operations)))))
+
+(deftest selects-two-nodes-for-leader-removal
+  (doseq [nodes [["n1" "n2"] ["n1" "n2" "n3" "n4" "n5"]]]
+    (let [parsed (tools-cli/parse-opts ["--liveness=leader-removal-recovery"] cli/cli-opts)
+          options (assoc (:options parsed) :nodes nodes)]
+      (is (empty? (:errors (#'cli/prepare-options {:options options}))))
+      (with-redefs [openraft-nemesis/compose-packages
+                    (fn [& _] (throw (AssertionError. "Safety nemesis selected")))]
+        (let [test (cli/openraft-test options)]
+          (is (= ["n1" "n2"] (:nodes test)))
+          (is (nil? (:two-leaf-partition test)))
+          (is (= openraft-db/default-snapshot-threshold (:snapshot-threshold test)))))))
+  (doseq [nodes [["n1"] ["n1" "n1"]]]
+    (is (seq (:errors (#'cli/prepare-options
+                       {:options {:liveness :leader-removal-recovery :nodes nodes}}))))))

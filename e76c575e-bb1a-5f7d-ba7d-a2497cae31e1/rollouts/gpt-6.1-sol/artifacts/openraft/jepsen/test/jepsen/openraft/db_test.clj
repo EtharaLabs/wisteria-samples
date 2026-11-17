@@ -1,0 +1,565 @@
+(ns jepsen.openraft.db-test
+  (:require [clojure.test :refer [deftest is testing]]
+            [jepsen.control :as c]
+            [jepsen.control.util :as cu]
+            [jepsen.core :as jepsen]
+            [jepsen.db :as db]
+            [jepsen.nemesis :as nemesis]
+            [jepsen.openraft.cluster :as cluster]
+            [jepsen.openraft.db :as openraft-db]
+            [jepsen.openraft.nemesis.process :as process]
+            [jepsen.random :as random]))
+
+(def test-config
+  {:api-port 21001
+   :raft-port 22001
+   :snapshot-threshold 250})
+
+(defn- command-kind [command]
+  (cond
+    (= :bash (first command)) :probe
+    (= :killall (first command)) (case (nth command 2)
+                                   9 :kill
+                                   "STOP" :pause
+                                   "CONT" :resume)
+    (= :mkdir (first command)) :mkdir
+    (some #{:start-stop-daemon} command) :start))
+
+(defn- argument-after [command argument]
+  (let [index (.indexOf command argument)]
+    (when-not (neg? index)
+      (nth command (inc index)))))
+
+(deftest process-recovery-preserves-pause-after-node-recreation
+  (doseq [initial-state [:absent :running]]
+    (testing (str "n1 was " initial-state " before the kill")
+      (let [nodes ["n1" "n2" "n3"]
+            test (assoc test-config
+                        :nodes nodes
+                        :sessions (zipmap nodes (repeat :unused-session)))
+            states (atom {"n1" initial-state
+                          "n2" :running
+                          "n3" :running})
+            selected (atom ["n3" "n1"])
+            starts (atom [])
+            database (openraft-db/db {})
+            process-nemesis (process/process-nemesis database)
+            pause-nemesis (process/pause-nemesis database)]
+        (with-redefs [c/exec
+                      (fn [& command]
+                        (let [node c/*host*]
+                          (case (command-kind command)
+                            :probe (name (get @states node))
+                            :kill (do
+                                    (swap! states assoc node :absent)
+                                    "")
+                            :pause (do
+                                     (swap! states assoc node :paused)
+                                     "")
+                            :resume (do
+                                      (swap! states assoc node :running)
+                                      "")
+                            :start (do
+                                     (swap! starts conj node)
+                                     (swap! states assoc node :running)
+                                     "")
+                            "")))
+                      cu/await-tcp-port (fn [& _])
+                      cluster/membership-status
+                      (constantly {:leader "n2"
+                                   :metrics (zipmap nodes (repeat {}))})
+                      cluster/voter-configs (fn [_test _status] [(set nodes)])
+                      random/nonempty-subset (fn [_nodes] @selected)]
+          (testing "kill records each target's actual state"
+            (let [op {:type :info :f :kill-process :value :random}
+                  result (nemesis/invoke! process-nemesis test op)
+                  stop-results (get-in result [:value :stop-results])
+                  n1-result (if (= :absent initial-state) :target-absent :killed)]
+              (is (= {"n1" n1-result "n3" :killed} stop-results))))
+          (testing "membership recreates n1 before another fault pauses it"
+            (openraft-db/start-empty-node! database test "n1")
+            (reset! selected ["n1" "n2"])
+            (let [op {:type :info :f :pause-process :value :random}
+                  result (nemesis/invoke! pause-nemesis test op)
+                  pause-results (get-in result [:value :pause-results])]
+              (is (= {"n1" :paused "n2" :paused} pause-results))))
+          (testing "restart preserves the pause and restores the absent n3"
+            (reset! starts [])
+            (let [result (nemesis/invoke! process-nemesis test
+                                          {:type :info :f :restart-process})
+                  start-results (get-in result [:value :start-results])
+                  expected (cond-> {"n3" :start-confirmed}
+                             (= :running initial-state)
+                             (assoc "n1" :already-paused))]
+              (is (= expected start-results))
+              (is (= ["n3"] @starts))
+              (is (= {"n1" :paused "n2" :paused "n3" :running} @states))))
+          (testing "pause recovery completes restoration"
+            (let [result (nemesis/invoke! pause-nemesis test
+                                          {:type :info :f :resume-process})
+                  status (get-in result [:value :status])]
+              (is (= :installed status))
+              (is (= {"n1" :running "n2" :running "n3" :running} @states)))))))))
+
+(deftest process-recovery-reports-existing-processes-without-changing-them
+  (let [database (openraft-db/db {})]
+    (doseq [[state expected] [["running" :already-running]
+                              ["paused" :already-paused]]]
+      (let [commands (atom [])
+            result (with-redefs [c/exec (fn [& command]
+                                          (swap! commands conj (command-kind command))
+                                          state)]
+                     (openraft-db/recover-process! database test-config "n1"))]
+        (is (= expected result))
+        (is (= [:probe] @commands))))))
+
+(deftest starts-and-confirms-the-test-app
+  (doseq [options [{} {:two-leaf-partition true} {:liveness :leader-removal-recovery}]]
+    (testing (str "scenario options " options)
+      (let [calls (atom [])
+            running? (atom false)
+            database (openraft-db/db {})]
+        (with-redefs [c/exec
+                      (fn [& command]
+                        (swap! calls conj command)
+                        (case (command-kind command)
+                          :probe (if @running? "running" "absent")
+                          :start (do (reset! running? true) "")
+                          ""))]
+          (is (= :start-confirmed
+                 (db/start! database (merge test-config options) "n1"))))
+        (let [start-command (vec (first (filter #(= :start (command-kind %)) @calls)))
+              pre-vote-flags (filter #{:--enable-pre-vote} start-command)]
+          (is (some #{:--oknodo} start-command))
+          (is (= "n1" (argument-after start-command :--id)))
+          (is (= "n1:21001" (argument-after start-command :--api-addr)))
+          (is (= "n1:22001" (argument-after start-command :--raft-addr)))
+          (is (= 250 (argument-after start-command :--snapshot-threshold)))
+          (is (= (= :leader-removal-recovery (:liveness options))
+                 (boolean (some #{:--disable-leader-restore} start-command))))
+          (is (= (if (:two-leaf-partition options) 1 0) (count pre-vote-flags)))
+          (when (:two-leaf-partition options)
+            (is (< (.indexOf start-command :--)
+                   (.indexOf start-command :--enable-pre-vote)
+                   (.indexOf start-command :>>)))))))))
+
+(deftest preserves-removed-leader-policy-across-node-starts
+  (doseq [policy [:default :never]]
+    (let [commands (atom [])
+          database (openraft-db/db {})
+          test (assoc test-config :removed-leader-step-down policy)]
+      (with-redefs [c/exec
+                    (fn [& command]
+                      (case (command-kind command)
+                        :probe "absent"
+                        :start (do (swap! commands conj (vec command)) "")
+                        ""))]
+        (with-redefs-fn {#'openraft-db/await-process-state! (fn [_])}
+          (fn []
+            (doseq [node ["n1" "n2" "n1"]]
+              (db/start! database test node)))))
+      (is (= ["n1" "n2" "n1"] (mapv #(argument-after % :--id) @commands)))
+      (is (= (repeat 3 (= :never policy))
+             (map #(boolean (some #{:--disable-removed-leader-step-down} %)) @commands))))))
+
+(deftest retains-the-existing-bootstrap-observation-when-requested
+  (doseq [node ["n1" "n2"]
+          capture? [false true]]
+    (let [bootstrap-state (atom nil)
+          status {:leader "n1" :metrics {"n1" {:current_term 7}}}
+          bootstraps (atom 0)
+          running? (atom false)
+          database (openraft-db/db {})
+          test (cond-> test-config
+                 capture? (assoc :bootstrap-state bootstrap-state))]
+      (with-redefs [c/exec (fn [& command]
+                             (case (command-kind command)
+                               :probe (if @running? "running" "absent")
+                               :start (do (reset! running? true) "")
+                               ""))
+                    cu/await-tcp-port (fn [& _])
+                    jepsen/synchronize (fn [_])
+                    jepsen/primary (constantly "n1")
+                    cluster/bootstrap! (fn [_]
+                                         (swap! bootstraps inc)
+                                         status)]
+        (db/setup! database test node))
+      (is (= (if (= "n1" node) 1 0) @bootstraps))
+      (is (= (when (and capture? (= "n1" node)) status)
+             @bootstrap-state)))))
+
+(deftest uses-explicit-process-evidence-when-starting
+  (let [database (openraft-db/db {})]
+    (testing "an already running process is not started again"
+      (let [starts (atom 0)]
+        (with-redefs [c/exec
+                      (fn [& command]
+                        (case (command-kind command)
+                          :probe "running"
+                          :start (do (swap! starts inc) "")
+                          ""))]
+          (is (= :already-running
+                 (db/start! database test-config "n1"))))
+        (is (zero? @starts))))
+
+    (testing "a paused process is not treated as already running"
+      (let [starts (atom 0)
+            error (with-redefs [c/exec
+                                (fn [& command]
+                                  (case (command-kind command)
+                                    :probe "paused"
+                                    :start (do (swap! starts inc) "")
+                                    ""))]
+                    (try
+                      (db/start! database test-config "n1")
+                      nil
+                      (catch Exception e
+                        e)))]
+        (is (= :unexpected-existing-process-state
+               (:kind (ex-data error))))
+        (is (= :paused (:state (ex-data error))))
+        (is (zero? @starts))))
+
+    (testing "an exit-one start failure propagates unchanged"
+      (let [error (ex-info "permission denied"
+                           {:type :jepsen.control/nonzero-exit
+                            :exit 1})
+            thrown (with-redefs [c/exec
+                                 (fn [& command]
+                                   (case (command-kind command)
+                                     :probe "absent"
+                                     :start (throw error)
+                                     ""))]
+                     (try
+                       (db/start! database test-config "n1")
+                       nil
+                       (catch Exception e
+                         e)))]
+        (is (identical? error thrown))))
+
+    (testing "a background start that never appears times out"
+      (let [error
+            (with-redefs-fn
+              {#'c/exec
+               (fn [& command]
+                 (case (command-kind command)
+                   :probe "absent"
+                   ""))
+               #'openraft-db/process-confirm-timeout-ms 0}
+              #(try
+                 (db/start! database test-config "n1")
+                 nil
+                 (catch Exception e
+                   e)))]
+        (is (= :process-confirmation-timeout
+               (:kind (ex-data error))))))))
+
+(deftest pauses-and-resumes-processes-with-strict-evidence
+  (let [database (openraft-db/db {})]
+    (testing "a pause signal is confirmed"
+      (let [state (atom :running)
+            calls (atom [])]
+        (with-redefs [c/exec
+                      (fn [& command]
+                        (swap! calls conj command)
+                        (case (command-kind command)
+                          :probe (name @state)
+                          :pause (do (reset! state :paused) "")
+                          ""))]
+          (is (= :paused (db/pause! database {} "n1"))))
+        (is (= [:probe :pause :probe]
+               (mapv command-kind @calls)))))
+
+    (testing "a resume signal is confirmed"
+      (let [state (atom :paused)
+            calls (atom [])]
+        (with-redefs [c/exec
+                      (fn [& command]
+                        (swap! calls conj command)
+                        (case (command-kind command)
+                          :probe (name @state)
+                          :resume (do (reset! state :running) "")
+                          ""))]
+          (is (= :resumed (db/resume! database {} "n1"))))
+        (is (= [:probe :resume :probe]
+               (mapv command-kind @calls)))))
+
+    (doseq [[label operation]
+            [[:pause #(db/pause! database {} "n1")]
+             [:resume #(db/resume! database {} "n1")]]]
+      (testing (str (name label) " records a pre-probe absence")
+        (let [calls (atom [])]
+          (with-redefs [c/exec
+                        (fn [& command]
+                          (swap! calls conj command)
+                          (case (command-kind command)
+                            :probe "absent"
+                            ""))]
+            (is (= :target-absent (operation))))
+          (is (= [:probe] (mapv command-kind @calls))))))
+
+    (doseq [[label process-state operation]
+            [[:pause :running #(db/pause! database {} "n1")]
+             [:resume :paused #(db/resume! database {} "n1")]]]
+      (testing (str (name label) " records an explicit exit race")
+        (let [race (ex-info "no process found"
+                            {:type :jepsen.control/nonzero-exit
+                             :exit 1
+                             :err (str openraft-db/process-name
+                                       ": no process found")})]
+          (with-redefs [c/exec
+                        (fn [& command]
+                          (case (command-kind command)
+                            :probe (name process-state)
+                            (:pause :resume) (throw race)
+                            ""))]
+            (is (= :target-already-exited (operation)))))))
+
+    (doseq [[label process-state operation]
+            [[:pause :running #(db/pause! database {} "n1")]
+             [:resume :paused #(db/resume! database {} "n1")]]]
+      (testing (str (name label) " propagates control failures")
+        (let [error (ex-info "permission denied"
+                             {:type :jepsen.control/nonzero-exit
+                              :exit 1
+                              :err "permission denied"})
+              thrown (with-redefs [c/exec
+                                   (fn [& command]
+                                     (case (command-kind command)
+                                       :probe (name process-state)
+                                       (:pause :resume) (throw error)
+                                       ""))]
+                       (try
+                         (operation)
+                         nil
+                         (catch Exception e
+                           e)))]
+          (is (identical? error thrown)))))
+
+    (doseq [[label process-state operation]
+            [[:pause :running #(db/pause! database {} "n1")]
+             [:resume :paused #(db/resume! database {} "n1")]]]
+      (testing (str (name label) " has bounded confirmation")
+        (let [error
+              (with-redefs-fn
+                {#'c/exec
+                 (fn [& command]
+                   (case (command-kind command)
+                     :probe (name process-state)
+                     ""))
+                 #'openraft-db/process-confirm-timeout-ms 0}
+                #(try
+                   (operation)
+                   nil
+                   (catch Exception e
+                     e)))]
+          (is (= :process-confirmation-timeout
+                 (:kind (ex-data error)))))))))
+
+(deftest stops-processes-with-strict-evidence
+  (let [database (openraft-db/db {})]
+    (testing "a pre-probe absence is a structured no-op"
+      (let [calls (atom [])]
+        (with-redefs [c/exec
+                      (fn [& command]
+                        (swap! calls conj command)
+                        (case (command-kind command)
+                          :probe "absent"
+                          ""))]
+          (is (= :target-absent (db/kill! database {} "n1"))))
+        (is (= [:probe]
+               (mapv command-kind @calls)))))
+
+    (testing "a successful kill is confirmed absent"
+      (let [running? (atom true)
+            calls (atom [])]
+        (with-redefs [c/exec
+                      (fn [& command]
+                        (swap! calls conj command)
+                        (case (command-kind command)
+                          :probe (if @running? "running" "absent")
+                          :kill (do (reset! running? false) "")
+                          ""))]
+          (is (= :killed (db/kill! database {} "n1"))))
+        (is (= [:probe :kill :probe]
+               (mapv command-kind @calls)))))
+
+    (testing "an explicit exit race is skipped without polling"
+      (let [calls (atom [])
+            race (ex-info "no process found"
+                          {:type :jepsen.control/nonzero-exit
+                           :exit 1
+                           :err "openraft-jepsen-app: no process found"})]
+        (with-redefs [c/exec
+                      (fn [& command]
+                        (swap! calls conj command)
+                        (case (command-kind command)
+                          :probe "running"
+                          :kill (throw race)
+                          ""))]
+          (is (= :target-already-exited
+                 (db/kill! database {} "n1"))))
+        (is (= [:probe :kill]
+               (mapv command-kind @calls)))))
+
+    (testing "permission failures are never treated as absence"
+      (let [removed? (atom false)
+            error (ex-info "permission denied"
+                           {:type :jepsen.control/nonzero-exit
+                            :exit 1
+                            :err "permission denied"})
+            thrown (with-redefs [c/exec
+                                 (fn [& command]
+                                   (case (command-kind command)
+                                     :probe "running"
+                                     :kill (throw error)
+                                     :remove (do (reset! removed? true) "")))]
+                     (try
+                       (db/kill! database {} "n1")
+                       nil
+                       (catch Exception e
+                         e)))]
+        (is (identical? error thrown))
+        (is (false? @removed?))))
+
+    (testing "mixed control diagnostics are not an explicit exit race"
+      (let [error (ex-info "kill failed"
+                           {:type :jepsen.control/nonzero-exit
+                            :exit 1
+                            :err (str "permission denied\n"
+                                      openraft-db/process-name
+                                      ": no process found")})
+            thrown (with-redefs [c/exec
+                                 (fn [& command]
+                                   (case (command-kind command)
+                                     :probe "running"
+                                     :kill (throw error)
+                                     ""))]
+                     (try
+                       (db/kill! database {} "n1")
+                       nil
+                       (catch Exception e
+                         e)))]
+        (is (identical? error thrown))))
+
+    (testing "a process that remains running fails bounded confirmation"
+      (let [error
+            (with-redefs-fn
+              {#'c/exec
+               (fn [& command]
+                 (case (command-kind command)
+                   :probe "running"
+                   ""))
+               #'openraft-db/process-confirm-timeout-ms 0}
+              #(try
+                 (db/kill! database {} "n1")
+                 nil
+                 (catch Exception e
+                   e)))]
+        (is (= :process-confirmation-timeout
+               (:kind (ex-data error))))))))
+
+(deftest process-control-preserves-interruptions
+  (doseq [[label make-error]
+          [[:interrupted #(InterruptedException. "interrupted")]
+           [:interrupted-io
+            #(java.io.InterruptedIOException. "interrupted")]
+           [:closed-by-interrupt
+            #(java.nio.channels.ClosedByInterruptException.)]
+           [:wrapped
+            #(ex-info "interrupted"
+                      {:kind :interrupted
+                       :type :jepsen.control/nonzero-exit
+                       :exit 1
+                       :err "no process found"})]]]
+    (testing (name label)
+      (Thread/interrupted)
+      (try
+        (let [error (make-error)
+              database (openraft-db/db {})
+              [thrown interrupted?]
+              (with-redefs [c/exec (fn [& _] (throw error))]
+                (try
+                  (db/kill! database {} "n1")
+                  [nil (.isInterrupted (Thread/currentThread))]
+                  (catch Exception e
+                    [e (.isInterrupted (Thread/currentThread))])))]
+          (is (identical? error thrown))
+          (is interrupted?))
+        (finally
+          (Thread/interrupted))))))
+
+(deftest every-process-control-stage-preserves-interruptions
+  (let [database (openraft-db/db {})
+        stages
+        [{:label :kill-signal
+          :operation #(db/kill! database {} "n1")
+          :exec (fn [error command]
+                  (case (command-kind command)
+                    :probe "running"
+                    :kill (throw error)
+                    ""))}
+         {:label :pause-signal
+          :operation #(db/pause! database {} "n1")
+          :exec (fn [error command]
+                  (case (command-kind command)
+                    :probe "running"
+                    :pause (throw error)
+                    ""))}
+         {:label :resume-signal
+          :operation #(db/resume! database {} "n1")
+          :exec (fn [error command]
+                  (case (command-kind command)
+                    :probe "paused"
+                    :resume (throw error)
+                    ""))}
+         {:label :start-command
+          :operation #(db/start! database test-config "n1")
+          :exec (fn [error command]
+                  (case (command-kind command)
+                    :probe "absent"
+                    :start (throw error)
+                    ""))}
+         {:label :recovery-probe
+          :operation #(openraft-db/recover-process! database test-config "n1")
+          :exec (fn [error _command] (throw error))}
+         {:label :recovery-start-command
+          :operation #(openraft-db/recover-process! database test-config "n1")
+          :exec (fn [error command]
+                  (case (command-kind command)
+                    :probe "absent"
+                    :start (throw error)
+                    ""))}]]
+    (doseq [{:keys [label operation exec]} stages]
+      (testing (name label)
+        (Thread/interrupted)
+        (try
+          (let [error (InterruptedException. "interrupted")
+                [thrown interrupted?]
+                (with-redefs [c/exec (fn [& command]
+                                       (exec error command))]
+                  (try
+                    (operation)
+                    [nil (.isInterrupted (Thread/currentThread))]
+                    (catch Exception e
+                      [e (.isInterrupted (Thread/currentThread))])))]
+            (is (identical? error thrown))
+            (is interrupted?))
+          (finally
+            (Thread/interrupted)))))))
+
+(deftest passes-the-process-pattern-as-a-separate-argument
+  (let [calls (atom [])
+        adversarial "/tmp/openraft app; touch /tmp/not-run"
+        database (openraft-db/db {})]
+    (with-redefs [openraft-db/binary adversarial
+                  c/exec (fn [& command]
+                           (swap! calls conj command)
+                           (if (= :probe (command-kind command))
+                             "absent"
+                             ""))]
+      (is (= :target-absent (db/kill! database {} "n1"))))
+    (let [probe (first @calls)]
+      (is (not (.contains ^String (nth probe 2) adversarial)))
+      (is (= (str "^" adversarial "([[:space:]].*)?$")
+             (last probe))))))

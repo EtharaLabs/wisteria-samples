@@ -1,0 +1,341 @@
+{
+  "reward": {
+    "kind": "group",
+    "score": 0.375,
+    "aggregation": "weighted-sum",
+    "components": [
+      {
+        "name": "judge",
+        "weight": 0.5,
+        "detail": {
+          "score": 0.75,
+          "criteria": [
+            {
+              "id": "O1",
+              "name": "in_app_diagnosis_md_does_the_note_iden",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 5.0,
+              "description": "In /app/diagnosis.md, does the note identify that the flow-controlled push consumer delivers a message before replicating its delivered state, so that after a consumer leadership change a delivery issued before the change can still arrive after it?",
+              "reasoning": "The note says the flow-control exception sends the message to outq immediately after proposing updateDeliveredOp, without waiting for quorum. It also says a delivery issued by the old leader can still be in flight and arrive after the new leader restores state. Its worked interleaving has the old leader's upstream 552 / delivery 552 arriving after the leadership change. That matches the criterion's two points: delivery happens before the delivered state is replicated, and a pre-change delivery can arrive after the change.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "O2",
+              "name": "does_app_diagnosis_md_state_that_after",
+              "value": 0.0,
+              "raw": "no",
+              "weight": 5.0,
+              "description": "Does /app/diagnosis.md state that after the consumer is reset its delivery sequence restarts at 1, so a stale delivery from before the reset can take the delivery number a new delivery needs?",
+              "reasoning": "The submission's diagnosis centers on uncommitted delivery numbers being reused after a leadership change. It also describes a second race, where selection continues during a pending reset and entries carry the old epoch's delivery numbers. It never says that a reset restarts the delivery sequence at 1, so a stale pre-reset delivery can take the number a new delivery needs. It mentions that reset establishes \"next delivery number 1\" only as part of the repair. Its main mechanism is reuse of the restored delivered state's next number after a leader change, not a restart at 1 after a reset. The stale-delivery-collides-with-new-delivery idea is partly present, but the specific claim about the reset restarting at 1 is missing as a cause.",
+              "samples": [
+                "no",
+                "no",
+                "no"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "O3",
+              "name": "does_app_diagnosis_md_explain_the_downs",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 5.0,
+              "description": "Does /app/diagnosis.md explain the downstream consequence: the source drops the new message as a duplicate and the mirror marks its sequence deleted, leaving interior gaps the origin still holds?",
+              "reasoning": "The submission explains the downstream consequence. A reused delivery number makes the receiver treat the new message as a duplicate. The duplicate is suppressed, but it still advances delivery accounting. The mirror then calls skipMsgs and marks the sequence as skipped or deleted. Later arrival of the missing message is suppressed because it is older than the watermark. The result is interior holes while the origin retains everything, with no error logged and the stream still progressing. Its mechanism differs from the reference's. It uses a stale or duplicate message advancing the count, and a later message being dropped as old. The reference has the new message dropped as a duplicate. Even so, the key consequence is covered: the new message is dropped, the mirror marks the sequence deleted, and interior gaps remain that the origin still holds. The source's behavior is described somewhat differently, because it accepts the jump rather than marking deletes. That is a minor difference.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "O4",
+              "name": "does_app_diagnosis_md_rule_out_ordinary",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 3.0,
+              "description": "Does /app/diagnosis.md rule out ordinary message redelivery as the cause, on the grounds that the messages are lost rather than re-sent?",
+              "reasoning": "The diagnosis says \"Ordinary redelivery is not itself data loss\": a retry can raise the consumer delivery sequence without raising the stream sequence, and \"repeated delivery of an origin message does not delete an interior downstream message.\" It also says the loss is interior holes while the origin stays intact. That rules out ordinary redelivery as the cause. The reasoning is framed a little differently from the reference's \"lost rather than re-sent\". It still says redelivery re-sends and does not remove data, so it matches in substance. It does allow redelivery to take part in the bad interleaving, but it rejects redelivery as the root cause.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "O5",
+              "name": "does_app_diagnosis_md_rule_out_legitima",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 3.0,
+              "description": "Does /app/diagnosis.md rule out legitimate duplicate suppression as the cause, recognising that a genuinely new message is being misclassified as a duplicate?",
+              "reasoning": "The diagnosis says ordinary duplicate suppression is not itself data loss. It says the defect makes delivery accounting give false evidence of continuity. It says a late missing message is suppressed only as a consequence of that false continuity decision. It also says the receiver's continuity test is passed by reused delivery numbers, so a genuinely new upstream message (such as 551) is wrongly suppressed after the watermark has advanced. This is the same conclusion as the reference, which reads it as a new message misclassified as a duplicate. The mechanism differs a little, but the ruling-out is explicit.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "O6",
+              "name": "does_app_diagnosis_md_rule_out_acknowle",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 3.0,
+              "description": "Does /app/diagnosis.md rule out acknowledgement lag as the cause, noting that lag does not delete interior sequences or lose messages permanently?",
+              "reasoning": "The diagnosis has a bullet, \"Ordinary acknowledgement lag is not itself data loss.\" It says ack state may trail delivered state, causing pending messages and retries. It says this \"does not authorize skipping retained origin data.\" It says faster acknowledgements or waiting for lag to clear is \"no correctness fix.\" That rules out ack lag as the cause. It conveys that lag does not permanently lose messages. It does not say in those exact words that lag doesn't delete interior sequences, but the point comes through. Other parts of the document add that the missing data is an interior hole caused by false continuity. This is close enough to the criterion.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "O7",
+              "name": "does_app_diagnosis_md_justify_that_deli",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 5.0,
+              "description": "Does /app/diagnosis.md justify that deliveries must be held while a reset is pending, because a delivery proposed before the reset applies must not mix into the delivered state after it?",
+              "reasoning": "The diagnosis argues that a reset must act as a barrier for delivery selection. It says getNextMsg returns errConsumerReset while a reset is pending. It says a delivery selected before the reset and reaching quorum during the barrier is released without being sent. It says a generation value invalidates messages prepared before the reset, so stale old-epoch delivery numbers can't follow the reset entry. This matches the reasoning that a delivery proposed before the reset applies must not mix into the delivered state after it. The explanation is framed around selection and in-flight entries carrying old-epoch delivery numbers, not the exact wording, but it justifies the same thing.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "O8",
+              "name": "does_app_diagnosis_md_explain_how_afte",
+              "value": 0.0,
+              "raw": "no",
+              "weight": 5.0,
+              "description": "Does /app/diagnosis.md explain how, after a reset, the downstream agrees with the consumer on which delivery number comes next, and why that agreement must hold even when delivery resumes before the post-reset state is gathered? An equivalent mechanism of the submitted repair counts.",
+              "reasoning": "The criterion asks the doc to explain how, after a reset, the downstream agrees with the consumer on the next delivery number. The reference does this by having the reset response report the reset point and having the downstream seed its delivery counting from it. The reason given is that delivery resumes before post-reset consumer info is gathered. The submission never describes that mechanism or an equivalent. It handles the problem on the producer side. It blocks selection during a reset, uses a quorum delivery path, applies a generation guard, and resets the consumer's own state to sequence `seq` and delivery 1. It does not say that the downstream is told or seeded with the post-reset delivery number. It also does not explain why that agreement must hold when delivery resumes before info is gathered. The submission's stated principle is that the producer enforces the existing continuity assumptions, so there is no downstream-consumer agreement mechanism. It does not meet the criterion.",
+              "samples": [
+                "no",
+                "no",
+                "no"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "O9",
+              "name": "does_app_diagnosis_md_explain_how_its_r",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 5.0,
+              "description": "Does /app/diagnosis.md explain how its repair keeps a delivery that arrives after a reset, carrying a stale or reused delivery number, from being counted as a new delivery?",
+              "reasoning": "The criterion asks whether the diagnosis explains how the repair keeps a post-reset delivery carrying a stale or reused delivery number from being counted as new. The submission does this, though by a different mechanism from the reference. It does not change the receiver's counting. Instead it stops reuse at the producer. Delivery numbers are made durable by quorum before they become visible. A reset barrier blocks selection while a reset is pending. A generation value invalidates messages prepared before a reset. Queued pre-reset deliveries are released without being sent. Flow-control identity and byte accounting are cleared so delayed old responses cannot cross a reset. The submission also states that stale deliveries are suppressed as duplicates, and that the repair enforces the receiver's continuity assumptions at the producer. This covers stale or reused delivery numbers after a reset, so it qualifies.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "O10",
+              "name": "does_app_diagnosis_md_explain_how_its_r",
+              "value": 0.0,
+              "raw": "no",
+              "weight": 3.0,
+              "description": "Does /app/diagnosis.md explain how its repair keeps a genuinely new message from being dropped as a duplicate when a stale delivery has already taken its delivery number?",
+              "reasoning": "The criterion asks whether the diagnosis explains how the repair keeps a genuinely new message from being dropped as a duplicate when a stale delivery has already taken its delivery number. The reference does this by counting each delivery once: it tracks the last counted stream sequence and advances only when the delivery number is one past the last and the stream sequence is above the last counted. A new source message whose delivery number is not above the last counted is retried instead of dropped.\n\nThe submission takes a different approach. Its repair works at the producer. It sends deliveries only after quorum, adds a reset barrier, and uses a generation value to invalidate stale deliveries. It states that it does not change the receiver. It says \"Only changing mirror gap detection would break legitimate upstream deletion...\" and \"These changes preserve the protocol's existing continuity assumptions by enforcing them at the producer.\"\n\nThe submission does explain how a stale delivery that takes a delivery number leads to the loss of a new message. It also explains how its producer-side repair prevents delivery numbers from being reused. But it never explains how the repair stops a genuinely new message from being dropped as a duplicate once a stale delivery has already taken its number. It prevents the stale delivery from occurring at all, and it does not handle the case where one has already happened.\n\nThe match is therefore only loose, and the specific mechanism the criterion asks about is missing.",
+              "samples": [
+                "no",
+                "no",
+                "no"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "O11",
+              "name": "does_app_diagnosis_md_explain_why_repai",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 3.0,
+              "description": "Does /app/diagnosis.md explain why repairing only the consumer side, or only the downstream accounting, leaves the defect in place?",
+              "reasoning": "The diagnosis explicitly explains why a narrow fix fails. It says changing only mirror gap detection would break legitimate deletion handling and would not make the consumer numbering trustworthy. It also says that fixing only the producer side, such as removing the flow-control exception, would leave the reset-era selection race. The same section covers delaying flow-control packets or clearing byte accounting alone, and a pending-reset check done only at send time. This matches the criterion, though the reference's consumer-plus-stream split is framed differently. Here the downstream fix is argued against rather than combined with a consumer fix.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "O12",
+              "name": "does_app_diagnosis_md_explain_why_resta",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 1.0,
+              "description": "Does /app/diagnosis.md explain why restarting the servers does not fix it (the defect is in delivery/reset accounting, not transient runtime state)?",
+              "reasoning": "The \"Restarting servers\" section explains that a restart restores persisted/agreed state, doesn't undo downstream skip records or watermarks, and leaves the faulty delivery path in the binary. It adds that a restart can itself expose the discrepancy and that a quiet restart might only avoid the race on one run. This locates the defect in delivery/reset accounting and not in transient runtime state, which is what the criterion asks for.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "O13",
+              "name": "does_app_diagnosis_md_explain_why_purgi",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 3.0,
+              "description": "Does /app/diagnosis.md explain why purging/truncating/re-reading a downstream stream, or deleting and recreating the consumer, mirror or source, does not fix it?",
+              "reasoning": "The diagnosis has a section, \"Why operational shortcuts are not repairs\". It covers purging/truncating/re-reading downstream. Purging destroys stored messages. Re-reading doesn't fill holes because of the watermark. Neither prevents recurrence at the next transition. It also covers deleting and recreating the consumer, mirror and source. That discards state, leaves the defect in place so it can recur, and doesn't clear the watermark. This matches the reference's reasoning: it destroys stored messages and the race recurs.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "O14",
+              "name": "does_app_diagnosis_md_explain_why_turni",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 3.0,
+              "description": "Does /app/diagnosis.md explain why turning off flow control on the consumer does not fix it (the race is independent of flow control, which must stay active)?",
+              "reasoning": "The \"Turning off consumer flow control\" section says AckFlowControl requires flow control, so disabling it isn't permitted. It also says \"disabling flow control does not repair the reset barrier and is not a repair of the required durable flow-controlled path. The corrected path keeps flow control enabled.\" This covers both that the reset race is independent of flow control and that flow control must stay active. The document also describes the flow-control exception as part of the cause, which is a bit at odds with the reference. The explanation still covers both required points, though it is brief.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            }
+          ],
+          "kind": "llm",
+          "judge": {
+            "model": "anthropic/claude-sonnet-5-5",
+            "reasoning_effort": "medium",
+            "timeout": 300,
+            "files": [
+              "/app/diagnosis.md"
+            ],
+            "atif_trajectory": null,
+            "reference": "/tests/reference/diagnosis.md",
+            "mode": "individual",
+            "samples": 3,
+            "guard": "penalize"
+          },
+          "judge_output": "--- sample 1 ---\n--- in_app_diagnosis_md_does_the_note_iden ---\n{\"score\": \"yes\", \"reasoning\": \"The note says the flow-control exception made `deliverMsg` put the message on `outq` immediately. It did this while the delivered-state proposal had not committed. It says a delivery number sent by the previous leader without quorum can be reused after a leadership change. It also says the old leader's remaining packets can still be in flight and arrive after the new leader's deliveries. This matches the criterion: delivery happens before the delivered state is replicated, so a pre-change delivery can arrive after the change.\"}\n\n--- does_app_diagnosis_md_state_that_after ---\n{\"score\": \"no\", \"reasoning\": \"The submission's diagnosis doesn't say that after a reset the delivery sequence restarts at 1 and that a stale pre-reset delivery can take the number a new delivery needs. It describes a different mechanism. On leadership change, the new leader restores the agreed delivered state and reuses delivery numbers that the old leader sent without quorum. That is reuse of uncommitted numbers, not a restart at 1 after a reset. The reset section does say that reset application establishes \\\"next delivery number 1\\\". It also says entries produced during the reset interval \\\"can follow the reset entry while carrying the old epoch's delivery numbers\\\". But it never states the collision as the criterion words it: the sequence restarts at 1, so a stale delivery takes the number a new delivery needs. That is only a loose partial match.\"}\n\n--- does_app_diagnosis_md_explain_the_downs ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis explains the downstream consequence. A duplicate whose delivery number is the next expected one is suppressed but still advances the downstream delivery accounting. The later upstream message then looks consecutive, and the receiver treats the jump as a legitimate upstream deletion. The mirror calls skipMsgs and records 551 as skipped. When the real message arrives, it is older than the watermark and is suppressed. The origin still holds the data, so the downstream stream ends up with interior holes and no error. The mechanism differs from the reference. It attributes the collision to reused delivery numbers after uncommitted deliveries and describes the source as accepting the jump, not marking a sequence deleted. It still covers the core points: the new message is dropped, the mirror marks the sequence skipped or deleted, and interior gaps remain that the origin holds. The source behavior is described a little differently, but the overall consequence matches.\"}\n\n--- does_app_diagnosis_md_rule_out_ordinary ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis has a bullet \\\"Ordinary redelivery is not itself data loss.\\\" It says redelivery can increase the consumer delivery sequence without increasing the stream sequence, and that \\\"repeated delivery of an origin message does not delete an interior downstream message.\\\" It also says the problem is a missing durable quorum record. The reference rules redelivery out because messages are lost, not re-sent. The submission gives a related but somewhat different reason. Its core point is that redelivery re-sends and does not delete, and that the interior holes come from false continuity. That is close enough to count as ruling it out on the grounds that data is lost, not re-sent. It does allow that redelivery can take part in the bad interleaving, which weakens the match slightly. Overall it rules redelivery out as the cause.\"}\n\n--- does_app_diagnosis_md_rule_out_legitima ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says ordinary duplicate suppression is not itself data loss. It says suppression of a late missing message happens only after the watermark was wrongly advanced, because of false continuity. In its interleaving example, upstream 551 arrives and is suppressed even though it is a genuinely new, missing message. This rules out legitimate suppression as the cause and recognizes that a new message is being misclassified. The mechanism differs from the reference's, which centers on a delivery-number collision after reset, but the conclusion matches.\"}\n\n--- does_app_diagnosis_md_rule_out_acknowle ---\n{\"score\": \"yes\", \"reasoning\": \"The \\\"Ordinary acknowledgement lag is not itself data loss\\\" section rules out ack lag. It says ack state may trail delivered state, causing pending messages and retries, and that this does not authorize skipping retained origin data. It also says waiting for lag to disappear is no correctness fix. The wording is not identical to the criterion. It never says lag doesn't \\\"delete interior sequences\\\" or \\\"lose messages permanently\\\" in those terms. But the substance is the same: lag causes retries and pending messages, and it does not remove or skip retained data. A lenient reading counts this as meeting the criterion.\"}\n\n--- does_app_diagnosis_md_justify_that_deli ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis argues that reset must be a barrier for selection. getNextMsg returns errConsumerReset while a reset is pending, and deliveries queued before the reset are released without being sent. It says entries produced during that interval \\\"can follow the reset entry while carrying the old epoch's delivery numbers.\\\" That matches the criterion: a delivery proposed before the reset applies must not mix into the post-reset delivered state. It also adds a generation check and a final delivery guard. The justification is framed differently from the reference, which centers on a stale delivery colliding on delivery number. It still makes the same point about holding deliveries during a pending reset.\"}\n\n--- does_app_diagnosis_md_explain_how_afte ---\n{\"score\": \"no\", \"reasoning\": \"The criterion asks the diagnosis to explain how, after a reset, the downstream agrees with the consumer on the next delivery number. The reference does this by having the reset response report the reset point, which seeds the downstream's delivery counting. It also asks why this must hold when delivery resumes before post-reset info is gathered. The submission's repair takes a different route. It adds a reset barrier, a generation value, quorum delivery under flow control, and clearing byte accounting and the flow-control identity. Reset application sets the next delivery number to 1 on the consumer side. The document never describes any mechanism by which the downstream mirror or source agrees with the consumer on the next number after a reset. It doesn't cover the reset response carrying the reset point, and it doesn't explain why delivery can resume before the post-reset state is gathered. The submission's mechanism instead prevents delivery during the reset and removes uncommitted exposure. That is a different approach and doesn't address the downstream-consumer agreement, so it isn't an equivalent mechanism for this criterion.\"}\n\n--- does_app_diagnosis_md_explain_how_its_r ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis explains that stale or reused delivery numbers are prevented from being treated as new or continuous deliveries. It does this by making delivery numbers durable at quorum before they are visible, and by adding a reset barrier. The barrier blocks selection, releases stale prepared messages without sending them (generation check), and clears old flow-control identity and byte accounting so delayed old-epoch responses cannot count in the new epoch. This differs from the reference, which changes stream-side counting, but the criterion asks how the repair keeps a stale delivery after a reset from being counted as new, and the submission answers that in substance. One caveat: it says pre-barrier in-flight packets can still arrive, and it handles that by making numbering durable. That is still an explanation.\"}\n\n--- does_app_diagnosis_md_explain_how_its_r ---\n{\"score\": \"no\", \"reasoning\": \"The criterion asks whether the diagnosis explains how the repair keeps a genuinely new message from being dropped as a duplicate when a stale delivery has already taken its delivery number. The reference does this by counting each delivery once. It tracks the last counted stream sequence, and it retries a newer message from the next stream sequence instead of dropping it. The submission takes a different approach. It prevents the stale or reused delivery numbers at the producer, using quorum delivery, a reset barrier and a generation guard. It says explicitly that it does not change the receiver's continuity or duplicate checks. The submission does describe the mechanism: a stale redelivery advances the accounting, and the genuinely new message is then suppressed as older than the watermark. It also explains that the repair prevents number reuse by committing delivery numbers before they are visible. But it never explains how a new message avoids being dropped when a stale delivery has already taken its number. Its answer is that this situation is prevented from arising. The receiver-side handling in the reference, which is the core of the criterion, is absent. An indirect, prevention-based explanation exists, so a lenient reader might accept it. Strictly, though, the specific scenario is not addressed as a repair behavior.\"}\n\n--- does_app_diagnosis_md_explain_why_repai ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis has a paragraph explaining why partial repairs fail. It says changing only mirror gap detection (the downstream or consumer-accounting side) would break legitimate deletion handling and wouldn't make consumer numbering trustworthy. It also says removing only the flow-control exception leaves the reset-era selection race, and that only delaying flow-control packets leaves the exposure of uncommitted numbers. It also says the checks \\\"preserve the protocol's existing continuity assumptions by enforcing them at the producer\\\". The submission's fix is producer-side, unlike the reference's three-part fix, but the criterion only asks whether the file explains why a one-sided repair leaves the defect in place. The file does explain this, particularly for the downstream side. It says little about why a consumer-only fix is insufficient, but it does explain why fixing only the downstream side is not enough.\"}\n\n--- does_app_diagnosis_md_explain_why_resta ---\n{\"score\": \"yes\", \"reasoning\": \"The \\\"Restarting servers\\\" section explains that a restart restores persisted/agreed state, does not undo downstream skip records or watermarks, and leaves the faulty delivery path in the binary. It adds that a restart can itself expose the discrepancy and that a quiet restart might only avoid the race on one run. This says the defect is in the delivery/reset accounting code and not in transient runtime state, which matches the reference.\"}\n\n--- does_app_diagnosis_md_explain_why_purgi ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis has a section \\\"Why operational shortcuts are not repairs\\\". It explains that purging, truncating or re-reading downstream destroys stored content and doesn't fix the protocol, so the failure could recur at the next transition. It also says re-reading doesn't fill recorded holes because of the watermark. For deleting and recreating the consumer, it says the same flow-controlled replicated delivery code can repeat the failure, and it abandons durable state. For deleting and recreating the mirror or source, it calls this replacement that leaves the defect in the broker. These points match the reference's reasoning that the defect recurs and the objects must stay the same.\"}\n\n--- does_app_diagnosis_md_explain_why_turni ---\n{\"score\": \"yes\", \"reasoning\": \"The \\\"Turning off consumer flow control\\\" section says AckFlowControl requires flow control, so disabling it isn't permitted. It also says that disabling flow control \\\"does not repair the reset barrier and is not a repair of the required durable flow-controlled path,\\\" and that the corrected path keeps flow control enabled. This matches the criterion: the reset race is independent of flow control, and flow control must stay active. The diagnosis also says the flow-control exception is one cause, so the explanation is a little muddied. It does still state that disabling flow control wouldn't fix the reset race, and that flow control must stay on.\"}\n\n--- guard ---\n{\"score\": \"no\", \"reasoning\": \"The document is a technical diagnosis. It has no text addressed to an evaluator and no text about how the work should be scored. References to test results and validation describe the engineering work, not scoring.\"}\n\n--- sample 2 ---\n--- in_app_diagnosis_md_does_the_note_iden ---\n{\"score\": \"yes\", \"reasoning\": \"The note says the flow-control exception sends the message to outq immediately after proposing updateDeliveredOp, without waiting for quorum. It also says a delivery issued by the old leader can still be in flight and arrive after the new leader restores state. Its worked interleaving has the old leader's upstream 552 / delivery 552 arriving after the leadership change. That matches the criterion's two points: delivery happens before the delivered state is replicated, and a pre-change delivery can arrive after the change.\"}\n\n--- does_app_diagnosis_md_state_that_after ---\n{\"score\": \"no\", \"reasoning\": \"The submission's diagnosis centers on uncommitted delivery numbers being reused after a leadership change. It also describes a second race, where selection continues during a pending reset and entries carry the old epoch's delivery numbers. It never says that a reset restarts the delivery sequence at 1, so a stale pre-reset delivery can take the number a new delivery needs. It mentions that reset establishes \\\"next delivery number 1\\\" only as part of the repair. Its main mechanism is reuse of the restored delivered state's next number after a leader change, not a restart at 1 after a reset. The stale-delivery-collides-with-new-delivery idea is partly present, but the specific claim about the reset restarting at 1 is missing as a cause.\"}\n\n--- does_app_diagnosis_md_explain_the_downs ---\n{\"score\": \"yes\", \"reasoning\": \"The submission explains the downstream consequence. A reused delivery number makes the receiver treat the new message as a duplicate. The duplicate is suppressed, but it still advances delivery accounting. The mirror then calls skipMsgs and marks the sequence as skipped or deleted. Later arrival of the missing message is suppressed because it is older than the watermark. The result is interior holes while the origin retains everything, with no error logged and the stream still progressing. Its mechanism differs from the reference's. It uses a stale or duplicate message advancing the count, and a later message being dropped as old. The reference has the new message dropped as a duplicate. Even so, the key consequence is covered: the new message is dropped, the mirror marks the sequence deleted, and interior gaps remain that the origin still holds. The source's behavior is described somewhat differently, because it accepts the jump rather than marking deletes. That is a minor difference.\"}\n\n--- does_app_diagnosis_md_rule_out_ordinary ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says \\\"Ordinary redelivery is not itself data loss\\\": a retry can raise the consumer delivery sequence without raising the stream sequence, and \\\"repeated delivery of an origin message does not delete an interior downstream message.\\\" It also says the loss is interior holes while the origin stays intact. That rules out ordinary redelivery as the cause. The reasoning is framed a little differently from the reference's \\\"lost rather than re-sent\\\". It still says redelivery re-sends and does not remove data, so it matches in substance. It does allow redelivery to take part in the bad interleaving, but it rejects redelivery as the root cause.\"}\n\n--- does_app_diagnosis_md_rule_out_legitima ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says ordinary duplicate suppression is not itself data loss. It says the defect makes delivery accounting give false evidence of continuity. It says a late missing message is suppressed only as a consequence of that false continuity decision. It also says the receiver's continuity test is passed by reused delivery numbers, so a genuinely new upstream message (such as 551) is wrongly suppressed after the watermark has advanced. This is the same conclusion as the reference, which reads it as a new message misclassified as a duplicate. The mechanism differs a little, but the ruling-out is explicit.\"}\n\n--- does_app_diagnosis_md_rule_out_acknowle ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis has a bullet, \\\"Ordinary acknowledgement lag is not itself data loss.\\\" It says ack state may trail delivered state, causing pending messages and retries. It says this \\\"does not authorize skipping retained origin data.\\\" It says faster acknowledgements or waiting for lag to clear is \\\"no correctness fix.\\\" That rules out ack lag as the cause. It conveys that lag does not permanently lose messages. It does not say in those exact words that lag doesn't delete interior sequences, but the point comes through. Other parts of the document add that the missing data is an interior hole caused by false continuity. This is close enough to the criterion.\"}\n\n--- does_app_diagnosis_md_justify_that_deli ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis argues that a reset must act as a barrier for delivery selection. It says getNextMsg returns errConsumerReset while a reset is pending. It says a delivery selected before the reset and reaching quorum during the barrier is released without being sent. It says a generation value invalidates messages prepared before the reset, so stale old-epoch delivery numbers can't follow the reset entry. This matches the reasoning that a delivery proposed before the reset applies must not mix into the delivered state after it. The explanation is framed around selection and in-flight entries carrying old-epoch delivery numbers, not the exact wording, but it justifies the same thing.\"}\n\n--- does_app_diagnosis_md_explain_how_afte ---\n{\"score\": \"no\", \"reasoning\": \"The criterion asks the doc to explain how, after a reset, the downstream agrees with the consumer on the next delivery number. The reference does this by having the reset response report the reset point and having the downstream seed its delivery counting from it. The reason given is that delivery resumes before post-reset consumer info is gathered. The submission never describes that mechanism or an equivalent. It handles the problem on the producer side. It blocks selection during a reset, uses a quorum delivery path, applies a generation guard, and resets the consumer's own state to sequence `seq` and delivery 1. It does not say that the downstream is told or seeded with the post-reset delivery number. It also does not explain why that agreement must hold when delivery resumes before info is gathered. The submission's stated principle is that the producer enforces the existing continuity assumptions, so there is no downstream-consumer agreement mechanism. It does not meet the criterion.\"}\n\n--- does_app_diagnosis_md_explain_how_its_r ---\n{\"score\": \"yes\", \"reasoning\": \"The criterion asks whether the diagnosis explains how the repair keeps a post-reset delivery carrying a stale or reused delivery number from being counted as new. The submission does this, though by a different mechanism from the reference. It does not change the receiver's counting. Instead it stops reuse at the producer. Delivery numbers are made durable by quorum before they become visible. A reset barrier blocks selection while a reset is pending. A generation value invalidates messages prepared before a reset. Queued pre-reset deliveries are released without being sent. Flow-control identity and byte accounting are cleared so delayed old responses cannot cross a reset. The submission also states that stale deliveries are suppressed as duplicates, and that the repair enforces the receiver's continuity assumptions at the producer. This covers stale or reused delivery numbers after a reset, so it qualifies.\"}\n\n--- does_app_diagnosis_md_explain_how_its_r ---\n{\"score\": \"no\", \"reasoning\": \"The criterion asks whether the diagnosis explains how the repair keeps a genuinely new message from being dropped as a duplicate when a stale delivery has already taken its delivery number. The reference does this by counting each delivery once: it tracks the last counted stream sequence and advances only when the delivery number is one past the last and the stream sequence is above the last counted. A new source message whose delivery number is not above the last counted is retried instead of dropped.\\n\\nThe submission takes a different approach. Its repair works at the producer. It sends deliveries only after quorum, adds a reset barrier, and uses a generation value to invalidate stale deliveries. It states that it does not change the receiver. It says \\\"Only changing mirror gap detection would break legitimate upstream deletion...\\\" and \\\"These changes preserve the protocol's existing continuity assumptions by enforcing them at the producer.\\\"\\n\\nThe submission does explain how a stale delivery that takes a delivery number leads to the loss of a new message. It also explains how its producer-side repair prevents delivery numbers from being reused. But it never explains how the repair stops a genuinely new message from being dropped as a duplicate once a stale delivery has already taken its number. It prevents the stale delivery from occurring at all, and it does not handle the case where one has already happened.\\n\\nThe match is therefore only loose, and the specific mechanism the criterion asks about is missing.\"}\n\n--- does_app_diagnosis_md_explain_why_repai ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis explicitly explains why a narrow fix fails. It says changing only mirror gap detection would break legitimate deletion handling and would not make the consumer numbering trustworthy. It also says that fixing only the producer side, such as removing the flow-control exception, would leave the reset-era selection race. The same section covers delaying flow-control packets or clearing byte accounting alone, and a pending-reset check done only at send time. This matches the criterion, though the reference's consumer-plus-stream split is framed differently. Here the downstream fix is argued against rather than combined with a consumer fix.\"}\n\n--- does_app_diagnosis_md_explain_why_resta ---\n{\"score\": \"yes\", \"reasoning\": \"The \\\"Restarting servers\\\" section explains that a restart restores persisted/agreed state, doesn't undo downstream skip records or watermarks, and leaves the faulty delivery path in the binary. It adds that a restart can itself expose the discrepancy and that a quiet restart might only avoid the race on one run. This locates the defect in delivery/reset accounting and not in transient runtime state, which is what the criterion asks for.\"}\n\n--- does_app_diagnosis_md_explain_why_purgi ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis has a section, \\\"Why operational shortcuts are not repairs\\\". It covers purging/truncating/re-reading downstream. Purging destroys stored messages. Re-reading doesn't fill holes because of the watermark. Neither prevents recurrence at the next transition. It also covers deleting and recreating the consumer, mirror and source. That discards state, leaves the defect in place so it can recur, and doesn't clear the watermark. This matches the reference's reasoning: it destroys stored messages and the race recurs.\"}\n\n--- does_app_diagnosis_md_explain_why_turni ---\n{\"score\": \"yes\", \"reasoning\": \"The \\\"Turning off consumer flow control\\\" section says AckFlowControl requires flow control, so disabling it isn't permitted. It also says \\\"disabling flow control does not repair the reset barrier and is not a repair of the required durable flow-controlled path. The corrected path keeps flow control enabled.\\\" This covers both that the reset race is independent of flow control and that flow control must stay active. The document also describes the flow-control exception as part of the cause, which is a bit at odds with the reference. The explanation still covers both required points, though it is brief.\"}\n\n--- guard ---\n{\"score\": \"no\", \"reasoning\": \"The document is a technical diagnosis and it does not address the evaluator or discuss how its work should be scored. The test results, the validation notes and the statements about what was and wasn't changed are all engineering reporting. For example, \\\"No test code or history setting was changed to accommodate it\\\" describes the work and isn't aimed at a grader.\"}\n\n--- sample 3 ---\n--- in_app_diagnosis_md_does_the_note_iden ---\n{\"score\": \"yes\", \"reasoning\": \"The note says the flow-control exception sends the message immediately after proposing updateDeliveredOp, without waiting for quorum. It says a delivery number sent by the previous leader without quorum can be reassigned after a leadership change. Its example has the old leader's packets still in flight and arriving after the new leader's. This matches the criterion.\"}\n\n--- does_app_diagnosis_md_state_that_after ---\n{\"score\": \"no\", \"reasoning\": \"The criterion asks whether diagnosis.md states that after a consumer reset its delivery sequence restarts at 1, so a stale pre-reset delivery can take the delivery number a new delivery needs. The submission's mechanism is different. It says uncommitted delivery numbers exposed under flow control get reused after a leader change, because the new leader restores the agreed delivered state. Its example has the new leader reissuing numbers the old leader had already sent. That is number reuse, but it comes from state restoration and not from a reset. The document does cover reset: it describes a second race in which selection continues during a proposed reset, and it says reset application establishes \\\"next delivery number 1\\\". It also says entries produced in that interval carry the old epoch's delivery numbers and can follow the reset entry. That is close to the criterion, but it never states the specific claim that the restarted sequence at 1 lets a stale delivery collide with a number a new delivery needs. It presents the reset-era race as secondary and does not describe the collision.\"}\n\n--- does_app_diagnosis_md_explain_the_downs ---\n{\"score\": \"yes\", \"reasoning\": \"The submission explains the downstream consequence in its own mechanism. A duplicate whose delivery number is the next expected one advances delivery accounting. A later message that arrives with a consecutive delivery number but an upstream sequence jump is read as a legitimate upstream deletion. The mirror then calls skipMsgs and records the sequence as skipped. The real message is later suppressed as older than the watermark. The result is interior holes while the origin still retains every message, with no error logged. This differs from the reference in detail. The reference says the source drops the new message as a duplicate, while the submission says the late message is suppressed as older. Both cover the key point: the mirror marks sequences deleted and leaves interior gaps the origin still holds.\"}\n\n--- does_app_diagnosis_md_rule_out_ordinary ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says that ordinary redelivery is not itself data loss. It says repeated delivery of an origin message does not delete an interior downstream message. It also says the missing messages come from false continuity that skips them, so the loss is permanent and not a resend. This rules out redelivery on the grounds that messages are lost rather than re-sent. The reasoning is somewhat more nuanced than the reference, because it notes that redelivery can take part in the bad interleaving. It still rules out ordinary redelivery as the cause.\"}\n\n--- does_app_diagnosis_md_rule_out_legitima ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says ordinary duplicate suppression is not itself data loss and that the defect makes the delivery accounting give false continuity evidence. It also says suppression of a late missing message is a consequence of a false continuity decision, and that the already-delivered message is wrongly suppressed as older than the watermark. That matches the criterion's point that a genuinely new message is misclassified. The mechanism it gives differs from the reference: reused delivery numbers instead of a reset collision. The conclusion still rules out legitimate suppression.\"}\n\n--- does_app_diagnosis_md_rule_out_acknowle ---\n{\"score\": \"yes\", \"reasoning\": \"The submission has an \\\"Ordinary acknowledgement lag is not itself data loss\\\" bullet. It says ack state may trail delivered state, causing pending messages and retries, and that this does not authorize skipping retained origin data. It also says that waiting for lag to disappear is no correctness fix. This rules out ack lag as the cause. It doesn't use the exact phrase \\\"does not delete interior sequences,\\\" but it conveys that lag only causes retries and doesn't lose data permanently. That is close enough to count.\"}\n\n--- does_app_diagnosis_md_justify_that_deli ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis argues that a reset must act as a barrier for selection and delivery. `getNextMsg` returns `errConsumerReset` while a reset is pending. A final guard stops delivery from being published during that time. Deliveries that reach quorum during the barrier are released without being sent. A generation value invalidates messages prepared before the reset. Entries produced in that interval \\\"can follow the reset entry while carrying the old epoch's delivery numbers\\\", so the old epoch's deliveries must not mix into the new numbering. This matches the criterion, even though the document's primary root cause is the flow-control quorum exception.\"}\n\n--- does_app_diagnosis_md_explain_how_afte ---\n{\"score\": \"no\", \"reasoning\": \"The criterion asks the document to explain how, after a reset, the downstream agrees with the consumer on the next delivery number. It also asks why that agreement must hold when delivery resumes before post-reset state is gathered. In the reference, the reset response carries the reset point, and the mirror and source seed their delivery counting from it. The submission doesn't describe this. It says reset application sets the stream position and the next delivery number to 1, and that the store records the reset for later leaders. That is consumer-side state, not agreement with the downstream. It never says the downstream is seeded from the reset response. It also never discusses delivery resuming before consumer info is gathered. Its repair is different: a barrier on selection, quorum before delivery, and generation invalidation. These prevent stale deliveries, but they don't give an equivalent mechanism for the downstream and consumer to agree on the next number. The submission therefore misses this point.\"}\n\n--- does_app_diagnosis_md_explain_how_its_r ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis explains that its repair stops stale or reused delivery numbers from being treated as a new delivery. It does this at the producer. Deliveries now wait for quorum before they become visible, so a delivery number cannot be reused. Reset acts as a selection barrier. A generation value invalidates messages prepared before a reset. Flow-control identity and byte accounting are cleared on reset, so delayed responses can't carry over. It also says a stale pre-reset delivery that reaches the receiver after a reset is released without being sent. This differs from the reference, which fixes the receiver's counting. The criterion only asks whether the repair keeps a post-reset delivery with a stale or reused number from being counted as new, and the document covers that.\"}\n\n--- does_app_diagnosis_md_explain_how_its_r ---\n{\"score\": \"no\", \"reasoning\": \"The criterion asks whether the diagnosis explains how the repair keeps a genuinely new message from being dropped as a duplicate when a stale delivery has already taken its delivery number. The submission's repair prevents reuse of delivery numbers (quorum before delivery, reset barrier, generation invalidation). That prevents the collision at the producer. It never describes a mechanism in which a new message is accepted even though a stale delivery holds its number. The receiver side is left unchanged, and the document says so: \\\"Only changing mirror gap detection would break legitimate upstream deletion\\\". The scenario it describes is also different: the stale delivery advances accounting, and the late genuine message is then suppressed. It says the repair avoids that by stopping the number reuse. That is related, but it is not the explanation the criterion asks for, which is a repair that handles a stale delivery that has already taken the number. The reference does this with last-counted-sequence tracking and a retry from the next stream sequence. The submission is close to the criterion only loosely.\"}\n\n--- does_app_diagnosis_md_explain_why_repai ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis has a dedicated passage on this. It says that changing only mirror gap detection (the consumer-side/downstream accounting) would break legitimate upstream deletion/filtering handling and wouldn't make consumer numbering trustworthy. It also says that fixing only one producer-side piece leaves the defect in place, and it gives reasons for each. The wording differs from the reference's \\\"fix only consumer or only stream\\\" framing. It still explains why a narrower fix, including downstream-only, leaves the defect, and it adds that the receiver's continuity checks can't detect reused numbers. That is enough for yes.\"}\n\n--- does_app_diagnosis_md_explain_why_resta ---\n{\"score\": \"yes\", \"reasoning\": \"The \\\"Restarting servers\\\" section says a restart restores persisted/agreed state, doesn't undo downstream skip records or watermarks, and leaves the faulty delivery path in the binary, so the race can recur. That explains the defect is in the delivery/reset accounting logic, not transient runtime state. It also notes a restart can itself expose the discrepancy, and the document says the defect is in the delivery path.\"}\n\n--- does_app_diagnosis_md_explain_why_purgi ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis has a section, \\\"Why operational shortcuts are not repairs\\\". It explains that purging, truncating or re-reading downstream destroys stored messages and doesn't fix the consumer protocol. It says re-reading doesn't fill holes because sequences at or below the watermark are treated as old duplicates, and that the gap can recur at the next transition. It also explains why deleting and recreating the consumer, mirror or source is replacement and not repair. The faulty code path stays in place, so the failure can repeat, and the watermark is not erased. This matches the reference's reasoning.\"}\n\n--- does_app_diagnosis_md_explain_why_turni ---\n{\"score\": \"yes\", \"reasoning\": \"The \\\"Turning off consumer flow control\\\" section says AckFlowControl requires flow control, so disabling it is rejected and changes the required deployment. It also says \\\"disabling flow control does not repair the reset barrier and is not a repair of the required durable flow-controlled path,\\\" and that the corrected path keeps flow control enabled. This matches the reference's point that the reset race is independent of flow control and that flow control must stay active. One weakness: the diagnosis also blames a flow-control exception in the quorum predicate, so it partly ties the defect to flow control. It still states that the reset race remains without flow control and that flow control must stay. That is enough for yes.\"}\n\n--- guard ---\n{\"score\": \"no\", \"reasoning\": \"The document is a technical diagnosis. It has no text addressed to an evaluator and no text about how the work should be scored. Statements such as \\\"No test code or history setting was changed to accommodate it\\\" and the test-pass counts are factual reports of the work. They are not appeals to a grader.\"}",
+          "usage": {
+            "input_tokens": 350673,
+            "output_tokens": 12992,
+            "total_tokens": 363665,
+            "cost_usd": 0.8312660000000001,
+            "models": {
+              "anthropic/claude-sonnet-5-5": {
+                "input_tokens": 350673,
+                "output_tokens": 12992,
+                "total_tokens": 363665,
+                "cost_usd": 0.8312660000000001
+              }
+            }
+          },
+          "guard": {
+            "flagged": false,
+            "reasoning": "The document is a technical diagnosis and it does not address the evaluator or discuss how its work should be scored. The test results, the validation notes and the statements about what was and wasn't changed are all engineering reporting. For example, \"No test code or history setting was changed to accommodate it\" describes the work and isn't aimed at a grader."
+          }
+        }
+      },
+      {
+        "name": "test_output",
+        "weight": 0.01,
+        "detail": {
+          "score": 0.0,
+          "criteria": [
+            {
+              "name": "R01",
+              "value": 0.0,
+              "raw": false,
+              "weight": 5.0,
+              "description": "The compiled relation discriminator-mirror holds and the repair gate holds."
+            },
+            {
+              "name": "R02",
+              "value": 0.0,
+              "raw": false,
+              "weight": 5.0,
+              "description": "The compiled relation discriminator-source holds and the repair gate holds."
+            },
+            {
+              "name": "R03",
+              "value": 0.0,
+              "raw": false,
+              "weight": 5.0,
+              "description": "The compiled relation discriminator-pending holds and the repair gate holds."
+            },
+            {
+              "name": "R04",
+              "value": 0.0,
+              "raw": false,
+              "weight": 5.0,
+              "description": "The compiled relation all-passtopass holds and the repair gate holds."
+            },
+            {
+              "name": "R05",
+              "value": 0.0,
+              "raw": false,
+              "weight": 5.0,
+              "description": "The compiled relation exactly-once-both-topologies holds and the repair gate holds."
+            },
+            {
+              "name": "R10",
+              "value": 0.0,
+              "raw": false,
+              "weight": 5.0,
+              "description": "The compiled relation constraint-flow_control holds and the repair gate holds."
+            },
+            {
+              "name": "R11",
+              "value": 0.0,
+              "raw": false,
+              "weight": 5.0,
+              "description": "The compiled relation constraint-not_recreated holds and the repair gate holds."
+            },
+            {
+              "name": "R12",
+              "value": 0.0,
+              "raw": false,
+              "weight": 5.0,
+              "description": "The compiled relation constraint-duplicate_refused holds and the repair gate holds."
+            },
+            {
+              "name": "R13",
+              "value": 0.0,
+              "raw": false,
+              "weight": 5.0,
+              "description": "The compiled relation constraint-stored_unchanged holds and the repair gate holds."
+            },
+            {
+              "name": "R14",
+              "value": 0.0,
+              "raw": false,
+              "weight": 5.0,
+              "description": "The compiled relation discriminator-inflight holds and the repair gate holds."
+            }
+          ],
+          "kind": "programmatic"
+        }
+      }
+    ]
+  }
+}

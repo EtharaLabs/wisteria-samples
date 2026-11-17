@@ -1,0 +1,76 @@
+use std::time::Duration;
+
+use anyhow::Result;
+use futures::TryStreamExt;
+use openraft::Config;
+use openraft::SnapshotPolicy;
+
+use crate::fixtures::RaftRouter;
+use crate::fixtures::expect_timeout;
+use crate::fixtures::ut_harness;
+
+/// Compaction test.
+///
+/// What does this test do?
+///
+/// - build a stable single node cluster.
+/// - send enough requests to the node that log compaction will be triggered.
+/// - add new nodes and assert that they receive the snapshot.
+#[tracing::instrument]
+#[test_harness::test(harness = ut_harness)]
+async fn snapshot_policy_never() -> Result<()> {
+    let n_logs: u64 = 6000;
+    let default_config = Config::default().snapshot_policy;
+    let default_threshold = if let SnapshotPolicy::LogsSinceLast(n) = default_config {
+        n
+    } else {
+        panic!("snapshot_policy must be never");
+    };
+
+    assert!(
+        n_logs > default_threshold,
+        "snapshot_threshold must be greater than default threshold"
+    );
+
+    // Setup test dependencies.
+    let config = Config {
+        snapshot_policy: SnapshotPolicy::Never,
+        enable_tick: false,
+        ..Default::default()
+    };
+    let mut router = RaftRouter::new(config)?;
+
+    tracing::info!("--- initializing cluster");
+    let mut log_index = router.new_cluster([0], []).await?;
+
+    tracing::info!(n_logs, "--- write enough logs to exceed the default snapshot threshold");
+    {
+        let mut clients = futures::stream::FuturesUnordered::new();
+        let n_clients = 20;
+        for i in 0..n_clients {
+            let per_client = n_logs / n_clients;
+            let r = router.clone();
+            clients.push(async move {
+                let client_id = format!("{}", i);
+                r.client_request_many(0, &client_id, per_client as usize).await
+            });
+            log_index += per_client;
+        }
+
+        while clients.try_next().await?.is_some() {}
+    }
+
+    tracing::info!(log_index, "--- verify all logs apply without building a snapshot");
+    {
+        router.wait(&0).applied_index(Some(log_index), format!("write log up to {}", log_index)).await?;
+
+        let wait_snapshot_res = router
+            .wait_with_timeout(&0, Duration::from_millis(3_000))
+            .metrics(|m| m.snapshot.is_some(), "no snapshot will be built")
+            .await;
+
+        expect_timeout(wait_snapshot_res)?;
+    }
+
+    Ok(())
+}

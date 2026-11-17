@@ -1,0 +1,88 @@
+schema_version = "1.4"
+reward_type = "bounded_continuous"
+
+[task]
+name = "ethara/62e0ebab-8172-524e-8775-270d4317e359"
+version = "1.0.3"
+description = "Repair a NATS JetStream server so a durable flow-controlled consumer stops feeding a mirror and a source stale deliveries after a consumer leader change and reset, and write a root-cause diagnosis."
+authors = [{ name = "dinesh.kumar", email = "dinesh.kumar@ethara.ai" }]
+keywords = ["nats", "jetstream", "flow-control", "mirror", "source", "consumer-reset"]
+
+[metadata]
+category = "software-engineering"
+null_floor = 0.0
+discrimination_weight = 1.0
+platforms = ["linux/amd64", "linux/arm64"]
+
+[metadata.contamination]
+public_source = "github.com/nats-io/nats-server"
+public_reference = "pull request 8802 (merge commit 6e1022239e89958be6ae5d463a74d4c84cde62ad)"
+note = "The reference solution derives from this public upstream change. The working environment has no network access to it."
+
+[verifier]
+timeout_sec = 21600.0
+environment_mode = "separate"
+# tests/test.sh runs as root and runs the submitted code as a separate unprivileged uid.
+user = "root"
+# Only the judge APIs are reachable from the verifier.
+network_mode = "allowlist"
+allowed_hosts = ["api.anthropic.com", "api.openai.com"]
+
+[verifier.env]
+# judge credentials and endpoints come from the runner's environment, never literals.
+ANTHROPIC_BASE_URL = "${ANTHROPIC_BASE_URL:-https://api.anthropic.com}"
+ANTHROPIC_API_KEY = "${ANTHROPIC_API_KEY:-}"
+OPENAI_BASE_URL = "${OPENAI_BASE_URL:-https://api.openai.com/v1}"
+OPENAI_API_KEY = "${OPENAI_API_KEY:-}"
+LITELLM_LOCAL_MODEL_COST_MAP = "${LITELLM_LOCAL_MODEL_COST_MAP:-True}"
+# Reward Kit always sends reasoning_effort; drop it for models litellm does not list as reasoning models.
+LITELLM_DROP_PARAMS = "True"
+LITELLM_LOCAL_ANTHROPIC_BETA_HEADERS = "True"
+
+[verifier.environment]
+network_mode = "allowlist"
+allowed_hosts = ["api.anthropic.com", "api.openai.com"]
+build_timeout_sec = 1800.0
+cpus = 2
+memory_mb = 8192
+storage_mb = 10240
+gpus = 0
+
+[agent]
+timeout_sec = 10800.0
+# Only the model APIs the preinstalled agent CLIs call; the environment itself has no network.
+network_mode = "allowlist"
+allowed_hosts = ["api.openai.com", "api.anthropic.com"]
+# numeric non-root; the agent runs as this user, so the environment image itself ends as root
+user = "65532:65532"
+
+[environment]
+network_mode = "no-network"
+build_timeout_sec = 1800.0
+cpus = 2
+memory_mb = 8192
+storage_mb = 10240
+gpus = 0
+
+[environment.env]
+
+[solution.env]
+
+[upstream_provenance]
+origin = "original"
+provenance_date = "2026-11-02"
+source_kind = "public_repository"
+
+[upstream_provenance.source]
+canonical_repo = "github.com/nats-io/nats-server"
+fork_ancestry_digest = "sha256:131837501a4f5db500adec32af7d427c344d4ed04b1e5adde64c289e1693fdc2"
+base_commit = "011cda33cec116deb81bd0a79ad5308e993f6b62"
+event_timestamp = "2026-10-25T20:38:41Z"
+
+[[artifacts]]
+# the repaired broker source tree, in place
+source = "/app/nats-server"
+
+[[artifacts]]
+# the root-cause and design note
+source = "/app/diagnosis.md"

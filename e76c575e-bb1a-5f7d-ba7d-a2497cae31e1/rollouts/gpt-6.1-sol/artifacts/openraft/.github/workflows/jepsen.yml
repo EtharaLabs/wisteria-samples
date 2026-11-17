@@ -1,0 +1,140 @@
+name: jepsen
+
+on:
+  pull_request:
+    paths:
+      - 'jepsen/**'
+      - '.github/workflows/jepsen.yml'
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Jepsen lint and unit tests
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup | Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: jepsen/project.clj
+
+      - name: Setup | Clojure tools
+        uses: DeLaGuardo/setup-clojure@13.6.1
+        with:
+          lein: 2.12.0
+          clj-kondo: 2026.07.24
+          cljfmt: 0.16.5
+
+      - name: Setup | Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: rustfmt, clippy
+
+      - name: Check | Clojure
+        run: make -C jepsen clojure-lint
+
+      - name: Check | Test app
+        run: make -C jepsen app-lint
+
+      - name: Test | Test app
+        run: make -C jepsen app-test
+
+      - name: Test | Clojure
+        run: make -C jepsen unit-test
+
+  jepsen:
+    name: Jepsen (${{ matrix.name }})
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: membership
+            target: safety
+            nemesis: membership
+          - name: partition
+            target: safety
+            nemesis: partition
+          - name: pause
+            target: safety
+            nemesis: pause
+            time_limit: 180
+          - name: process
+            target: safety
+            nemesis: process
+          - name: packet-slow
+            target: safety
+            nemesis: packet
+            packet_mode: slow
+          - name: packet-flaky
+            target: safety
+            nemesis: packet
+            packet_mode: flaky
+          - name: clock
+            target: safety
+            nemesis: clock
+          - name: chaos
+            target: safety
+            nemesis: chaos
+          - name: liveness
+            target: liveness
+
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v4
+
+      - name: Test | Jepsen
+        run: |
+          make -C jepsen build
+          make -C jepsen up
+          docker compose -f jepsen/docker/docker-compose.yml exec control lein test
+          make -C jepsen ${{ matrix.target }} NEMESIS=${{ matrix.nemesis }} PACKET_MODE=${{ matrix.packet_mode }} TIME_LIMIT=${{ matrix.time_limit }}
+
+      - name: Debug | Docker logs
+        if: failure()
+        run: |
+          docker compose -f jepsen/docker/docker-compose.yml logs --no-color \
+            | tee jepsen/docker-compose.log
+
+      - name: Results | Upload Jepsen results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jepsen-results-${{ matrix.name }}
+          path: jepsen/store/**/results.edn
+          if-no-files-found: ignore
+
+      - name: Debug | Upload Jepsen diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jepsen-debug-${{ matrix.name }}
+          path: |
+            jepsen/store/
+            jepsen/docker-compose.log
+          if-no-files-found: ignore
+
+      - name: Cleanup | Docker
+        if: always()
+        run: make -C jepsen down

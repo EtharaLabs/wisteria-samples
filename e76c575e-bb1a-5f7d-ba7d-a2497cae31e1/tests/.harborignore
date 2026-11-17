@@ -1,0 +1,2 @@
+# Build-context-only files: tests/Dockerfile installs them into the image, so no trial uploads them.
+.build/

@@ -1,0 +1,38 @@
+# The named scores Reward Kit writes to /logs/verifier/reward.json.
+#
+#   reward    decides the rollout's pass and folds both channels; the
+#             deterministic dimension and the judged dimension each contribute
+#             one half, so only a run that is perfect on both reaches 1.0.
+#   compiled  the deterministic dimension ALONE on a 0-1 scale, with the judged
+#             dimension pinned to 0.0.  It is judge-free; with no judge key at
+#             all, this score is the published reward.
+#
+# Reward Kit gives a dimension a named score does not list the default weight
+# 1.0, so each score names every dimension it can see; leaving `judge` out of
+# `compiled` would let the judged channel into a judge-free number.  The gate's
+# own judged_gate criterion exists only on the zero route, so only
+# .gate/zero.toml may weight it: naming it here would be an unknown input and
+# Reward Kit would refuse to load this file at all.
+#
+#   the compiled DIMENSION: positive weights sum to 50; aggregation weighted-sum; weight
+#   1/(2*50) = 0.01; a perfect compiled run contributes 50 * 0.01 = 0.5.
+#   the judged DIMENSION: positive weights sum to 52; aggregation weighted-mean, which divides
+#   by 52 inside the channel, so 1/(2*52) * 52 = 0.5; a perfect judged run contributes 0.5.
+#   Overall perfect reward 1.0.
+#   the compiled SCORE: the same compiled dimension alone on a 0-1 scale, the judge-free number
+#   published when no judge key is set; weight 1/50 = 0.02 and the judged dimension pinned to 0.0, so a
+#   perfect compiled run scores 50 * 0.02 = 1.0 and an unrepaired tree scores 0.0.
+#   It decides no pass.
+
+[[reward]]
+name = "reward"
+aggregation = "weighted-sum"
+weights = { test_output = 0.01, judge = 0.5 }
+
+[[reward]]
+name = "compiled"
+aggregation = "weighted-sum"
+weights = { test_output = 0.02, judge = 0.0 }
+
+[scoring.test_output]
+aggregation = "weighted-sum"

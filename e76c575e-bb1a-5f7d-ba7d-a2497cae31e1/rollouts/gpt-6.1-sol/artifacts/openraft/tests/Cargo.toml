@@ -1,0 +1,53 @@
+# These tests depend on `memstore`, while `memstore` enables `serde` feature of `openraft`.
+# This make it impossible to test openraft with `serde` feature off.
+
+[package]
+name = "tests"
+description = "openraft integration tests. To prevent memstore from enabling `serde` feature"
+publish = false
+
+version       = { workspace = true }
+edition       = { workspace = true }
+authors       = { workspace = true }
+categories    = { workspace = true }
+documentation = { workspace = true }
+homepage      = { workspace = true }
+keywords      = { workspace = true }
+license       = { workspace = true }
+repository    = { workspace = true }
+
+[dependencies]
+# Only enables `sim-log`: with `OPENRAFT_SIM_LOG=<file>`, a test on rt-sim writes a reproducible log.
+openraft-rt-sim    = { path = "../rt-sim", features = ["sim-log"], optional = true }
+openraft           = { path = "../openraft", version = "0.10.0-alpha.37", features = ["type-alias"] }
+openraft-memstore  = { path = "../stores/memstore" }
+openraft-legacy    = { path = "../legacy", features = ["serde"] }
+
+anyhow             = { workspace = true }
+derive_more        = { workspace = true }
+futures            = { workspace = true }
+lazy_static        = { workspace = true }
+rand               = { workspace = true }
+serde              = { workspace = true }
+tracing            = { workspace = true }
+tracing-appender   = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+[dev-dependencies]
+openraft-membership = { path = "../membership", version = "0.10.0-alpha.37" }
+
+anyerror           = { workspace = true }
+bincode            = { workspace = true }
+maplit             = { workspace = true }
+pretty_assertions  = { workspace = true }
+test-harness       = { workspace = true }
+
+
+[features]
+
+bt = ["openraft/bt"]
+runtime-stats = ["openraft/runtime-stats"]
+single-term-leader = ["openraft-memstore/single-term-leader"]
+
+# Run the tests on the deterministic simulated runtime, for openraft#206. Not all of them pass yet.
+rt-sim = ["openraft-memstore/rt-sim", "dep:openraft-rt-sim"]

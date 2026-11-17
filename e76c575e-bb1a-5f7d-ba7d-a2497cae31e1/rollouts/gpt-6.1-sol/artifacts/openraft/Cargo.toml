@@ -1,0 +1,122 @@
+[workspace.package]
+version = "0.10.0-alpha.37"
+edition = "2024"
+rust-version = "1.88"
+authors = [
+    "Databend Authors <opensource@datafuselabs.com>",
+    "Anthony Dodd <Dodd.AnthonyJosiah@gmail.com>",
+]
+categories = ["algorithms", "asynchronous", "data-structures"]
+description = "Advanced Raft consensus"
+documentation = "https://docs.rs/openraft"
+homepage = "https://github.com/databendlabs/openraft"
+keywords = ["raft", "consensus"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/databendlabs/openraft"
+
+
+[workspace.dependencies]
+anyerror           = { version = "0.1.10" }
+anyhow             = { version = "1.0.63" }
+backoff-series     = { version = "0.1.1" }
+parse-size         = { version = "1.1.0" }
+bytes              = { version = "1.0" }
+chrono             = { version = "0.4" }
+clap               = { version = "4.1.11", features = ["derive", "env"] }
+criterion          = { version = "0.8.2", features = ["html_reports"] }
+derive_more        = { version = "2.1.1", features = ["std", "from", "try_into", "display"] }
+display-more       = { version = "0.2.6" }
+itertools          = { version = "0.15" }
+futures            = { version = "0.3" }
+futures-channel    = { version = "0.3" }
+futures-util       = { version = "0.3" }
+base2histogram     = { version = "0.2.3" }
+bincode            = { version = "1.3" }
+lazy_static        = { version = "1.4.0" }
+maplit             = { version = "1.0.2" }
+peel-off           = { version = "0.1.0" }
+pretty_assertions  = { version = "1.0.0" }
+proc-macro2        = { version = "1.0" }
+quorum-set         = { version = "0.6.0" }
+quote              = { version = "1.0" }
+rand               = { version = "0.10" }
+smallvec           = { version = "1" }
+semver             = { version = "1.0.14" }
+serde              = { version = "1.0.114", features = ["derive", "rc"] }
+serde_json         = { version = "1.0.57" }
+syn                = { version = "3.0" }
+tabled             = { version = "0.20.0", default-features = false, features = ["std"] }
+tempfile           = { version = "3.4.0" }
+test-harness       = { version = "0.3.0" }
+thiserror          = { version = "2.0.18" }
+tokio              = { version = "1.39", default-features = false, features = [
+    "io-util",
+    "macros",
+    "rt",
+    "rt-multi-thread",
+    "sync",
+    "time",
+    "tracing",
+] }
+tracing            = { version = "0.1.40" }
+tracing-appender   = { version = "0.2.0" }
+tracing-subscriber = { version = "0.3.3", features = ["env-filter"] }
+validit            = { version = "0.2.6" }
+
+
+[profile.release]
+debug = 2
+split-debuginfo = "packed"
+
+
+[workspace]
+
+resolver = "3"
+
+members = [
+    "rt",
+    "openraft",
+    "membership",
+    "legacy",
+    "macros",
+    "tests",
+    "stores/memstore",
+    "stores/memstore-custom-node-id",
+]
+exclude = [
+    "benchmarks/minimal",
+    "metrics-otel",
+    "tests-turmoil",
+
+    "examples/app-http",
+    "examples/network-v1-http",
+    "examples/network-v2-http",
+
+    "examples/dir-transfer",
+    "examples/log-mem",
+    "examples/log-rocks",
+    "examples/log-wal",
+    "examples/mem-log",
+    "examples/memstore",
+    "examples/rocksstore",
+    "examples/sm-mem",
+    "examples/sm-rocks",
+    "examples/types-kv",
+
+    "examples/raft-kv-log-wal-sm-mem",
+    "examples/raft-kv-memstore",
+    "examples/raft-kv-memstore-grpc",
+    "examples/raft-kv-memstore-single-threaded",
+    "examples/raft-kv-memstore-network-v1",
+    "examples/raft-kv-memstore-opendal-snapshot-data",
+    "examples/raft-kv-rocksdb",
+    "examples/multi-raft-kv",
+
+    "jepsen/openraft-test-app",
+
+    "rt-monoio",
+    "rt-sim",
+    "rt-compio",
+    "rt-tokio",
+    "multiraft"
+]

@@ -1,0 +1,226 @@
+use std::collections::BTreeMap;
+use std::io;
+use std::sync::Arc;
+use std::sync::Mutex as StdMutex;
+
+use futures::Stream;
+use futures::TryStreamExt;
+use futures::lock::Mutex;
+use opendal::Operator;
+use openraft::OptionalSend;
+use openraft::RaftSnapshotBuilder;
+use openraft::storage::EntryResponder;
+use openraft::storage::RaftStateMachine;
+use serde::Deserialize;
+use serde::Serialize;
+
+use crate::decode_buffer;
+use crate::encode;
+use crate::typ::*;
+
+pub type LogStore = log_mem::LogStore<TypeConfig>;
+
+#[derive(Debug)]
+pub struct StoredSnapshot {
+    pub meta: SnapshotMeta,
+
+    /// The data of the state machine at the time of this snapshot.
+    pub data: SnapshotData,
+}
+
+/// Data contained in the Raft state machine.
+///
+/// Note that we are using `serde` to serialize the
+/// `data`, which has a implementation to be serialized. Note that for this test we set both the key
+/// and value as String, but you could set any type of value that has the serialization impl.
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
+pub struct StateMachineData {
+    pub last_applied: Option<LogId>,
+
+    pub last_membership: StoredMembership,
+
+    /// Application data.
+    pub data: BTreeMap<String, types_kv::VersionedValue>,
+}
+
+/// Defines a state machine for the Raft cluster. This state machine represents a copy of the
+/// data for this node. Additionally, it is responsible for storing the last snapshot of the data.
+#[derive(Debug)]
+pub struct StateMachineStore {
+    /// The Raft state machine.
+    pub state_machine: Mutex<StateMachineData>,
+
+    storage: Operator,
+
+    /// The last received snapshot.
+    current_snapshot: StdMutex<Option<StoredSnapshot>>,
+}
+
+impl StateMachineStore {
+    pub fn new(storage: Operator) -> Self {
+        Self {
+            state_machine: Mutex::new(StateMachineData::default()),
+            storage,
+            current_snapshot: StdMutex::new(None),
+        }
+    }
+}
+
+impl RaftSnapshotBuilder<TypeConfig> for Arc<StateMachineStore> {
+    type SnapshotData = SnapshotData;
+
+    #[tracing::instrument(level = "trace", skip(self))]
+    async fn build_snapshot(&mut self) -> Result<Snapshot, io::Error> {
+        let data;
+        let last_applied_log;
+        let last_membership;
+
+        {
+            // Serialize the data of the state machine.
+            let state_machine = self.state_machine.lock().await.clone();
+
+            last_applied_log = state_machine.last_applied;
+            last_membership = state_machine.last_membership.clone();
+            data = state_machine;
+        }
+
+        // Generate a unique path to store the snapshot at.
+        // Users can design their own logic for this like using uuid.
+        let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos();
+        let snapshot_filename = if let Some(last) = last_applied_log {
+            format!("{}-{}-{}", last.committed_leader_id(), last.index(), nanos)
+        } else {
+            format!("--{}", nanos)
+        };
+
+        // Save the snapshot to the storage.
+        self.storage.write(&snapshot_filename, encode(&data)).await.unwrap();
+
+        let meta = SnapshotMeta {
+            last_log_id: last_applied_log,
+            last_membership,
+        };
+
+        let snapshot = StoredSnapshot {
+            meta: meta.clone(),
+            data: snapshot_filename.clone(),
+        };
+
+        {
+            let mut current_snapshot = self.current_snapshot.lock().unwrap();
+            // A newer snapshot may have been installed while this upload was in flight.
+            if current_snapshot.as_ref().is_none_or(|current| current.meta.last_log_id < meta.last_log_id) {
+                *current_snapshot = Some(snapshot);
+            }
+        }
+
+        Ok(Snapshot {
+            meta,
+            snapshot: snapshot_filename,
+        })
+    }
+}
+
+impl RaftStateMachine<TypeConfig> for Arc<StateMachineStore> {
+    type SnapshotData = crate::SnapshotData;
+
+    type SnapshotBuilder = Self;
+
+    async fn applied_state(&mut self) -> Result<(Option<LogId>, StoredMembership), io::Error> {
+        let state_machine = self.state_machine.lock().await;
+        Ok((state_machine.last_applied, state_machine.last_membership.clone()))
+    }
+
+    #[tracing::instrument(level = "trace", skip(self, entries))]
+    async fn apply<Strm>(&mut self, mut entries: Strm) -> Result<(), io::Error>
+    where Strm: Stream<Item = Result<EntryResponder<TypeConfig>, io::Error>> + Unpin + OptionalSend {
+        let mut sm = self.state_machine.lock().await;
+
+        while let Some((entry, responder)) = entries.try_next().await? {
+            tracing::debug!(%entry.log_id, "replicate to sm");
+
+            let version = entry.log_id.index();
+            sm.last_applied = Some(entry.log_id);
+
+            let response = match entry.payload {
+                EntryPayload::Blank => types_kv::Response::none(),
+                EntryPayload::Normal(ref req) => match req {
+                    types_kv::Request::Set { key, value, .. } => {
+                        sm.data.insert(key.clone(), types_kv::VersionedValue {
+                            value: value.clone(),
+                            version,
+                        });
+                        types_kv::Response::new(value.clone(), version)
+                    }
+                    types_kv::Request::CompareAndSet {
+                        key,
+                        expected_version,
+                        value,
+                    } => {
+                        let matches = sm.data.get(key).is_some_and(|current| current.version == *expected_version);
+
+                        if matches {
+                            sm.data.insert(key.clone(), types_kv::VersionedValue {
+                                value: value.clone(),
+                                version,
+                            });
+                            types_kv::Response::new(value.clone(), version)
+                        } else {
+                            types_kv::Response::none()
+                        }
+                    }
+                },
+                EntryPayload::Membership(ref mem) => {
+                    sm.last_membership = StoredMembership::new(Some(entry.log_id), mem.clone());
+                    types_kv::Response::none()
+                }
+            };
+
+            if let Some(responder) = responder {
+                responder.send(response);
+            }
+        }
+        Ok(())
+    }
+
+    #[tracing::instrument(level = "trace", skip(self, snapshot))]
+    async fn install_snapshot(&mut self, meta: &SnapshotMeta, snapshot: SnapshotData) -> Result<(), io::Error> {
+        tracing::info!("install snapshot");
+
+        let new_snapshot = StoredSnapshot {
+            meta: meta.clone(),
+            data: snapshot,
+        };
+
+        // Update the state machine.
+        {
+            let bs = self.storage.read(&new_snapshot.data).await.unwrap();
+            let updated_state_machine: StateMachineData = decode_buffer(bs);
+            let mut state_machine = self.state_machine.lock().await;
+            *state_machine = updated_state_machine;
+        }
+
+        // Update current snapshot.
+        let mut current_snapshot = self.current_snapshot.lock().unwrap();
+        *current_snapshot = Some(new_snapshot);
+        Ok(())
+    }
+
+    #[tracing::instrument(level = "trace", skip(self))]
+    async fn get_current_snapshot(&mut self) -> Result<Option<Snapshot>, io::Error> {
+        match &*self.current_snapshot.lock().unwrap() {
+            Some(snapshot) => {
+                let data = snapshot.data.clone();
+                Ok(Some(Snapshot {
+                    meta: snapshot.meta.clone(),
+                    snapshot: data,
+                }))
+            }
+            None => Ok(None),
+        }
+    }
+
+    async fn get_snapshot_builder(&mut self) -> Self::SnapshotBuilder {
+        self.clone()
+    }
+}

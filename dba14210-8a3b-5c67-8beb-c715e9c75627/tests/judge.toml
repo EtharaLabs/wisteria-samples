@@ -1,0 +1,119 @@
+# The judged part, ADVISORY: it has no weight in the reward. The reward stays the
+# compiled score of tests/test_output.py alone, and reward.json holds only that one
+# key. tests/test.sh writes this part's score to the side file judged.json as
+# `judged` (beside `compiled`, for information only).
+#
+# Input: tests/test.sh copies, before any submitted code runs, each regular *_test.go
+# file directly in the collected package directory whose name does not start with . or _
+# and that the solver added (whole) or changed (as a unified diff against the unchanged
+# upstream file of the same name in tests/base-module.tar.gz) into the root-only
+# directory /work/grade/out/judge/input; unchanged upstream test files are left out.
+# With none, that directory holds one empty marker file and every criterion scores 0.
+# Nothing new is asked of the solver. Each criterion is one yes/no question about
+# one behaviour the issue in instruction.md asks the tests to cover; each traces to
+# solution/TRUTH.md ("Judged part (advisory)" and "Criterion trace").
+#
+# tests/Dockerfile installs this file as /opt/judge/judge.toml, outside /tests, so the
+# compiled Reward Kit run over /tests never sees it; tests/test.sh runs Reward Kit
+# over that directory only when the runner supplied the judge key. `files` is
+# absolute: Reward Kit resolves it against the verifier's working directory.
+#
+# samples = 3: each criterion is judged 3 times per grading and the
+# median vote counts. guard = "penalize": a submission flagged for text addressed
+# to the evaluator scores 0 on this part.
+[judge]
+judge = "anthropic/claude-sonnet-5-5"
+mode = "individual"
+timeout = 300
+files = ["/work/grade/out/judge/input"]
+weight = 1.0
+guard = "penalize"
+samples = 3
+
+[scoring]
+aggregation = "weighted-mean"
+
+[[criterion]]
+id = "R-JUDGE-CUSTOM-STALE"
+name = "r_judge_custom_stale"
+description = "Do the submitted tests configure an association source that reads a pod label or a pod annotation, send a pod update that removes that label or annotation or changes its value, and check that, once the grace period has passed and the delayed deletes have been processed, the pod is no longer found under the old value?"
+type = "binary"
+weight = 5
+negate = false
+[criterion.annotations]
+mode = "judged"
+type = "VALUE"
+obligation = "D-1"
+dimension = "coverage"
+evaluation_target = "submitted_test_files"
+evidence = ["submitted_test_files"]
+residue = "whether a test exercises this behaviour of the issue and checks its outcome; the compiled items read only each candidate's pass or fail, not which behaviour a test covers"
+importance = "critically_important"
+
+[[criterion]]
+id = "R-JUDGE-RESTORED"
+name = "r_judge_restored"
+description = "Do the submitted tests send a pod update that drops one of the pod's identifiers, then a later update that restores the same identifier for the same pod UID before its delayed delete has been processed, and check that the pod is still found under that identifier after the grace period has passed and the delayed deletes have been processed?"
+type = "binary"
+weight = 5
+negate = false
+[criterion.annotations]
+mode = "judged"
+type = "VALUE"
+obligation = "D-1"
+dimension = "coverage"
+evaluation_target = "submitted_test_files"
+evidence = ["submitted_test_files"]
+residue = "whether a test exercises this behaviour of the issue and checks its outcome; the compiled items read only each candidate's pass or fail, not which behaviour a test covers"
+importance = "critically_important"
+
+[[criterion]]
+id = "R-JUDGE-RESTORED-CUSTOM"
+name = "r_judge_restored_custom"
+description = "Do the submitted tests configure an association source that reads a pod label or a pod annotation, send a pod update that removes that value, then a later update of the same pod that restores the same value before its delayed delete has been processed, and check that the pod is still found under that value after the grace period has passed and the delayed deletes have been processed?"
+type = "binary"
+weight = 3
+negate = false
+[criterion.annotations]
+mode = "judged"
+type = "VALUE"
+obligation = "D-1"
+dimension = "coverage"
+evaluation_target = "submitted_test_files"
+evidence = ["submitted_test_files"]
+residue = "whether a test exercises this behaviour of the issue and checks its outcome; the compiled items read only each candidate's pass or fail, not which behaviour a test covers"
+importance = "important"
+
+[[criterion]]
+id = "R-JUDGE-COME-AND-GO"
+name = "r_judge_come_and_go"
+description = "Do the submitted tests let one identifier of a pod come and go more than once (dropped, restored, then dropped again by later updates of the same pod) and check that after the last removal the pod is no longer found under it once the grace period has passed and the delayed deletes have been processed?"
+type = "binary"
+weight = 3
+negate = false
+[criterion.annotations]
+mode = "judged"
+type = "VALUE"
+obligation = "D-1"
+dimension = "coverage"
+evaluation_target = "submitted_test_files"
+evidence = ["submitted_test_files"]
+residue = "whether a test exercises this behaviour of the issue and checks its outcome; the compiled items read only each candidate's pass or fail, not which behaviour a test covers"
+importance = "important"
+
+[[criterion]]
+id = "R-JUDGE-LIVE-KEYS"
+name = "r_judge_live_keys"
+description = "Where the submitted tests have a pod's stale identifiers cleaned up, do they also check that the identifiers the pod still has keep resolving to that pod after the cleanup has run?"
+type = "binary"
+weight = 3
+negate = false
+[criterion.annotations]
+mode = "judged"
+type = "VALUE"
+obligation = "D-1"
+dimension = "coverage"
+evaluation_target = "submitted_test_files"
+evidence = ["submitted_test_files"]
+residue = "whether a test exercises this behaviour of the issue and checks its outcome; the compiled items read only each candidate's pass or fail, not which behaviour a test covers"
+importance = "important"

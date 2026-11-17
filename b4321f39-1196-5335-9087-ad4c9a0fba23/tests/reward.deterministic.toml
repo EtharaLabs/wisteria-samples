@@ -1,0 +1,23 @@
+# tests/reward.toml without the judge dimension: the compiled dimension alone. The reward is the
+# same number with or without the judge (tests/reward.toml gives the judge weight 0). This is the
+# rule tests/test.sh scores when the judge cannot be used (no judge key, judge input not staged,
+# Reward Kit failed, or an incomplete or inconsistent judge result): reward = compiled =
+# tests/test_output.py's score, recomputed exactly from grading.json, with
+# /logs/verifier/judge-skipped.json naming the reason; see tests/test.sh and solution/TRUTH.md.
+
+[scoring.test_output]
+aggregation = "weighted-mean"
+
+[[reward]]
+name = "reward"
+aggregation = "weighted-sum"
+
+[reward.weights]
+test_output = 1.0
+
+[[reward]]
+name = "compiled"
+aggregation = "weighted-sum"
+
+[reward.weights]
+test_output = 1.0

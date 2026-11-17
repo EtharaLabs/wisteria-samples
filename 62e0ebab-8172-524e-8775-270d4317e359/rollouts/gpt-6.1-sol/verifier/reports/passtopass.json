@@ -1,0 +1,22 @@
+{
+  "absent": [],
+  "exit_code": 0,
+  "failure_output": {},
+  "ok": true,
+  "reason": "",
+  "step": "passtopass",
+  "tests": {
+    "TestJetStreamConsumerFlowControlResetOnLeaderChange": "pass",
+    "TestJetStreamDurableStreamMirrorAndSourceIncorrectConsumerConfig": "pass",
+    "TestJetStreamDurableStreamSourcesWithUniqueConsumerNames": "pass",
+    "TestJetStreamFlowControlRequiresHeartbeats": "pass",
+    "TestJetStreamMirrorConsumerRetryUsesFreshReplySubject": "pass",
+    "TestJetStreamMirrorProcessInboundNilDeref": "pass",
+    "TestJetStreamMirrorRetriesOnSeqAlreadySeenMismatch": "pass",
+    "TestJetStreamSourceBasics": "pass",
+    "TestJetStreamSourceConsumerRetryUsesFreshReplySubject": "pass",
+    "TestJetStreamSourceConsumerUsesScopedAPIReplySubject": "pass",
+    "TestJetStreamSourceStartSeqRespectedOnEmptyOrigin": "pass"
+  },
+  "unparsed_lines": []
+}

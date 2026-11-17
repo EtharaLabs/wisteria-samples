@@ -1,0 +1,9 @@
+{
+  "ids": [
+    "no_symlink_leaves_tree",
+    "no_test_harness_detection",
+    "reward_files_untouched",
+    "step_reports_untouched"
+  ],
+  "schema": "cheat-checks/v1"
+}

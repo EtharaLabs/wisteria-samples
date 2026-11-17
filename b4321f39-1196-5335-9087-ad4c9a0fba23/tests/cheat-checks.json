@@ -1,0 +1,8 @@
+{
+  "schema": "stree.cheat-checks/v1",
+  "ids": [
+    "cheat_no_verifier_paths",
+    "cheat_reward_carrier_intact",
+    "cheat_no_escaped_processes"
+  ]
+}

@@ -1,0 +1,279 @@
+{
+  "reward": {
+    "kind": "group",
+    "score": 0.369,
+    "aggregation": "weighted-sum",
+    "components": [
+      {
+        "name": "judge",
+        "weight": 0.5,
+        "detail": {
+          "score": 0.7381,
+          "criteria": [
+            {
+              "id": "C01",
+              "name": "does_app_diagnosis_md_state_that_after",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 5.0,
+              "description": "Does /app/diagnosis.md state that after the restart the leader writes a different entry at the same index under the same log id (same term, same leader, same index) as an entry it lost?",
+              "reasoning": "The diagnosis says the leader loses unflushed X, restarts at i-1, and after restoring leadership proposes Y \"with precisely the same id\" (term T, old leader, index i). That matches the criterion: a different entry at the same index under the same log id as the lost entry.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C02",
+              "name": "does_app_diagnosis_md_state_that_the_lo",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 5.0,
+              "description": "Does /app/diagnosis.md state that the lost entry had already been replicated to a follower before the leader's own local flush of it completed, so the crash removed it only from the leader?",
+              "reasoning": "The submission says X is persisted by one follower before the leader's flush completes (\"replication before the leader's flush completes\"), and that the leader loses its unflushed X on restart. This conveys that the entry was replicated to a follower before the leader's local flush finished, so the crash removed it only from the leader. It is somewhat implicit, but it covers the criterion.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C03",
+              "name": "does_app_diagnosis_md_state_that_the_fo",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 3.0,
+              "description": "Does /app/diagnosis.md state that the follower holding the lost entry keeps it because an equal log id is taken to mean an equal entry, so nodes apply different entries without any error?",
+              "reasoning": "The submission says the follower holding X \"sees a matching id and retains X,\" and that \"Matching log ids are supposed to identify identical entries; follower reconciliation relies on that invariant.\" It also says a quorum can commit Y while the first follower applies X, giving inconsistent state machines. That matches the criterion. It doesn't say \"without any error\" in those words, but \"producing inconsistent state machines\" with no detection conveys the same thing, so this is a minor gap.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C04",
+              "name": "does_app_diagnosis_md_identify_leader_r",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 5.0,
+              "description": "Does /app/diagnosis.md identify leader restore, which resumes leadership at start-up in the same term with the same leader id and without an election, as what lets the log id be reused?",
+              "reasoning": "The diagnosis says restoring leadership from the persisted committed vote lets the leader propose Y with precisely the same id (term T, same leader). It names \"startup restoring authority without an election\" as a combining factor. This matches the criterion: leader restore, same term and leader id, no election, enabling log id reuse. It never uses the config name enable_leader_restore in that passage, but it does say \"with restoration enabled\". The substance is covered.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C05",
+              "name": "does_app_diagnosis_md_state_that_the_re",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 5.0,
+              "description": "Does /app/diagnosis.md state that the repair makes a former leader win an election for a higher term before it accepts proposals, instead of resuming leadership in its old term?",
+              "reasoning": "The diagnosis says a former leader goes through the ordinary election path in term T+1 at startup. It also says the node cannot propose until a quorum grants authority, and that it remains a candidate and adds no entries without a quorum. That matches the criterion: the leader wins an election for a higher term before accepting proposals, and does not resume leadership in its old term. The title and the contrast with \"Restoring leadership from its persisted committed vote\" support this.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C06",
+              "name": "does_app_diagnosis_md_explain_that_the",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 3.0,
+              "description": "Does /app/diagnosis.md explain that the higher term gives the former leader a new leader id, so no entry it writes afterwards can carry the lost entry's log id?",
+              "reasoning": "The diagnosis says startup sends the former leader through an election in term T+1. It says the new leader's blank entry and later entries have term T+1, so the stale X conflicts with them. It also says the new term gives \"a fresh log-id namespace\". That conveys the criterion's point: a higher term means a new leader id, so later entries can't carry the lost entry's log id. It never says \"new leader id\" in those words, but the meaning is clearly there.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C07",
+              "name": "does_app_diagnosis_md_explain_that_a_re",
+              "value": 0.0,
+              "raw": "no",
+              "weight": 3.0,
+              "description": "Does /app/diagnosis.md explain that a re-election or quorum probe within the same term is not enough, because a follower that is down during that round can still hold the lost entry?",
+              "reasoning": "The submission explains that a new term is needed and says a timer, payload comparison, old-term blank entry, or changing the committed bit won't work. It never says that a re-election or quorum probe within the same term is insufficient. It also never says that a follower that is down during that round can still hold the lost entry. The reference states both points explicitly, so the criterion is not met.",
+              "samples": [
+                "no",
+                "no",
+                "no"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C08",
+              "name": "does_app_diagnosis_md_state_that_the_fo",
+              "value": 0.0,
+              "raw": "no",
+              "weight": 3.0,
+              "description": "Does /app/diagnosis.md state that the former leader's vote is demoted in memory only and the stored committed vote is not overwritten, so vote storage never moves backwards? An equivalent mechanism of the submitted repair counts.",
+              "reasoning": "The submission says the stored vote is never rolled back or demoted, and that the election writes a strictly newer vote. It also says the in-memory committed vote stays intact when restoration is disabled. It never says the former leader's vote is demoted in memory only. Its repair is different: it sends the node through a normal election in term T+1. It does state that vote storage stays monotonic, but it gives no in-memory demotion and no equivalent mechanism. It even says that changing the in-memory vote's committed bit would not be enough. The reference ties the no-overwrite property to the in-memory demotion, so this is not a match.",
+              "samples": [
+                "no",
+                "no",
+                "no"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C09",
+              "name": "does_app_diagnosis_md_state_that_the_re",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 3.0,
+              "description": "Does /app/diagnosis.md state that the repair keeps log appends asynchronous (append may return before entries are persisted), rather than requiring entries to be durable before they are replicated?",
+              "reasoning": "The diagnosis says \"The log storage contract is unchanged: local append completion may still be asynchronous, and replication need not wait for the local flush. No stronger durability requirement is imposed.\" This matches the criterion: the repair keeps appends asynchronous and does not require durability before replication.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C10",
+              "name": "does_app_diagnosis_md_state_that_with_e",
+              "value": 0.0,
+              "raw": "no",
+              "weight": 3.0,
+              "description": "Does /app/diagnosis.md state that with enable_leader_restore set to false a former leader starts as a follower (or learner), keeps its stored vote and waits for a normal election?",
+              "reasoning": "The submission's last section says that with restoration disabled, startup keeps the stored and in-memory committed vote, creates no leadership state, and picks follower or learner from membership. It adds that an explicit election still advances to T+1. That covers the follower/learner start and the kept vote. It never says the node waits for a normal election. \"An explicit election still advances\" is not the same as waiting for one. The required statement is therefore only partly there, so I scored it no.",
+              "samples": [
+                "no",
+                "no",
+                "no"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C11",
+              "name": "does_app_diagnosis_md_state_that_the_st",
+              "value": 0.0,
+              "raw": "no",
+              "weight": 1.0,
+              "description": "Does /app/diagnosis.md state that the start-up election begins at once, without waiting for an election timeout and independently of enable_tick and enable_elect?",
+              "reasoning": "The diagnosis says startup sends a former leader through the ordinary election path in term T+1. It never says the election starts at once, without waiting for an election timeout. It also never says the election is independent of enable_tick and enable_elect. It only says that \"merely waiting for a timer\" would not suffice, which doesn't state the required behavior.",
+              "samples": [
+                "no",
+                "no",
+                "no"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C12",
+              "name": "does_app_diagnosis_md_state_that_on_win",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 1.0,
+              "description": "Does /app/diagnosis.md state that on winning the start-up election the former leader appends a blank entry under its new leader id before any client write?",
+              "reasoning": "The submission says \"the new leader's blank entry and subsequent client entries have term T+1,\" and that \"the newly elected leader's blank entry then commits and applies through the ordinary replication.\" It also says the node \"cannot propose until a quorum grants authority.\" Together these state that on winning the election the leader appends a blank entry under the new term, and that this happens before client entries. \"Term T+1\" stands in for \"new leader id,\" so the match is slightly loose but acceptable.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C13",
+              "name": "does_app_diagnosis_md_state_that_start",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 1.0,
+              "description": "Does /app/diagnosis.md state that start-up of nodes that were followers, learners or unfinished candidates is left unchanged by the repair?",
+              "reasoning": "The submission says: \"Nodes that were not leaders follow their existing startup path without a new election or vote rewrite.\" That states that startup for non-leaders (followers, learners, unfinished candidates) is unchanged. It doesn't list the three categories explicitly, but \"not leaders\" covers them.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "C14",
+              "name": "does_app_diagnosis_md_state_that_leader",
+              "value": 0.0,
+              "raw": "no",
+              "weight": 1.0,
+              "description": "Does /app/diagnosis.md state that leader restore stays enabled by default, so turning it off by default is not the repair?",
+              "reasoning": "The submission never says leader restore stays enabled by default or that disabling it by default is not the fix. It describes behavior \"with restoration enabled\" and \"disabled\" but makes no statement about the default setting.",
+              "samples": [
+                "no",
+                "no",
+                "no"
+              ],
+              "agreement": 1.0
+            }
+          ],
+          "kind": "llm",
+          "judge": {
+            "model": "anthropic/claude-sonnet-5-5",
+            "reasoning_effort": "medium",
+            "timeout": 300,
+            "files": [
+              "/app/diagnosis.md"
+            ],
+            "atif_trajectory": null,
+            "reference": "/tests/reference/diagnosis.md",
+            "mode": "individual",
+            "samples": 3,
+            "guard": "penalize"
+          },
+          "judge_output": "--- sample 1 ---\n--- does_app_diagnosis_md_state_that_after ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says the leader loses unflushed X, restarts at i-1, and restores leadership from its persisted committed vote, letting it propose Y with \\\"precisely the same id\\\" (term T, old leader, index i) as X. That matches the criterion: a different entry at the same index under the same log id as the lost entry.\"}\n\n--- does_app_diagnosis_md_state_that_the_lo ---\n{\"score\": \"yes\", \"reasoning\": \"The submission says X is one that a follower has persisted before the crash, the leader loses its unflushed X, and it mentions \\\"replication before the leader's flush completes\\\". Together this states that the entry was replicated to a follower before the leader's own flush finished, so the crash removed it only from the leader. The wording is somewhat compact, but the content matches.\"}\n\n--- does_app_diagnosis_md_state_that_the_fo ---\n{\"score\": \"yes\", \"reasoning\": \"The submission says the follower holding X \\\"sees a matching id and retains X,\\\" and that \\\"Matching log ids are supposed to identify identical entries; follower reconciliation relies on that invariant.\\\" It also says a quorum can commit Y while the first follower applies X, \\\"producing inconsistent state machines.\\\" That covers the criterion: an equal id is taken to mean an equal entry, so the follower keeps X and different entries are applied. It does not say outright that no error is raised. That is only a minor gap, since the divergence it describes implies it.\"}\n\n--- does_app_diagnosis_md_identify_leader_r ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says that restoring leadership from the persisted committed vote lets the leader propose Y with exactly the same id. It also names \\\"startup restoring authority without an election\\\" as a contributing factor. That identifies leader restore as what lets the log id be reused. The wording on \\\"same term, same leader id, no election\\\" is spread across the text but all present.\"}\n\n--- does_app_diagnosis_md_state_that_the_re ---\n{\"score\": \"yes\", \"reasoning\": \"The submission says startup sends a former leader through the ordinary election path in term T+1. It says the leader cannot propose until a quorum grants authority. This matches the criterion: it wins an election for a higher term before accepting proposals, and it does not resume its old term. Its title, \\\"Restarted leaders must campaign in a new term,\\\" says the same thing.\"}\n\n--- does_app_diagnosis_md_explain_that_the ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says startup sends the former leader through an election in term T+1, and that the new leader's blank entry and later client entries have term T+1. It also says the repair needs \\\"a fresh log-id namespace\\\". That means the new term gives a new leader id, so entries written afterwards can't carry the lost entry's id. The point is made in substance, though it never uses the words \\\"new leader id\\\".\"}\n\n--- does_app_diagnosis_md_explain_that_a_re ---\n{\"score\": \"no\", \"reasoning\": \"The submission says a new term is needed and rejects several alternatives: waiting for a timer, comparing payloads, appending an old-term blank entry, and changing the committed bit. It never says that a re-election or quorum probe within the same term is insufficient. It also never says a follower that is down during that round can still hold the lost entry. The closest point is that a new term is needed for a fresh log-id namespace, but that is not the required explanation.\"}\n\n--- does_app_diagnosis_md_state_that_the_fo ---\n{\"score\": \"no\", \"reasoning\": \"The diagnosis says the stored vote is never rolled back or demoted. That matches the \\\"storage never moves backwards\\\" half of the criterion. But it also says changing the in-memory vote's committed bit would not be enough. And with restoration disabled it says the in-memory committed vote stays intact. It never says the former leader's vote is demoted in memory only. The submitted repair avoids demotion and runs an ordinary election that writes a strictly newer vote. The criterion allows an equivalent mechanism, but this one does not state the in-memory demotion with storage left alone. It reaches monotonic storage by a different route, so I judge it not to match.\"}\n\n--- does_app_diagnosis_md_state_that_the_re ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says: \\\"The log storage contract is unchanged: local append completion may still be asynchronous, and replication need not wait for the local flush. No stronger durability requirement is imposed.\\\" This states the repair keeps appends asynchronous and does not require durability before replication. It doesn't use the exact phrase \\\"append may return before entries are persisted\\\", but the meaning is the same.\"}\n\n--- does_app_diagnosis_md_state_that_with_e ---\n{\"score\": \"no\", \"reasoning\": \"The submission's disabled-restoration paragraph says startup leaves the stored and in-memory committed vote intact, creates no leadership state, and selects follower or learner from membership. That covers the follower/learner start and the kept vote. It never says the node waits for a normal election. Instead it says \\\"An explicit election still advances to T+1,\\\" which isn't the same claim. The statement is only partly covered, so I'm scoring it no.\"}\n\n--- does_app_diagnosis_md_state_that_the_st ---\n{\"score\": \"no\", \"reasoning\": \"The diagnosis says startup sends a former leader through the ordinary election path in term T+1. It never says the election starts at once, without waiting for an election timeout. It also never says the election is independent of enable_tick and enable_elect. It only says \\\"Merely waiting for a timer ... would not establish\\\" a fresh namespace, which is a different point. The criterion is not met.\"}\n\n--- does_app_diagnosis_md_state_that_on_win ---\n{\"score\": \"yes\", \"reasoning\": \"The submission says \\\"the new leader's blank entry and subsequent client entries have term T+1\\\", and that \\\"the newly elected leader's blank entry then commits and applies\\\". It also says the node \\\"cannot propose until a quorum grants authority\\\". Together this says the winner appends a blank entry in the new term before client entries. It does not say \\\"under its new leader id\\\" in those words, but T+1 is the new leader id's term, so the claim is effectively stated.\"}\n\n--- does_app_diagnosis_md_state_that_start ---\n{\"score\": \"yes\", \"reasoning\": \"The submission states: \\\"Nodes that were not leaders follow their existing startup path without a new election or vote rewrite.\\\" That says startup for non-leader nodes (followers, learners, unfinished candidates) is unchanged. It doesn't list the categories explicitly, but \\\"not leaders\\\" covers them.\"}\n\n--- does_app_diagnosis_md_state_that_leader ---\n{\"score\": \"no\", \"reasoning\": \"The submission never says that leader restore stays enabled by default or that disabling it by default is not the fix. It only describes behavior \\\"with restoration enabled\\\" and \\\"with restoration disabled\\\", and it never mentions the default setting.\"}\n\n--- guard ---\n{\"score\": \"no\", \"reasoning\": \"The diagnosis is a technical root-cause write-up. It has no text addressed to an evaluator and no commentary about how the work should be scored.\"}\n\n--- sample 2 ---\n--- does_app_diagnosis_md_state_that_after ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says the leader loses unflushed X, restarts at i-1, and after restoring leadership proposes Y \\\"with precisely the same id\\\" (term T, old leader, index i). That matches the criterion: a different entry at the same index under the same log id as the lost entry.\"}\n\n--- does_app_diagnosis_md_state_that_the_lo ---\n{\"score\": \"yes\", \"reasoning\": \"The submission says X is persisted by one follower before the leader's flush completes (\\\"replication before the leader's flush completes\\\"), and that the leader loses its unflushed X on restart. This conveys that the entry was replicated to a follower before the leader's local flush finished, so the crash removed it only from the leader. It is somewhat implicit, but it covers the criterion.\"}\n\n--- does_app_diagnosis_md_state_that_the_fo ---\n{\"score\": \"yes\", \"reasoning\": \"The submission says the follower holding X \\\"sees a matching id and retains X,\\\" and that \\\"Matching log ids are supposed to identify identical entries; follower reconciliation relies on that invariant.\\\" It also says a quorum can commit Y while the first follower applies X, giving inconsistent state machines. That matches the criterion. It doesn't say \\\"without any error\\\" in those words, but \\\"producing inconsistent state machines\\\" with no detection conveys the same thing, so this is a minor gap.\"}\n\n--- does_app_diagnosis_md_identify_leader_r ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says restoring leadership from the persisted committed vote lets the leader propose Y with precisely the same id (term T, same leader). It names \\\"startup restoring authority without an election\\\" as a combining factor. This matches the criterion: leader restore, same term and leader id, no election, enabling log id reuse. It never uses the config name enable_leader_restore in that passage, but it does say \\\"with restoration enabled\\\". The substance is covered.\"}\n\n--- does_app_diagnosis_md_state_that_the_re ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says a former leader goes through the ordinary election path in term T+1 at startup. It also says the node cannot propose until a quorum grants authority, and that it remains a candidate and adds no entries without a quorum. That matches the criterion: the leader wins an election for a higher term before accepting proposals, and does not resume leadership in its old term. The title and the contrast with \\\"Restoring leadership from its persisted committed vote\\\" support this.\"}\n\n--- does_app_diagnosis_md_explain_that_the ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says startup sends the former leader through an election in term T+1. It says the new leader's blank entry and later entries have term T+1, so the stale X conflicts with them. It also says the new term gives \\\"a fresh log-id namespace\\\". That conveys the criterion's point: a higher term means a new leader id, so later entries can't carry the lost entry's log id. It never says \\\"new leader id\\\" in those words, but the meaning is clearly there.\"}\n\n--- does_app_diagnosis_md_explain_that_a_re ---\n{\"score\": \"no\", \"reasoning\": \"The submission explains that a new term is needed and says a timer, payload comparison, old-term blank entry, or changing the committed bit won't work. It never says that a re-election or quorum probe within the same term is insufficient. It also never says that a follower that is down during that round can still hold the lost entry. The reference states both points explicitly, so the criterion is not met.\"}\n\n--- does_app_diagnosis_md_state_that_the_fo ---\n{\"score\": \"no\", \"reasoning\": \"The submission says the stored vote is never rolled back or demoted, and that the election writes a strictly newer vote. It also says the in-memory committed vote stays intact when restoration is disabled. It never says the former leader's vote is demoted in memory only. Its repair is different: it sends the node through a normal election in term T+1. It does state that vote storage stays monotonic, but it gives no in-memory demotion and no equivalent mechanism. It even says that changing the in-memory vote's committed bit would not be enough. The reference ties the no-overwrite property to the in-memory demotion, so this is not a match.\"}\n\n--- does_app_diagnosis_md_state_that_the_re ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says \\\"The log storage contract is unchanged: local append completion may still be asynchronous, and replication need not wait for the local flush. No stronger durability requirement is imposed.\\\" This matches the criterion: the repair keeps appends asynchronous and does not require durability before replication.\"}\n\n--- does_app_diagnosis_md_state_that_with_e ---\n{\"score\": \"no\", \"reasoning\": \"The submission's last section says that with restoration disabled, startup keeps the stored and in-memory committed vote, creates no leadership state, and picks follower or learner from membership. It adds that an explicit election still advances to T+1. That covers the follower/learner start and the kept vote. It never says the node waits for a normal election. \\\"An explicit election still advances\\\" is not the same as waiting for one. The required statement is therefore only partly there, so I scored it no.\"}\n\n--- does_app_diagnosis_md_state_that_the_st ---\n{\"score\": \"no\", \"reasoning\": \"The diagnosis says startup sends a former leader through the ordinary election path in term T+1. It never says the election starts at once, without waiting for an election timeout. It also never says the election is independent of enable_tick and enable_elect. It only says that \\\"merely waiting for a timer\\\" would not suffice, which doesn't state the required behavior.\"}\n\n--- does_app_diagnosis_md_state_that_on_win ---\n{\"score\": \"yes\", \"reasoning\": \"The submission says \\\"the new leader's blank entry and subsequent client entries have term T+1,\\\" and that \\\"the newly elected leader's blank entry then commits and applies through the ordinary replication.\\\" It also says the node \\\"cannot propose until a quorum grants authority.\\\" Together these state that on winning the election the leader appends a blank entry under the new term, and that this happens before client entries. \\\"Term T+1\\\" stands in for \\\"new leader id,\\\" so the match is slightly loose but acceptable.\"}\n\n--- does_app_diagnosis_md_state_that_start ---\n{\"score\": \"yes\", \"reasoning\": \"The submission says: \\\"Nodes that were not leaders follow their existing startup path without a new election or vote rewrite.\\\" That states that startup for non-leaders (followers, learners, unfinished candidates) is unchanged. It doesn't list the three categories explicitly, but \\\"not leaders\\\" covers them.\"}\n\n--- does_app_diagnosis_md_state_that_leader ---\n{\"score\": \"no\", \"reasoning\": \"The submission never says leader restore stays enabled by default or that disabling it by default is not the fix. It describes behavior \\\"with restoration enabled\\\" and \\\"disabled\\\" but makes no statement about the default setting.\"}\n\n--- guard ---\n{\"score\": \"no\", \"reasoning\": \"The submission is a technical diagnosis document. It contains no text addressed to the evaluator and nothing about how the work should be scored.\"}\n\n--- sample 3 ---\n--- does_app_diagnosis_md_state_that_after ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says the leader loses unflushed X, restarts at i-1, restores leadership from its committed vote, and proposes Y with \\\"precisely the same id\\\" (term T, old leader, index i) as X. That matches the criterion that the leader writes a different entry at the same index under the same log id as the lost one.\"}\n\n--- does_app_diagnosis_md_state_that_the_lo ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says X is persisted by one follower before the leader's flush, and the leader loses its unflushed X on restart. It also says replication happens before the leader's flush completes. So the entry was replicated to a follower first and the crash removed it only from the leader. The wording is slightly indirect, but it states the criterion.\"}\n\n--- does_app_diagnosis_md_state_that_the_fo ---\n{\"score\": \"yes\", \"reasoning\": \"The submission says the follower holding X \\\"sees a matching id and retains X,\\\" and that matching log ids are supposed to identify identical entries and reconciliation relies on that invariant instead of comparing payloads. It also says a quorum can commit Y while the first follower applies X, \\\"producing inconsistent state machines.\\\" That covers the criterion's main points. It doesn't say outright that no error is raised, but \\\"retains X\\\" and the divergent state machines imply it.\"}\n\n--- does_app_diagnosis_md_identify_leader_r ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis states that restoring leadership from the persisted committed vote at startup (without an election) lets the leader propose Y with exactly the same id (same term, same leader, same index). It says \\\"startup restoring authority without an election\\\" is a combined cause. That matches the criterion, though \\\"same term/same leader id\\\" is phrased via the log id (term T, old leader, index i).\"}\n\n--- does_app_diagnosis_md_state_that_the_re ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says startup sends a former leader through the ordinary election path in term T+1. It says the leader cannot propose until a quorum grants authority, so it doesn't resume leadership in its old term. This matches the criterion.\"}\n\n--- does_app_diagnosis_md_explain_that_the ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says the restarted leader goes through an election in term T+1, and that the new leader's blank entry and later entries carry term T+1. It says this \\\"establish[es] a fresh log-id namespace\\\", and the stale X conflicts with the blank entry. That is the same point as the criterion: a higher term gives a new leader id, so later entries can't carry the lost entry's log id. It never uses the phrase \\\"leader id\\\", but it makes the point in substance.\"}\n\n--- does_app_diagnosis_md_explain_that_a_re ---\n{\"score\": \"no\", \"reasoning\": \"The submission says a new term T+1 is needed and rules out some alternatives, such as waiting for a timer, comparing payloads, appending an old-term blank entry, and changing the committed bit. It never says that a re-election or quorum probe within the same term is not enough. It also never says that a follower that is down during that round can still hold the lost entry. The criterion asks for exactly that explanation, so it is not met.\"}\n\n--- does_app_diagnosis_md_state_that_the_fo ---\n{\"score\": \"no\", \"reasoning\": \"The submission says the stored vote is never rolled back or demoted, and that the ordinary election writes a strictly newer vote. It also says that with restoration disabled, startup leaves both the stored and in-memory committed vote intact. It never says the former leader's vote is demoted in memory only while the stored committed vote is left unchanged. It does say that \\\"changing the in-memory vote's committed bit would not establish a fresh log-id namespace\\\", which implies the repair doesn't rely on an in-memory demotion. So its mechanism is different from the reference. It is only partly equivalent: it avoids moving vote storage backwards, because the election writes a newer vote. But it doesn't state the in-memory-only demotion, and it explicitly says the stored vote is never demoted. I judge this as not meeting the criterion.\"}\n\n--- does_app_diagnosis_md_state_that_the_re ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says \\\"The log storage contract is unchanged: local append completion may still be asynchronous, and replication need not wait for the local flush. No stronger durability requirement is imposed.\\\" That states the repair keeps appends asynchronous and does not require durability before replication.\"}\n\n--- does_app_diagnosis_md_state_that_with_e ---\n{\"score\": \"no\", \"reasoning\": \"The submission's last paragraph says that with restoration disabled, startup leaves the stored and in-memory committed vote intact, creates no leadership state, and selects follower or learner from membership. That covers the follower/learner start and the kept vote. It doesn't say the node waits for a normal election. It says instead that \\\"An explicit election still advances to T+1.\\\" That is close but not the same, so the required statement is only partly there. The wording also doesn't clearly state that the node waits for a normal election.\"}\n\n--- does_app_diagnosis_md_state_that_the_st ---\n{\"score\": \"no\", \"reasoning\": \"The diagnosis says startup sends a former leader through the ordinary election path in term T+1. It never says the election starts at once, without waiting for an election timeout. It also never says the election is independent of enable_tick and enable_elect. It only says that merely waiting for a timer is insufficient, which isn't the required statement. It also doesn't mention enable_tick or enable_elect.\"}\n\n--- does_app_diagnosis_md_state_that_on_win ---\n{\"score\": \"yes\", \"reasoning\": \"The submission says the new leader's blank entry and subsequent client entries have term T+1. It also says the newly elected leader's blank entry commits through ordinary replication. This implies a blank entry is appended on winning, before client entries, but it doesn't say so explicitly. The \\\"before any client write\\\" ordering and \\\"under its new leader id\\\" are conveyed through \\\"blank entry and subsequent client entries have term T+1\\\". This is close enough to count as stating it.\"}\n\n--- does_app_diagnosis_md_state_that_start ---\n{\"score\": \"yes\", \"reasoning\": \"The diagnosis says \\\"Nodes that were not leaders follow their existing startup path without a new election or vote rewrite.\\\" That matches the criterion: startup of followers, learners and unfinished candidates is unchanged. It doesn't list the categories by name, but \\\"not leaders\\\" covers them.\"}\n\n--- does_app_diagnosis_md_state_that_leader ---\n{\"score\": \"no\", \"reasoning\": \"The submission never says that leader restore stays enabled by default or that disabling it by default is not the fix. It only describes behavior \\\"with restoration enabled\\\" and \\\"with restoration disabled\\\", and it says nothing about the default setting.\"}\n\n--- guard ---\n{\"score\": \"no\", \"reasoning\": \"The submission is a technical diagnosis document. It contains no text addressed to the evaluator and nothing about how its work should be scored.\"}",
+          "usage": {
+            "input_tokens": 121461,
+            "output_tokens": 8591,
+            "total_tokens": 130052,
+            "cost_usd": 0.328832,
+            "models": {
+              "anthropic/claude-sonnet-5-5": {
+                "input_tokens": 121461,
+                "output_tokens": 8591,
+                "total_tokens": 130052,
+                "cost_usd": 0.328832
+              }
+            }
+          },
+          "guard": {
+            "flagged": false,
+            "reasoning": "The submission is a technical diagnosis document. It contains no text addressed to the evaluator and nothing about how the work should be scored."
+          }
+        }
+      },
+      {
+        "name": "test_output",
+        "weight": 0.5,
+        "detail": {
+          "score": 0.0,
+          "criteria": [
+            {
+              "name": "graded_tests",
+              "value": 0.0,
+              "raw": 0.0,
+              "weight": 1.0,
+              "description": "0 on a failed build, any failed cheat check or any failing pass-to-pass test; otherwise the share of fail-to-pass tests passing in every one of their runs",
+              "reasoning": "{\"failing\": [\"openraft::engine::tests::startup_test::test_startup_as_leader_leader_restore_disabled\"], \"reason\": \"pass_to_pass_failed\"}"
+            }
+          ],
+          "kind": "programmatic"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+# The judged admission gate.  One reference-based judged item,
+# graded once out of this directory and never as a dimension of the weighted
+# mean: Reward Kit's directory scan skips any child whose name begins with a
+# dot, so tests/.gate/ is invisible to `rewardkit /tests`.  tests/test.sh grades
+# this file into a scratch directory first; a reward of 1.0 lets the real
+# grading run, and anything else takes the zero route in zero.toml beside it.
+#
+# It decides the one semantic residue no compiled relation can: whether the note
+# names THIS incident's cause rather than a plausible look-alike.  The compiled
+# channel never sees it, which is why the zero route gives the judged_gate
+# criterion tests/test.sh writes there weight 0 in its `compiled` table.
+[judge]
+judge = "anthropic/claude-sonnet-5-5"
+mode = "individual"
+timeout = 300
+samples = 3
+files = ["/app/diagnosis.md"]
+reference = "/tests/reference/diagnosis.md"
+weight = 1.0
+guard = "penalize"
+
+[scoring]
+aggregation = "all-pass"
+
+[[criterion]]
+id = "G01"
+description = "Does /app/diagnosis.md identify this incident's genuine root cause (a stale, reused post-reset delivery number causing interior downstream loss), rather than a look-alike cause or no cause at all?"
+type = "binary"
+weight = 1
+[criterion.annotations]
+mode = "judged"
+type = "diagnosis"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+gate = true
+obligation = "G01"
+dimension = "judged"
+evidence = "/app/diagnosis.md against /tests/reference/diagnosis.md"
+residue = "whether the note names this incident's own cause or a look-alike"

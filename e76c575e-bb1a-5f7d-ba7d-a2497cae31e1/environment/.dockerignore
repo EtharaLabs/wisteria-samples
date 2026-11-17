@@ -1,0 +1,3 @@
+# Deny the whole build context, then admit only what environment/Dockerfile copies.
+*
+!.build

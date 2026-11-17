@@ -1,0 +1,204 @@
+{
+  "reward": {
+    "kind": "group",
+    "score": 0.5333,
+    "aggregation": "weighted-sum",
+    "components": [
+      {
+        "name": "judge",
+        "weight": 0.0,
+        "detail": {
+          "score": 1.0,
+          "criteria": [
+            {
+              "id": "J1",
+              "name": "literal_chars_in_filters",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 5.0,
+              "description": "Do the submitted tests call Match or MatchUntil with filters in which `*` or `>` sits inside a longer token (such as `a*`, `*a`, `**`, `>b` or `a>`), and check that such a token matches only a stored token with exactly the same bytes, so that, for example, a filter `KV.a*` does not report stored subjects like `KV.apple`?",
+              "reasoning": "The tests include filters such as \"KV.a*\" (in the corpus filters list) against stored subjects KV.a, KV.apple, KV.avocado, KV.banana. They also use filters with tokens like a*, *a, **, a>, >b, etc. checkLiteralFilter uses a token-level model where a non-exact `*` or `>` token matches only identical bytes, and it asserts the reported set exactly equals the expected set, with an error on any unexpected subject and on count mismatches. So KV.apple being reported for KV.a* would fail. Both Match and MatchUntil are called (stop<0 uses Match, otherwise MatchUntil).",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "J2",
+              "name": "literal_chars_in_stored_subjects",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 5.0,
+              "description": "Do the submitted tests insert subjects that have `*` or `>` inside a longer token (such as `a*`, `*a`, `**`, `>b` or `a>`) into the tree and check which filters match those stored subjects?",
+              "reasoning": "The tests insert subjects containing `*` or `>` inside longer tokens (a*, *a, **, a>, >b, >>, a*b, a>b, *>) in corpus and small-tree tests, then check many filters against a token-level model via Match/MatchUntil, comparing the callback results with the model and with the stored contents. Filters include the literal subjects, so stored literal subjects are checked for which filters match them.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "J3",
+              "name": "real_and_literal_wildcards_mixed",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 3.0,
+              "description": "Do the submitted tests use at least one filter that combines a real wildcard (a token that is exactly `*`, or a last token that is exactly `>`) with a `*` or `>` inside another, longer token of the same filter, and check the subjects it matches?",
+              "reasoning": "The corpus and tests include filters mixing real wildcards with literal ones in longer tokens (e.g. \"a*.>\", \"*.a*\", \"a*.*.end\", \"**.*\", \">b.*\"). These are verified against a token-level model via checkLiteralFilter, which asserts the matching subjects.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "J4",
+              "name": "long_subjects_and_filters",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 3.0,
+              "description": "Do the submitted tests check Match or MatchUntil results for subjects and filters of any length and any number of tokens, that is, not only for short subjects and filters with few tokens but also for longer ones with more tokens?",
+              "reasoning": "The corpus includes subjects and filters with many tokens. For n in 31, 64, 257, 1024, it builds prefixes of n bytes (\"p\" repeated) and deep subjects of n tokens (\"x.\" repeated n times). Filters include deep+\"**.*\", deep+\"*.end\" and deep+\">b.>\", with up to about 1026 tokens. These are checked through checkLiteralFilter against a token-level model, using Match and MatchUntil with several stop values, and the assertions would fail if results were wrong. Short ones are covered too, so both short and long subjects and filters are tested.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "J5",
+              "name": "each_match_reported_once",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 5.0,
+              "description": "Do the submitted tests check that Match reports every matching stored subject exactly once and nothing else (a missing, an extra or a repeated report makes the check fail), with checks that do not depend on the order of the callback calls? Any sound way of checking this counts, for example comparing the reported subjects with the expected ones as a collection, or checking each reported subject as it arrives against the expected matches and the subjects already reported and then checking the number of calls.",
+              "reasoning": "checkLiteralFilter computes the expected match count from a model. In each callback it checks that the subject is in contents, matches the filter, and has not been seen before. A duplicate, extra or wrong subject sets a problem. The seen map is then compared with the expected count, so a missing report fails. The checks use a map and a count, so they don't depend on callback order. With stop = -1 or 0 it covers Match and full MatchUntil, and the unit checks run across many tree shapes. This meets the criterion.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "J6",
+              "name": "match_until_stops",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 3.0,
+              "description": "Do the submitted tests check MatchUntil's stop: once the callback returns false there is no further callback call and MatchUntil returns false, while MatchUntil returns true when the callback never returns false?",
+              "reasoning": "checkLiteralFilter calls MatchUntil with stop values 0 (never false) and 2 (returns false when len(seen) reaches stop). It checks that completed equals !(stop>0 && want>=stop), so it expects false when stopped and true when it never stops. It also checks len(seen) == min(want, stop). If a callback were called after returning false, len(seen) would exceed stop, because the callback records every call and the count would be wrong. Since seen is keyed by subject and duplicates are flagged, an extra call would add to seen or set an error. So the stop is verified. The reference checks every k up to the match count. This submission checks stops 1 and 2 in several tests, and stop 2 in the main shape test. Together these cover the criterion adequately.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "J7",
+              "name": "callback_receives_stored_value",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 3.0,
+              "description": "Do the submitted tests check that the value pointer the callback receives is the stored value itself, for example by comparing it with the pointer Find returns for the reported subject, or by writing through it and reading the stored value back?",
+              "reasoning": "The tests check that the callback's value pointer is the stored value. checkLiteralFilter calls st.Find on each reported subject and flags a failure if p != value. This helper runs in nearly every test. TestLiteralWildcardCallbackWrites also compares the pointer with Find's result and writes through it (*v += 10). It then reads the values back by running Match and MatchUntil and comparing against the model. That covers both approaches the criterion names.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "J8",
+              "name": "results_after_updates",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 3.0,
+              "description": "Do the submitted tests check Match or MatchUntil results again after the tree was changed by Delete or Empty (and, where relevant, by later Insert calls), against what the tree holds at that point?",
+              "reasoning": "TestLiteralWildcardTreeShapes builds the tree, then deletes about two thirds of the subjects and re-inserts the rest with new values. It then calls check(filters), which runs Match and MatchUntil against the model map. It then calls Empty() and clears the model, and checks again. Last, it re-inserts every subject and checks again. checkLiteralFilter compares callbacks and counts against the current contents, including values, Find pointers, and stop behavior. This covers Match and MatchUntil after Delete, Empty, and later Insert calls. The checks are less fine-grained than the reference's per-change checks, but they meet the criterion.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            },
+            {
+              "id": "J9",
+              "name": "overlapping_calls",
+              "value": 1.0,
+              "raw": "yes",
+              "weight": 3.0,
+              "description": "Do the submitted tests run Match or MatchUntil concurrently from several goroutines, and also call Match or MatchUntil from inside a callback of a running Match or MatchUntil on the same tree, checking the results of those calls?",
+              "reasoning": "TestLiteralWildcardReentrantAndConcurrent does both. Nested: inside the callback of an outer Match or MatchUntil on trees[0], it calls checkLiteralFilter on the same tree. That helper runs Match or MatchUntil with stop values -1, 0 and 1, and the results are checked against the model. Concurrent: 4 goroutines run checkLiteralFilter, which calls Match or MatchUntil, over shared trees (k = (i+w)%2), and each result is checked. The outer subject is copied and verified, and the outer visit count is also checked.",
+              "samples": [
+                "yes",
+                "yes",
+                "yes"
+              ],
+              "agreement": 1.0
+            }
+          ],
+          "kind": "llm",
+          "judge": {
+            "model": "anthropic/claude-sonnet-5-5",
+            "reasoning_effort": "medium",
+            "timeout": 300,
+            "files": [
+              "/var/lib/grader-judge/server/stree"
+            ],
+            "atif_trajectory": null,
+            "reference": "/tests/reference/judge-reference.md",
+            "mode": "individual",
+            "samples": 3,
+            "guard": "penalize"
+          },
+          "judge_output": "--- sample 1 ---\n--- literal_chars_in_filters ---\n{\"score\": \"yes\", \"reasoning\": \"The tests store KV.a, KV.apple, KV.avocado, KV.banana and use filter \\\"KV.a*\\\" (in the base filters list), as well as filters built from tokens like a*, *a, **, a>, >b. They compare Match and MatchUntil results to a token-level model, where a non-exact token must equal the value exactly. This verifies that KV.apple isn't reported for KV.a*. The assertions would fail if the behaviour were wrong: the callback checks that each reported subject matches the model, and the callback count is compared against the expected count.\"}\n\n--- literal_chars_in_stored_subjects ---\n{\"score\": \"yes\", \"reasoning\": \"The submission's corpus inserts subjects built from tokens like a*, *a, **, a>, >b, >>, a*b, a>b, *> (e.g. \\\"KV.a*\\\", \\\"a*.b.end\\\", \\\"root.**.x\\\"). It checks many filters against those stored subjects using a token-level model and asserts exact callback results. TestLiteralWildcardSmallTrees also stores literal-containing subjects and checks the filters that match them. This meets the criterion.\"}\n\n--- real_and_literal_wildcards_mixed ---\n{\"score\": \"yes\", \"reasoning\": \"The corpus generates filters combining real wildcards with literal tokens containing * or >, e.g. a+\\\".*\\\", a+\\\".>\\\", \\\"*.\\\"+a, and \\\"KV.a*\\\" style tokens. Examples: \\\"a*.*\\\", \\\"*.a*\\\", \\\"a*.>\\\", \\\"root.**.*\\\". Tests check matches against a token-level model with assertions on the callbacks and counts. Direct hand-written filters such as \\\"a*.>\\\", \\\"**.*\\\", \\\">b.*\\\", and \\\"*.**.*\\\" are also used.\"}\n\n--- long_subjects_and_filters ---\n{\"score\": \"yes\", \"reasoning\": \"The corpus includes long subjects and filters: prefix of 'p' repeated up to 1024 bytes, and deep subjects \\\"x.\\\" repeated up to 1024 tokens (e.g. deep+\\\"**.end\\\"), with filters like deep+\\\"**.*\\\", deep+\\\"*.end\\\", deep+\\\">b.>\\\". Short ones are also covered. These are checked through checkLiteralFilter, which compares Match and MatchUntil against a token-level model with assertions. Tests insert these subjects and check filters, so long, many-token cases are verified.\"}\n\n--- each_match_reported_once ---\n{\"score\": \"yes\", \"reasoning\": \"checkLiteralFilter computes the expected match count from a model. In each callback it flags a subject that isn't stored, doesn't match the filter, or was already seen. It then checks that the number of distinct seen subjects equals the expected count. Duplicates are caught by the seen map and extras by the model check. Missing reports are caught by the count comparison. Nothing depends on callback order. One limit: a repeat report is flagged through `problem`, which later calls can overwrite. A repeat still leaves `problem` set unless a later valid callback overwrites it, and a valid callback does not clear it, so the error persists. For stop<0, a duplicate also does not change len(seen), but `problem` stays set, so the failure is still reported.\"}\n\n--- match_until_stops ---\n{\"score\": \"yes\", \"reasoning\": \"checkLiteralFilter calls MatchUntil with stop values 0 (never returns false) and 2 (returns false when len(seen) reaches stop). It asserts completed == !(stop>0 && want>=stop), so MatchUntil must return false when stopped and true when it never returns false or when fewer matches than stop exist. It also asserts len(seen) == min(want, stop), so no callbacks occur after the false return. The tests use stops 1 and 2 in other places too. This is less exhaustive than the reference, which tests every k, but it covers the criterion.\"}\n\n--- callback_receives_stored_value ---\n{\"score\": \"yes\", \"reasoning\": \"The shared checker checkLiteralFilter runs in every Match and MatchUntil test. Its callback calls st.Find on the reported subject and flags a problem if p != value. TestLiteralWildcardCallbackWrites does the same pointer comparison, then writes through the pointer (*v += 10) and reads the stored values back by running the filter check against the updated model. This meets the criterion.\"}\n\n--- results_after_updates ---\n{\"score\": \"yes\", \"reasoning\": \"TestLiteralWildcardTreeShapes inserts all subjects, then deletes about two thirds of them and re-inserts the rest with new values, and calls check(filters) on the result. It then calls Empty() and checks again, which should find nothing. It then re-inserts everything and checks a third time. Each check goes through checkLiteralFilter. That function compares Match and MatchUntil results with a model map (contents) that is updated alongside the tree. It verifies the subjects, the values, the counts and the stop behaviour. This covers Delete, Empty and later Insert calls, each checked against the tree's current contents. The check is coarser than the reference suite, which checks after every single change. It still meets the criterion.\"}\n\n--- overlapping_calls ---\n{\"score\": \"yes\", \"reasoning\": \"TestLiteralWildcardReentrantAndConcurrent runs 4 goroutines calling checkLiteralFilter (Match and MatchUntil, depending on stop) on shared trees, and checks the results. It also calls Match and MatchUntil from inside outer Match and MatchUntil callbacks on the same tree. Inner results are checked via checkLiteralFilter, and the outer traversal's visit count is checked as well.\"}\n\n--- guard ---\n{\"score\": \"no\", \"reasoning\": \"The submission is Go test code. Its comments describe test behavior, such as callback order and memory validity. None of them address an evaluator or say how the work should be scored.\"}\n\n--- sample 2 ---\n--- literal_chars_in_filters ---\n{\"score\": \"yes\", \"reasoning\": \"The tests include filters such as \\\"KV.a*\\\" (in the corpus filters list) against stored subjects KV.a, KV.apple, KV.avocado, KV.banana. They also use filters with tokens like a*, *a, **, a>, >b, etc. checkLiteralFilter uses a token-level model where a non-exact `*` or `>` token matches only identical bytes, and it asserts the reported set exactly equals the expected set, with an error on any unexpected subject and on count mismatches. So KV.apple being reported for KV.a* would fail. Both Match and MatchUntil are called (stop<0 uses Match, otherwise MatchUntil).\"}\n\n--- literal_chars_in_stored_subjects ---\n{\"score\": \"yes\", \"reasoning\": \"The tests insert subjects containing `*` or `>` inside longer tokens (a*, *a, **, a>, >b, >>, a*b, a>b, *>) in corpus and small-tree tests, then check many filters against a token-level model via Match/MatchUntil, comparing the callback results with the model and with the stored contents. Filters include the literal subjects, so stored literal subjects are checked for which filters match them.\"}\n\n--- real_and_literal_wildcards_mixed ---\n{\"score\": \"yes\", \"reasoning\": \"The corpus and tests include filters mixing real wildcards with literal ones in longer tokens (e.g. \\\"a*.>\\\", \\\"*.a*\\\", \\\"a*.*.end\\\", \\\"**.*\\\", \\\">b.*\\\"). These are verified against a token-level model via checkLiteralFilter, which asserts the matching subjects.\"}\n\n--- long_subjects_and_filters ---\n{\"score\": \"yes\", \"reasoning\": \"The corpus includes subjects and filters with many tokens. For n in 31, 64, 257, 1024, it builds prefixes of n bytes (\\\"p\\\" repeated) and deep subjects of n tokens (\\\"x.\\\" repeated n times). Filters include deep+\\\"**.*\\\", deep+\\\"*.end\\\" and deep+\\\">b.>\\\", with up to about 1026 tokens. These are checked through checkLiteralFilter against a token-level model, using Match and MatchUntil with several stop values, and the assertions would fail if results were wrong. Short ones are covered too, so both short and long subjects and filters are tested.\"}\n\n--- each_match_reported_once ---\n{\"score\": \"yes\", \"reasoning\": \"checkLiteralFilter computes the expected match count from a model. In each callback it checks that the subject is in contents, matches the filter, and has not been seen before. A duplicate, extra or wrong subject sets a problem. The seen map is then compared with the expected count, so a missing report fails. The checks use a map and a count, so they don't depend on callback order. With stop = -1 or 0 it covers Match and full MatchUntil, and the unit checks run across many tree shapes. This meets the criterion.\"}\n\n--- match_until_stops ---\n{\"score\": \"yes\", \"reasoning\": \"checkLiteralFilter calls MatchUntil with stop values 0 (never false) and 2 (returns false when len(seen) reaches stop). It checks that completed equals !(stop>0 && want>=stop), so it expects false when stopped and true when it never stops. It also checks len(seen) == min(want, stop). If a callback were called after returning false, len(seen) would exceed stop, because the callback records every call and the count would be wrong. Since seen is keyed by subject and duplicates are flagged, an extra call would add to seen or set an error. So the stop is verified. The reference checks every k up to the match count. This submission checks stops 1 and 2 in several tests, and stop 2 in the main shape test. Together these cover the criterion adequately.\"}\n\n--- callback_receives_stored_value ---\n{\"score\": \"yes\", \"reasoning\": \"The tests check that the callback's value pointer is the stored value. checkLiteralFilter calls st.Find on each reported subject and flags a failure if p != value. This helper runs in nearly every test. TestLiteralWildcardCallbackWrites also compares the pointer with Find's result and writes through it (*v += 10). It then reads the values back by running Match and MatchUntil and comparing against the model. That covers both approaches the criterion names.\"}\n\n--- results_after_updates ---\n{\"score\": \"yes\", \"reasoning\": \"TestLiteralWildcardTreeShapes builds the tree, then deletes about two thirds of the subjects and re-inserts the rest with new values. It then calls check(filters), which runs Match and MatchUntil against the model map. It then calls Empty() and clears the model, and checks again. Last, it re-inserts every subject and checks again. checkLiteralFilter compares callbacks and counts against the current contents, including values, Find pointers, and stop behavior. This covers Match and MatchUntil after Delete, Empty, and later Insert calls. The checks are less fine-grained than the reference's per-change checks, but they meet the criterion.\"}\n\n--- overlapping_calls ---\n{\"score\": \"yes\", \"reasoning\": \"TestLiteralWildcardReentrantAndConcurrent does both. Nested: inside the callback of an outer Match or MatchUntil on trees[0], it calls checkLiteralFilter on the same tree. That helper runs Match or MatchUntil with stop values -1, 0 and 1, and the results are checked against the model. Concurrent: 4 goroutines run checkLiteralFilter, which calls Match or MatchUntil, over shared trees (k = (i+w)%2), and each result is checked. The outer subject is copied and verified, and the outer visit count is also checked.\"}\n\n--- guard ---\n{\"score\": \"no\", \"reasoning\": \"The submission is Go test code. Its comments describe test behavior, such as not assuming callback order and copying slices. None of them address an evaluator or say how the work should be scored.\"}\n\n--- sample 3 ---\n--- literal_chars_in_filters ---\n{\"score\": \"yes\", \"reasoning\": \"The submission's corpus includes filters like \\\"KV.a*\\\", \\\"a*.>\\\", \\\"**.*\\\", \\\">b.*\\\", and \\\"fan.Xa*\\\" run via Match and MatchUntil. Subjects include KV.a, KV.apple, KV.avocado and KV.banana. A token-level model (literalFilterMatches) treats `*` and `>` as wildcards only when they are the whole token. checkLiteralFilter checks the exact count and set of callbacks, so a `KV.a*` filter that reports KV.apple would fail. This meets the criterion.\"}\n\n--- literal_chars_in_stored_subjects ---\n{\"score\": \"yes\", \"reasoning\": \"The tests insert subjects containing `*` and `>` inside longer tokens (a*, *a, **, a>, >b, >>, a*b, a>b, *>), including as stored subjects such as \\\"KV.a*\\\", \\\"a*.tail\\\" and \\\"**.end\\\". They check many filters against a token-level model and assert results through checkLiteralFilter. This meets the criterion.\"}\n\n--- real_and_literal_wildcards_mixed ---\n{\"score\": \"yes\", \"reasoning\": \"The corpus generates filters such as a+\\\".*\\\", a+\\\".>\\\", \\\"*.\\\"+a, \\\"root.\\\"+a+\\\".*\\\", \\\"*.\\\"+a+\\\".>\\\", and a+\\\".\\\"+b+\\\".*\\\", where a and b come from tokens like \\\"a*\\\", \\\"*a\\\", \\\"**\\\", \\\">b\\\". These mix real wildcard tokens (a whole `*` or a final `>`) with literal tokens that contain `*` or `>`. Examples are \\\"a*.>\\\" and \\\"*.**.*\\\". checkLiteralFilter compares the matched subjects against a token-level model, so the mixed filters are checked. The tests also use these filters directly in TestLiteralWildcardCallbackWrites and in the reentrant test.\"}\n\n--- long_subjects_and_filters ---\n{\"score\": \"yes\", \"reasoning\": \"The corpus includes long subjects and filters: prefixes of 31, 64, 257 and 1024 'p' characters, and deep subjects with 'x.' repeated up to 1024 times, which gives about 1000+ tokens. Filters such as deep+\\\"**.*\\\", deep+\\\"*.end\\\" and deep+\\\">b.>\\\" are long with many tokens. These are checked through checkLiteralFilter against a token-level model, using both Match and MatchUntil. They also include short cases, so the tests cover subjects and filters of varied length and token count.\"}\n\n--- each_match_reported_once ---\n{\"score\": \"yes\", \"reasoning\": \"checkLiteralFilter computes the expected count from a model. In each callback it verifies the subject exists in the contents, matches the filter, and has not been seen before. A duplicate, extra or wrong report sets the problem. After the traversal it checks that the number of distinct seen subjects equals the expected count, so a missing report fails. Because duplicates are caught by the seen map, the counts are exact. None of this depends on callback order. For stop<=0, which includes Match with stop -1, the whole traversal runs, so every matching subject is reported once. The helper is called across many tests and tree shapes. One flaw: a callback that fires on a duplicate sets the problem but still continues, which is fine.\"}\n\n--- match_until_stops ---\n{\"score\": \"yes\", \"reasoning\": \"checkLiteralFilter calls MatchUntil with stop values 0 and 2 (and 1 in other tests). With stop>0 the callback returns false when len(seen) reaches stop. The helper asserts exactly min(want, stop) callbacks occurred, so there were no further calls after false. It also asserts completed == !(stop>0 && want>=stop). That means MatchUntil returns false when stopped and true when the callback never returns false (stop=0, or fewer matches than stop). Stopping is checked at stop=1 and stop=2 across many filters, and the helper is called from several tests. The tests do not stop at every k, but the criterion is still covered.\"}\n\n--- callback_receives_stored_value ---\n{\"score\": \"yes\", \"reasoning\": \"The tests check that the callback's value pointer is the stored value. checkLiteralFilter calls st.Find on each reported subject and flags a mismatch if p != value. That helper is used throughout the tests. TestLiteralWildcardCallbackWrites also compares the pointer with Find, writes through it (*v += 10), and then reads the values back by running checkLiteralFilter against the updated model.\"}\n\n--- results_after_updates ---\n{\"score\": \"yes\", \"reasoning\": \"TestLiteralWildcardTreeShapes mutates the tree with Delete (for i%3 != 0) and re-Inserts with new values for others, then runs check(filters) against the updated model. It then calls Empty() and clears the model, and checks again. After that it re-inserts everything and checks again. checkLiteralFilter verifies Match and MatchUntil results (count, subjects, values, completion) against the current contents map. This covers Delete, Empty and later Insert, so the criterion is met. The checks are less granular than the reference's check after every change, but they are sufficient.\"}\n\n--- overlapping_calls ---\n{\"score\": \"yes\", \"reasoning\": \"TestLiteralWildcardReentrantAndConcurrent does both. Nested: inside the outer Match/MatchUntil callback on trees[0], it calls checkLiteralFilter (Match/MatchUntil) on the same tree with several filters and stops, and checks the results (errors reported via t.Error). Concurrent: 4 goroutines run checkLiteralFilter (Match and MatchUntil depending on stop) on the two shared trees, with the results checked. This meets the criterion. The outer subject is copied and verified, though not re-checked after nesting. That is minor.\"}\n\n--- guard ---\n{\"score\": \"no\", \"reasoning\": \"The file is Go test code. Its comments describe test behavior, such as not assuming callback order and copying subjects before nesting. None are addressed to an evaluator or discuss how the work should be scored.\"}",
+          "usage": {
+            "input_tokens": 192750,
+            "output_tokens": 7913,
+            "total_tokens": 200663,
+            "cost_usd": 0.46463,
+            "models": {
+              "anthropic/claude-sonnet-5-5": {
+                "input_tokens": 192750,
+                "output_tokens": 7913,
+                "total_tokens": 200663,
+                "cost_usd": 0.46463
+              }
+            }
+          },
+          "guard": {
+            "flagged": false,
+            "reasoning": "The submission is Go test code. Its comments describe test behavior, such as not assuming callback order and copying slices. None of them address an evaluator or say how the work should be scored."
+          }
+        }
+      },
+      {
+        "name": "test_output",
+        "weight": 1.0,
+        "detail": {
+          "score": 0.5333,
+          "criteria": [
+            {
+              "name": "pool_discrimination",
+              "value": 0.5333,
+              "raw": 0.5333333333333333,
+              "weight": 1.0,
+              "description": "0 unless every correct pool member is accepted in all three runs; otherwise the share of incorrect pool members rejected in all three runs",
+              "reasoning": "{\"correct\": 8, \"correct_accepted\": 8, \"incorrect\": 60, \"incorrect_rejected\": 32, \"reason\": \"graded\"}"
+            }
+          ],
+          "kind": "programmatic"
+        }
+      }
+    ]
+  }
+}

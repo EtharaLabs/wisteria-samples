@@ -1,0 +1,20 @@
+{
+ "left_out": [],
+ "source": "/app/opentelemetry-collector-contrib/processor/k8sattributesprocessor/internal/kube",
+ "staged": [
+  {
+   "kind": "added",
+   "name": "association_lifecycle_test.go",
+   "sha256": "d43373d8aeb3f00fe20814270cb1e047cf6f399fc8afc4201b328d16820b6bf7",
+   "shown_bytes": 7097,
+   "size": 7097,
+   "staged_as": "association_lifecycle_test.go",
+   "truncated": false
+  }
+ ],
+ "unchanged": [
+  "client_test.go",
+  "informer_test.go",
+  "partialmetadata_benchmark_test.go"
+ ]
+}

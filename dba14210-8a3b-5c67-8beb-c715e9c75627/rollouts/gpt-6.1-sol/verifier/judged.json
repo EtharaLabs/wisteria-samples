@@ -1,0 +1,63 @@
+{
+  "compiled": 0.5806,
+  "judged": 0.5789473684210527,
+  "guard_flagged": false,
+  "weight_in_reward": 0,
+  "criteria": [
+    {
+      "id": "R-JUDGE-CUSTOM-STALE",
+      "name": "r_judge_custom_stale",
+      "weight": 5.0,
+      "samples": [
+        "no",
+        "no",
+        "no"
+      ],
+      "value": 0.0
+    },
+    {
+      "id": "R-JUDGE-RESTORED",
+      "name": "r_judge_restored",
+      "weight": 5.0,
+      "samples": [
+        "yes",
+        "yes",
+        "yes"
+      ],
+      "value": 1.0
+    },
+    {
+      "id": "R-JUDGE-RESTORED-CUSTOM",
+      "name": "r_judge_restored_custom",
+      "weight": 3.0,
+      "samples": [
+        "no",
+        "no",
+        "no"
+      ],
+      "value": 0.0
+    },
+    {
+      "id": "R-JUDGE-COME-AND-GO",
+      "name": "r_judge_come_and_go",
+      "weight": 3.0,
+      "samples": [
+        "yes",
+        "yes",
+        "yes"
+      ],
+      "value": 1.0
+    },
+    {
+      "id": "R-JUDGE-LIVE-KEYS",
+      "name": "r_judge_live_keys",
+      "weight": 3.0,
+      "samples": [
+        "yes",
+        "yes",
+        "yes"
+      ],
+      "value": 1.0
+    }
+  ]
+}

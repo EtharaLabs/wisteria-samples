@@ -1,0 +1,307 @@
+use anyhow::Result;
+use futures::prelude::*;
+use openraft::Config;
+use openraft::RaftLogReader;
+use openraft::SnapshotPolicy;
+use openraft::Vote;
+use openraft::impls::ProgressResponder;
+use openraft::raft::ClientWriteResponse;
+use openraft::storage::RaftLogStorage;
+use openraft::storage::RaftStateMachine;
+use openraft::type_config::alias::LeaderIdOf;
+use openraft_memstore::ClientRequest;
+use openraft_memstore::ClientResponse;
+use openraft_memstore::IntoMemClientRequest;
+use openraft_memstore::TypeConfig;
+
+use crate::fixtures::RaftRouter;
+use crate::fixtures::WriteSummary;
+use crate::fixtures::log_id;
+use crate::fixtures::ut_harness;
+
+/// - create a stable 3-node cluster.
+/// - write a lot of data to it.
+/// - assert that the cluster stayed stable and has all of the expected data.
+#[tracing::instrument]
+#[test_harness::test(harness = ut_harness)]
+async fn client_writes() -> Result<()> {
+    let config = Config {
+        snapshot_policy: SnapshotPolicy::LogsSinceLast(500),
+        // The write load is heavy in this test, need a relatively long timeout.
+        election_timeout_min: 500,
+        election_timeout_max: 1000,
+        enable_tick: false,
+        ..Default::default()
+    };
+
+    let mut router = RaftRouter::new(config)?;
+
+    tracing::info!("--- initializing cluster");
+    let mut log_index = router.new_cluster([0, 1, 2], []).await?;
+
+    tracing::info!(
+        log_index,
+        "--- strict writes preserve redirects and empty workloads do not write"
+    );
+    {
+        let error = router.client_request(1, "redirect", 0).await.expect_err("follower rejects writes");
+        let forward = error.forward_to_leader().expect("leader hint");
+        assert_eq!(Some(0), forward.leader_id);
+        let empty = router.client_request_many(0, "empty", 0).await?;
+        assert_eq!(
+            WriteSummary {
+                count: 0,
+                last_log_id: None
+            },
+            empty
+        );
+        let request = ClientRequest::make_request("redirect", 0);
+        let response = router.write_following_leader(1, request).await?;
+        log_index += 1;
+        let expected_log_id = log_id(1, 0, log_index);
+        assert_eq!(expected_log_id, response.log_id);
+        assert_eq!(ClientResponse(None), response.data);
+        assert_eq!(None, response.membership);
+    }
+
+    tracing::info!(log_index, "--- run concurrent writes while the cluster remains stable");
+    {
+        let leader = router.leader().expect("leader not found");
+        let mut clients = futures::stream::FuturesUnordered::new();
+        clients.push(router.client_request_many(leader, "0", 100));
+        clients.push(router.client_request_many(leader, "1", 100));
+        clients.push(router.client_request_many(leader, "2", 100));
+        clients.push(router.client_request_many(leader, "3", 100));
+        clients.push(router.client_request_many(leader, "4", 100));
+        clients.push(router.client_request_many(leader, "5", 100));
+        while clients.try_next().await?.is_some() {}
+
+        log_index += 100 * 6;
+        router.wait_applied_at_least([0, 1, 2], log_index, "sync logs").await?;
+        router.wait_applied_at_least([0, 1, 2], log_index - 1, "already passed boundary").await?;
+    }
+
+    tracing::info!(
+        log_index,
+        "--- verify every node persisted and applied the complete workload"
+    );
+    {
+        for id in [0, 1, 2] {
+            let (mut sto, mut sm) = router.get_storage_handle(&id)?;
+
+            let last_log_id = sto.get_log_state().await?.last_log_id;
+            assert_eq!(Some(log_id(1, 0, log_index)), last_log_id);
+
+            let vote = sto.read_vote().await?.unwrap();
+            assert_eq!(Vote::new_committed(1, 0), vote);
+
+            let (last_applied, _) = sm.applied_state().await?;
+            assert_eq!(Some(log_id(1, 0, log_index)), last_applied);
+
+            let snap = sm.get_current_snapshot().await?.unwrap();
+            let snap_log_id = snap.meta.last_log_id.unwrap();
+            assert!(snap_log_id.index() >= 450);
+            assert!(snap_log_id.index() < 600);
+            assert_eq!(1, snap_log_id.committed_leader_id().term);
+        }
+    }
+
+    Ok(())
+}
+
+/// Test Raft::client_write_ff,
+///
+/// Manually receive the client-write response via the returned `Responder::Receiver`
+#[tracing::instrument]
+#[test_harness::test(harness = ut_harness)]
+async fn client_write_ff() -> Result<()> {
+    let config = Config {
+        enable_tick: false,
+        ..Default::default()
+    };
+
+    let mut router = RaftRouter::new(config)?;
+
+    tracing::info!("--- initializing cluster");
+    let log_index = router.new_cluster([0, 1, 2], []).await?;
+    let _ = log_index;
+
+    let n0 = router.get_raft_handle(&0)?;
+
+    let (responder, complete_rx) = ProgressResponder::complete_only();
+    n0.client_write_ff(ClientRequest::make_request("foo", 2), Some(responder)).await?;
+    let got: ClientWriteResponse<TypeConfig> = complete_rx.await??;
+    assert_eq!(None, got.response().0.as_deref());
+
+    tracing::info!("--- omit one responder and observe that write through the next response");
+    {
+        n0.client_write_ff(ClientRequest::make_request("foo", 3), None).await?;
+
+        let (responder, complete_rx) = ProgressResponder::complete_only();
+        n0.client_write_ff(ClientRequest::make_request("foo", 4), Some(responder)).await?;
+        let got: ClientWriteResponse<TypeConfig> = complete_rx.await??;
+        assert_eq!(Some("request-3"), got.response().0.as_deref());
+    }
+
+    Ok(())
+}
+
+/// Test Raft::write() builder API
+///
+/// Test the new write() API that returns WriteRequest builder, both with and without responder.
+#[tracing::instrument]
+#[test_harness::test(harness = ut_harness)]
+async fn write_builder() -> Result<()> {
+    let config = Config {
+        enable_tick: false,
+        ..Default::default()
+    };
+
+    let mut router = RaftRouter::new(config)?;
+
+    tracing::info!("--- initializing cluster");
+    let log_index = router.new_cluster([0, 1, 2], []).await?;
+    let _ = log_index;
+
+    let n0 = router.get_raft_handle(&0)?;
+
+    // Test write with responder
+    let (responder, complete_rx) = ProgressResponder::complete_only();
+    n0.write(ClientRequest::make_request("foo", 2)).responder(responder).await?;
+    let got: ClientWriteResponse<TypeConfig> = complete_rx.await??;
+    assert_eq!(None, got.response().0.as_deref());
+
+    // Test write without responder (fire-and-forget)
+    n0.write(ClientRequest::make_request("foo", 3)).await?;
+
+    // Test write with responder again to verify previous write completed
+    let (responder, complete_rx) = ProgressResponder::complete_only();
+    n0.write(ClientRequest::make_request("foo", 4)).responder(responder).await?;
+    let got: ClientWriteResponse<TypeConfig> = complete_rx.await??;
+    assert_eq!(Some("request-3"), got.response().0.as_deref());
+
+    Ok(())
+}
+
+/// Test Raft::write().with_leader() for conditional writes
+///
+/// Test that writes only execute when the expected leader matches current leader.
+#[tracing::instrument]
+#[test_harness::test(harness = ut_harness)]
+async fn write_with_leader() -> Result<()> {
+    use openraft::errors::ClientWriteError;
+    use openraft::vote::RaftLeaderId;
+
+    let config = Config {
+        enable_tick: false,
+        ..Default::default()
+    };
+
+    let mut router = RaftRouter::new(config)?;
+
+    tracing::info!("--- initializing cluster");
+    let mut log_index = router.new_cluster([0, 1, 2], []).await?;
+
+    let n0 = router.get_raft_handle(&0)?;
+
+    let leader_id = n0.as_leader().unwrap().to_committed_leader_id();
+
+    // Test 1: Write with correct leader should succeed
+    let (responder, complete_rx) = ProgressResponder::complete_only();
+    n0.write(ClientRequest::make_request("foo", 2)).with_leader(leader_id).responder(responder).await?;
+
+    log_index += 1;
+    router.wait(&0).applied_index(Some(log_index), "write with correct leader").await?;
+
+    let got = complete_rx.await??;
+    assert_eq!(&ClientResponse(None), got.response());
+    assert_eq!(&log_id(1, 0, log_index), got.log_id());
+
+    // Test 2: Write with incorrect leader should fail with ForwardToLeader
+    // Create a fake leader ID that doesn't match
+    let fake_leader = LeaderIdOf::<TypeConfig>::new(100, 99).to_committed();
+
+    let (responder, complete_rx) = ProgressResponder::complete_only();
+    n0.write(ClientRequest::make_request("foo", 3))
+        .with_leader(fake_leader)
+        .responder(responder)
+        .await?;
+
+    let err = complete_rx.await?.unwrap_err();
+    let ClientWriteError::ForwardToLeader(forward) = err else {
+        panic!("Expected ForwardToLeader error, got: {:?}", err)
+    };
+    // Check the error content: leader_id should point to node 0
+    assert_eq!(Some(0), forward.leader_id);
+    assert_eq!(openraft::errors::ForwardReason::NotLeader, forward.reason);
+
+    // Test 3: Write without leader check should succeed
+    let (responder, complete_rx) = ProgressResponder::complete_only();
+    n0.write(ClientRequest::make_request("foo", 4)).responder(responder).await?;
+
+    log_index += 1;
+    router.wait(&0).applied_index(Some(log_index), "write without leader check").await?;
+
+    let got = complete_rx.await??;
+    // Should see request-2 (request-3 failed)
+    assert_eq!(&ClientResponse(Some("request-2".to_string())), got.response());
+    assert_eq!(&log_id(1, 0, log_index), got.log_id());
+
+    Ok(())
+}
+
+/// Test Raft::write_blank() to write blank log entries
+///
+/// Blank entries contain no application data and are used to:
+/// - Commit entries from previous terms
+/// - Advance commit index without state machine changes
+/// - Act as a barrier
+#[tracing::instrument]
+#[test_harness::test(harness = ut_harness)]
+async fn write_blank() -> Result<()> {
+    let config = Config {
+        enable_tick: false,
+        ..Default::default()
+    };
+
+    let mut router = RaftRouter::new(config)?;
+
+    tracing::info!("--- initializing cluster");
+    let mut log_index = router.new_cluster([0, 1, 2], []).await?;
+
+    let n0 = router.get_raft_handle(&0)?;
+
+    tracing::info!("--- write blank entry");
+    {
+        let resp = n0.write_blank().await?;
+        log_index += 1;
+        assert_eq!(&log_id(1, 0, log_index), resp.log_id());
+
+        for id in [0, 1, 2] {
+            router.wait(&id).applied_index(Some(log_index), "blank entry applied").await?;
+        }
+
+        let (mut sto, _sm) = router.get_storage_handle(&0)?;
+        let entries = sto.try_get_log_entries(log_index..=log_index).await?;
+        assert_eq!(1, entries.len());
+
+        let entry = &entries[0];
+        assert!(
+            matches!(entry.payload, openraft::entry::EntryPayload::Blank),
+            "Expected Blank payload, got: {:?}",
+            entry.payload
+        );
+    }
+
+    tracing::info!("--- write normal entry after blank");
+    {
+        n0.client_write(ClientRequest::make_request("after_blank", 1)).await?;
+        log_index += 1;
+
+        for id in [0, 1, 2] {
+            router.wait(&id).applied_index(Some(log_index), "normal entry after blank").await?;
+        }
+    }
+
+    Ok(())
+}

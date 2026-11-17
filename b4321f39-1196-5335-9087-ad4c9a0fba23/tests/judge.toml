@@ -1,0 +1,154 @@
+# The judged part: the Go test files the solver leaves in /app/server/stree, the task's declared
+# artifact. tests/test.sh copies every regular *_test.go file directly in that directory that is
+# not byte-identical to the package's unchanged test file of the same name into the verifier-only
+# directory /var/lib/grader-judge/server/stree before any submitted code runs (an empty marker file
+# when there is none, which scores 0); the judge reads that copy and the private reference
+# /tests/reference/judge-reference.md. Nothing new is asked of the solver.
+#
+# Each criterion is one yes/no question about the submitted tests and restates a requirement that
+# instruction.md already gives the solver (solution/TRUTH.md, "Judged part"). The judged part is
+# advisory: tests/reward.toml gives it weight 0 in the reward, and tests/test.sh publishes it beside
+# the reward as `judged`. samples = 3: each
+# criterion is judged three times per grading and the median vote counts. guard = "penalize": a
+# submission flagged for text addressed to the evaluator scores 0 on this part.
+#
+# `files` and `reference` are absolute: Reward Kit resolves them against the verifier's working
+# directory, not against this file's directory.
+[judge]
+judge = "anthropic/claude-sonnet-5-5"
+mode = "individual"
+timeout = 300
+files = ["/var/lib/grader-judge/server/stree"]
+reference = "/tests/reference/judge-reference.md"
+weight = 1.0
+guard = "penalize"
+samples = 3
+
+[scoring]
+aggregation = "weighted-mean"
+
+[[criterion]]
+id = "J1"
+name = "literal_chars_in_filters"
+description = "Do the submitted tests call Match or MatchUntil with filters in which `*` or `>` sits inside a longer token (such as `a*`, `*a`, `**`, `>b` or `a>`), and check that such a token matches only a stored token with exactly the same bytes, so that, for example, a filter `KV.a*` does not report stored subjects like `KV.apple`?"
+type = "binary"
+weight = 5
+[criterion.annotations]
+mode = "judged"
+type = "coverage"
+obligation = "rule-1-literal-bytes"
+dimension = "filters"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+
+[[criterion]]
+id = "J2"
+name = "literal_chars_in_stored_subjects"
+description = "Do the submitted tests insert subjects that have `*` or `>` inside a longer token (such as `a*`, `*a`, `**`, `>b` or `a>`) into the tree and check which filters match those stored subjects?"
+type = "binary"
+weight = 5
+[criterion.annotations]
+mode = "judged"
+type = "coverage"
+obligation = "rule-1-literal-bytes"
+dimension = "stored_subjects"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+
+[[criterion]]
+id = "J3"
+name = "real_and_literal_wildcards_mixed"
+description = "Do the submitted tests use at least one filter that combines a real wildcard (a token that is exactly `*`, or a last token that is exactly `>`) with a `*` or `>` inside another, longer token of the same filter, and check the subjects it matches?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "coverage"
+obligation = "rule-1-literal-bytes"
+dimension = "mixed_filters"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "J4"
+name = "long_subjects_and_filters"
+description = "Do the submitted tests check Match or MatchUntil results for subjects and filters of any length and any number of tokens, that is, not only for short subjects and filters with few tokens but also for longer ones with more tokens?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "coverage"
+obligation = "rule-1-literal-bytes"
+dimension = "input_length"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "J5"
+name = "each_match_reported_once"
+description = "Do the submitted tests check that Match reports every matching stored subject exactly once and nothing else (a missing, an extra or a repeated report makes the check fail), with checks that do not depend on the order of the callback calls? Any sound way of checking this counts, for example comparing the reported subjects with the expected ones as a collection, or checking each reported subject as it arrives against the expected matches and the subjects already reported and then checking the number of calls."
+type = "binary"
+weight = 5
+[criterion.annotations]
+mode = "judged"
+type = "coverage"
+obligation = "rule-2-reports"
+dimension = "result_set"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+
+[[criterion]]
+id = "J6"
+name = "match_until_stops"
+description = "Do the submitted tests check MatchUntil's stop: once the callback returns false there is no further callback call and MatchUntil returns false, while MatchUntil returns true when the callback never returns false?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "coverage"
+obligation = "rule-2-reports"
+dimension = "early_stop"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "J7"
+name = "callback_receives_stored_value"
+description = "Do the submitted tests check that the value pointer the callback receives is the stored value itself, for example by comparing it with the pointer Find returns for the reported subject, or by writing through it and reading the stored value back?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "coverage"
+obligation = "rule-3-callback"
+dimension = "value_pointer"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "J8"
+name = "results_after_updates"
+description = "Do the submitted tests check Match or MatchUntil results again after the tree was changed by Delete or Empty (and, where relevant, by later Insert calls), against what the tree holds at that point?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "coverage"
+obligation = "rule-5-current-contents"
+dimension = "updates"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "J9"
+name = "overlapping_calls"
+description = "Do the submitted tests run Match or MatchUntil concurrently from several goroutines, and also call Match or MatchUntil from inside a callback of a running Match or MatchUntil on the same tree, checking the results of those calls?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "coverage"
+obligation = "rule-6-read-only"
+dimension = "overlapping_calls"
+evaluation_target = "workspace_state"
+importance = "important"

@@ -1,0 +1,78 @@
+use std::time::Duration;
+
+use anyhow::Result;
+use openraft::Config;
+use openraft::type_config::TypeConfigExt;
+use openraft_memstore::TypeConfig;
+
+use crate::fixtures::Node;
+use crate::fixtures::RaftRouter;
+use crate::fixtures::timeout;
+use crate::fixtures::ut_harness;
+
+/// A restarted unreachable node should recover correctly, and catch up with the leader:
+/// - Setup cluster {0,1,2}, Shutdown leader node-0;
+/// - Elect node-1, write some logs;
+/// - Restart node-0, it should receive append-entries from node-1 and catch up.
+#[tracing::instrument]
+#[test_harness::test(harness = ut_harness)]
+async fn append_entries_backoff_rejoin() -> Result<()> {
+    let config = Config {
+        election_timeout_min: 100,
+        election_timeout_max: 200,
+        enable_elect: false,
+        // Disable heartbeat to make the problem clear.
+        enable_heartbeat: true,
+        ..Default::default()
+    };
+
+    let mut router = RaftRouter::new(config)?;
+
+    tracing::info!("--- initializing cluster");
+    let mut log_index = router.new_cluster([0, 1, 2], []).await?;
+
+    let n = 10;
+
+    tracing::info!(log_index, "--- set node 0 to unreachable and remove it");
+    router.set_unreachable(0, true);
+
+    let Node {
+        log_store: ls0,
+        state_machine: sm0,
+        ..
+    } = router.stop_node(0).await?;
+    let n1 = router.get_raft_handle(&1)?;
+
+    tracing::info!(log_index, "--- elect node-1");
+    {
+        // Timeout leader lease otherwise vote-request will be rejected by node-2
+        TypeConfig::sleep(Duration::from_millis(1_000)).await;
+
+        n1.trigger().elect(false).await?;
+        n1.wait(timeout())
+            .leader_with_quorum_acked(None, "node-1 elects and establishes its leader lease")
+            .await?;
+    }
+
+    tracing::info!(log_index, "--- write {} entries to node-1", n);
+    {
+        let written = router.client_request_many(1, "1", n as usize).await?;
+        log_index += written.count;
+        n1.wait(timeout())
+            .applied_index_at_least(Some(log_index), format!("node-1 commit {} writes", n))
+            .await?;
+    }
+
+    tracing::info!(log_index, "--- restart node-0, check replication");
+    {
+        router.new_raft_node_with_sto(0, ls0, sm0).await?;
+        router.set_unreachable(0, false);
+
+        router
+            .wait(&0)
+            .applied_index_at_least(Some(log_index), format!("node-0 commit {} writes", n))
+            .await?;
+    }
+
+    Ok(())
+}

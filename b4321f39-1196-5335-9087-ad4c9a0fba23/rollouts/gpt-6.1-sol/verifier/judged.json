@@ -1,0 +1,117 @@
+{
+ "judged": 1.0,
+ "guard_flagged": false,
+ "criteria": [
+  {
+   "id": "J1",
+   "name": "literal_chars_in_filters",
+   "weight": 5.0,
+   "samples": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "value": 1.0,
+   "agreement": 1.0
+  },
+  {
+   "id": "J2",
+   "name": "literal_chars_in_stored_subjects",
+   "weight": 5.0,
+   "samples": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "value": 1.0,
+   "agreement": 1.0
+  },
+  {
+   "id": "J3",
+   "name": "real_and_literal_wildcards_mixed",
+   "weight": 3.0,
+   "samples": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "value": 1.0,
+   "agreement": 1.0
+  },
+  {
+   "id": "J4",
+   "name": "long_subjects_and_filters",
+   "weight": 3.0,
+   "samples": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "value": 1.0,
+   "agreement": 1.0
+  },
+  {
+   "id": "J5",
+   "name": "each_match_reported_once",
+   "weight": 5.0,
+   "samples": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "value": 1.0,
+   "agreement": 1.0
+  },
+  {
+   "id": "J6",
+   "name": "match_until_stops",
+   "weight": 3.0,
+   "samples": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "value": 1.0,
+   "agreement": 1.0
+  },
+  {
+   "id": "J7",
+   "name": "callback_receives_stored_value",
+   "weight": 3.0,
+   "samples": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "value": 1.0,
+   "agreement": 1.0
+  },
+  {
+   "id": "J8",
+   "name": "results_after_updates",
+   "weight": 3.0,
+   "samples": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "value": 1.0,
+   "agreement": 1.0
+  },
+  {
+   "id": "J9",
+   "name": "overlapping_calls",
+   "weight": 3.0,
+   "samples": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "value": 1.0,
+   "agreement": 1.0
+  }
+ ],
+ "weight_in_reward": 0.0,
+ "compiled": 0.5333333333333333,
+ "blended": 0.6033333333333333
+}

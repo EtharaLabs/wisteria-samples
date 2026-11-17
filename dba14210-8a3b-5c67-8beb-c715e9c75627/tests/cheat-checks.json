@@ -1,0 +1,9 @@
+{
+  "schema": "kube-testgen.cheat-checks/v1",
+  "ids": [
+    "RL-GIT",
+    "RL-PREBUILT",
+    "RL-SEAL-TAMPER",
+    "RL-REWARD-WRITE"
+  ]
+}

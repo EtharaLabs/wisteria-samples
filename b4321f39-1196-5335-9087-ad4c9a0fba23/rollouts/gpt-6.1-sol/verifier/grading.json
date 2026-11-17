@@ -1,0 +1,2361 @@
+{
+  "reward": 0.5333333333333333,
+  "gate_accepted": true,
+  "all_correct_accepted": true,
+  "correct_members": 8,
+  "correct_accepted": 8,
+  "incorrect_members": 60,
+  "incorrect_rejected": 32,
+  "submission_files": [
+    "helper_test.go",
+    "literal_wildcards_test.go",
+    "stree_test.go"
+  ],
+  "runner_isolated": true,
+  "members": [
+    {
+      "member": "c01_upstream",
+      "kind": "correct",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.781119958
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.641970244
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.5910185500000003
+        }
+      ],
+      "verdict": "accepted",
+      "credit": true
+    },
+    {
+      "member": "c06_unspecified_inputs_differ",
+      "kind": "correct",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 4.186735187
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.987959177
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.988228829
+        }
+      ],
+      "verdict": "accepted",
+      "credit": true
+    },
+    {
+      "member": "c03_ordered_scan",
+      "kind": "correct",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 16.459736241
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 15.662249593
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 15.651206846000001
+        }
+      ],
+      "verdict": "accepted",
+      "credit": true
+    },
+    {
+      "member": "c05_literal_lookup",
+      "kind": "correct",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.7725111140000003
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.6327526900000002
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.58469787
+        }
+      ],
+      "verdict": "accepted",
+      "credit": true
+    },
+    {
+      "member": "c07_subject_wiped_after_callback",
+      "kind": "correct",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.8484247529999998
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.716491136
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.675295082
+        }
+      ],
+      "verdict": "accepted",
+      "credit": true
+    },
+    {
+      "member": "c02_zero_length_placeholders",
+      "kind": "correct",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.772113247
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.632166717
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.613946075
+        }
+      ],
+      "verdict": "accepted",
+      "credit": true
+    },
+    {
+      "member": "c08_random_order_each_call",
+      "kind": "correct",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 4.300448348
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 4.072920479
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 4.012185277
+        }
+      ],
+      "verdict": "accepted",
+      "credit": true
+    },
+    {
+      "member": "c04_reverse_children",
+      "kind": "correct",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.779328857
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.631870876
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.612637871
+        }
+      ],
+      "verdict": "accepted",
+      "credit": true
+    },
+    {
+      "member": "i80_wide_terminal_pwc_value_copy",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.809709551
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.669463784
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.629323655
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i20_until_false_when_absent",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.370312459,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:126: filter \"KV.a*\" stop 0: got 0 callbacks, completed false; want 0, true\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.91s)\n    literal_wildcards_test.go:239: filter \"KV.a*\" stop 0: got 0 callbacks, completed false; want 0, true\n    literal_wildcards_test.go:239: filter \"KV.apple\" stop 0: got 0 callbacks, completed false; want 0, true\n    literal_wildcards_test.go:239: filter \"KV.apple\" stop 2: got 0 callbacks, completed false; want 0, true\n    literal_wildcards_test.go:239: filter \"KV.a*\" stop 2: got 0 callbacks, completed false; want 0, true\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.346839579,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:126: filter \"KV.a*\" stop 0: got 0 callbacks, completed false; want 0, true\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.89s)\n    literal_wildcards_test.go:239: filter \"KV.a*\" stop 2: got 0 callbacks, completed false; want 0, true\n    literal_wildcards_test.go:239: filter \"KV.a*\" stop 0: got 0 callbacks, completed false; want 0, true\n    literal_wildcards_test.go:239: filter \"KV.apple\" stop 2: got 0 callbacks, completed false; want 0, true\n    literal_wildcards_test.go:239: filter \"KV.apple\" stop 0: got 0 callbacks, completed false; want 0, true\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.357052369,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:126: filter \"KV.a*\" stop 0: got 0 callbacks, completed false; want 0, true\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.89s)\n    literal_wildcards_test.go:239: filter \"KV.a*\" stop 0: got 0 callbacks, completed false; want 0, true\n    literal_wildcards_test.go:239: filter \"KV.a*\" stop 2: got 0 callbacks, completed false; want 0, true\n    literal_wildcards_test.go:239: filter \"KV.apple\" stop 2: got 0 callbacks, completed false; want 0, true\n    literal_wildcards_test.go:239: filter \"KV.apple\" stop 0: got 0 callbacks, completed false; want 0, true\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i84_node256_slots_memo_stale",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.792527158
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.647482526
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.600758991
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i74_long_filter_shared_parts",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.809390901
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 2.691773119,
+          "tail": "...om/nats-io/nats-server/v2/server/stree.(*SubjectTree[go.shape.int]).MatchUntil()\n      /var/lib/grader/ws/server/stree/stree.go:144 +0xb4\n  github.com/nats-io/nats-server/v2/server/stree.checkLiteralFilter()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:55 +0x268\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent.func3()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:238 +0x20c\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent.gowrap1()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:243 +0x38\n\nGoroutine 94 (running) created at:\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:234 +0x6e4\n  testing.tRunner()\n      /usr/local/go/src/testing/testing.go:2036 +0x164\n  testing.(*T).Run.gowrap1()\n      /usr/local/go/src/testing/testing.go:2101 +0x34\n\nGoroutine 96 (finished) created at:\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:234 +0x6e4\n  testing.tRunner()\n      /usr/local/go/src/testing/testing.go:2036 +0x164\n  testing.(*T).Run.gowrap1()\n      /usr/local/go/src/testing/testing.go:2101 +0x34\n==================\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (1.01s)\n    testing.go:1712: race detected during execution of test\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 2.6099732380000003,
+          "tail": "...x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.*.end\" stop 1: got 0 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop 0: got 0 callbacks, completed true; want 1, true\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.*.end\" stop 0: got 0 callbacks, completed true; want 1, true\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop -1: got 0 callbacks, completed true; want 1, true\n    testing.go:1712: race detected during execution of test\nFAIL\n"
+        }
+      ],
+      "verdict": "mixed",
+      "credit": false
+    },
+    {
+      "member": "i82_wide_terminal_pwc_multi_token_leaves",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.799726228
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.647676351
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.622724994
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i77_node48_key_order_off_by_one",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.806081114
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.650557419
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.637481613
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i42_terminal_pwc_stops_at_hole",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.790121338
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.677992059
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.630640456
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i75_wide_terminal_scan_counter",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.774886859
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.668927659
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.6562632710000003
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i14_lookup_value_copy",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.353264348,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\": unexpected/duplicate subject or value pointer for \"a*\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.01s)\n    literal_wildcards_test.go:129: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.90s)\n    literal_wildcards_test.go:239: filter \"a\": unexpected/duplicate subject or value pointer for \"a\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*\"\n    literal_wildcards_test.go:239: filter \"a\": unexpected/duplicate subject or value pointer for \"a\"\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.333657015,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\": unexpected/duplicate subject or value pointer for \"a*\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:129: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.88s)\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*\"\n    literal_wildcards_test.go:239: filter \"a\": unexpected/duplicate subject or value pointer for \"a\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*\"\n    literal_wildcards_test.go:239: filter \"a\": unexpected/duplicate subject or value pointer for \"a\"\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.35924238,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\": unexpected/duplicate subject or value pointer for \"a*\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:129: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.90s)\n    literal_wildcards_test.go:239: filter \"a\": unexpected/duplicate subject or value pointer for \"a\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*\"\n    literal_wildcards_test.go:239: filter \"a\": unexpected/duplicate subject or value pointer for \"a\"\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i44_terminal_pwc_node_ignores_stop",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.499209924,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"*\" stop 2: got 3 callbacks, completed false; want 2, false\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:129: filter \"*\" stop 2: got 5 callbacks, completed false; want 2, false\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (1.05s)\n    literal_wildcards_test.go:239: filter \"*\" stop 2: got 5 callbacks, completed false; want 2, false\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.436726982,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"*\" stop 2: got 3 callbacks, completed false; want 2, false\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:129: filter \"*\" stop 2: got 5 callbacks, completed false; want 2, false\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.98s)\n    literal_wildcards_test.go:239: filter \"*\" stop 2: got 5 callbacks, completed false; want 2, false\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.391729703,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"*\" stop 2: got 3 callbacks, completed false; want 2, false\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:129: filter \"*\" stop 2: got 5 callbacks, completed false; want 2, false\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.94s)\n    literal_wildcards_test.go:239: filter \"*\" stop 2: got 5 callbacks, completed false; want 2, false\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i17_lookup_detects_32_tokens",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.73202706,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardTreeShapes (0.19s)\n    literal_wildcards_test.go:129: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop -1: got 0 callbacks, completed true; want 1, true\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (1.08s)\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop 1: got 0 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop 2: got 0 callbacks, completed true; want 1, true\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop -1: got 0 callbacks, completed true; want 1, true\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop 0: got 0 callbacks, completed true; want 1, true\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.6338471449999998,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardTreeShapes (0.20s)\n    literal_wildcards_test.go:129: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop -1: got 0 callbacks, completed true; want 1, true\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.97s)\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop -1: got 0 callbacks, completed true; want 1, true\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop 0: got 0 callbacks, completed true; want 1, true\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop 2: got 0 callbacks, completed true; want 1, true\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop 1: got 0 callbacks, completed true; want 1, false\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.606880788,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardTreeShapes (0.20s)\n    literal_wildcards_test.go:129: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop -1: got 0 callbacks, completed true; want 1, true\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.94s)\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop 2: got 0 callbacks, completed true; want 1, true\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop -1: got 0 callbacks, completed true; want 1, true\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop 1: got 0 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop 0: got 0 callbacks, completed true; want 1, true\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i40_star_iteration_stops_at_hole",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.784539278
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.6560242560000002
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.686724884
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i92_long_filter_value_copy",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.739746844,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardTreeShapes (0.20s)\n    literal_wildcards_test.go:129: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.end\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (1.09s)\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.end\"\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.end\"\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.end\"\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.end\"\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.64197484,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardTreeShapes (0.19s)\n    literal_wildcards_test.go:129: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.end\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.99s)\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.end\"\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.end\"\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.end\"\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.end\"\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.654127827,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardTreeShapes (0.19s)\n    literal_wildcards_test.go:129: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.end\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.98s)\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.end\"\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.end\"\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.end\"\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.end\"\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i23_match_holds_tree_lock",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 2,
+          "killed": false,
+          "seconds": 60.012588256,
+          "tail": "...b/grader/ws/server/stree/stree.go:136 +0x58\ngithub.com/nats-io/nats-server/v2/server/stree.(*SubjectTree[...]).match(0x266520, {0x264940, 0xc0002b6ea0}, {0xc000432758, 0x1, 0x1e}, {0xc000116100, 0x7, 0x100}, 0xc000073b88)\n\t/var/lib/grader/ws/server/stree/stree.go:378 +0x914\ngithub.com/nats-io/nats-server/v2/server/stree.(*SubjectTree[...]).match(0x266520, {0x264cf8, 0xc0002c8340}, {0xc000432740, 0x2, 0x1f}, {0xc000116100, 0x6, 0x100}, 0xc000073b88)\n\t/var/lib/grader/ws/server/stree/stree.go:407 +0x708\ngithub.com/nats-io/nats-server/v2/server/stree.(*SubjectTree[...]).match(0x266520, {0x264940, 0xc0002b7800}, {0xc000432740, 0x2, 0x1f}, {0xc000116100, 0x5, 0x100}, 0xc000073b88)\n\t/var/lib/grader/ws/server/stree/stree.go:407 +0x708\ngithub.com/nats-io/nats-server/v2/server/stree.(*SubjectTree[...]).match(0x266520, {0x264cf8, 0xc0002c8ea0}, {0xc000432728, 0x3, 0x20}, {0xc000116100, 0x0, 0x100}, 0xc000073b88)\n\t/var/lib/grader/ws/server/stree/stree.go:407 +0x708\ngithub.com/nats-io/nats-server/v2/server/stree.(*SubjectTree[...]).Match(0x266520, {0xc0001705f8, 0x8, 0x8}, 0xc000073e58)\n\t/var/lib/grader/ws/server/stree/stree.go:135 +0x1d0\ngithub.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent(0xc00014a488)\n\t/var/lib/grader/ws/server/stree/literal_wildcards_test.go:219 +0x594\ntesting.tRunner(0xc00014a488, 0x25f068)\n\t/usr/local/go/src/testing/testing.go:2036 +0x168\ncreated by testing.(*T).Run in goroutine 1\n\t/usr/local/go/src/testing/testing.go:2101 +0x7c0\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 2,
+          "killed": false,
+          "seconds": 60.070881553,
+          "tail": "...b/grader/ws/server/stree/stree.go:136 +0x58\ngithub.com/nats-io/nats-server/v2/server/stree.(*SubjectTree[...]).match(0x266520, {0x264940, 0xc0002c4de0}, {0xc000101c58, 0x1, 0x1e}, {0xc000237100, 0x7, 0x100}, 0xc0000e5b88)\n\t/var/lib/grader/ws/server/stree/stree.go:378 +0x914\ngithub.com/nats-io/nats-server/v2/server/stree.(*SubjectTree[...]).match(0x266520, {0x264cf8, 0xc000262ea0}, {0xc000101c40, 0x2, 0x1f}, {0xc000237100, 0x6, 0x100}, 0xc0000e5b88)\n\t/var/lib/grader/ws/server/stree/stree.go:407 +0x708\ngithub.com/nats-io/nats-server/v2/server/stree.(*SubjectTree[...]).match(0x266520, {0x264940, 0xc0002c58c0}, {0xc000101c40, 0x2, 0x1f}, {0xc000237100, 0x5, 0x100}, 0xc0000e5b88)\n\t/var/lib/grader/ws/server/stree/stree.go:407 +0x708\ngithub.com/nats-io/nats-server/v2/server/stree.(*SubjectTree[...]).match(0x266520, {0x264cf8, 0xc000263450}, {0xc000101c28, 0x3, 0x20}, {0xc000237100, 0x0, 0x100}, 0xc0000e5b88)\n\t/var/lib/grader/ws/server/stree/stree.go:407 +0x708\ngithub.com/nats-io/nats-server/v2/server/stree.(*SubjectTree[...]).Match(0x266520, {0xc0002bd098, 0x8, 0x8}, 0xc0000e5e58)\n\t/var/lib/grader/ws/server/stree/stree.go:135 +0x1d0\ngithub.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent(0xc000266008)\n\t/var/lib/grader/ws/server/stree/literal_wildcards_test.go:219 +0x594\ntesting.tRunner(0xc000266008, 0x25f068)\n\t/usr/local/go/src/testing/testing.go:2036 +0x168\ncreated by testing.(*T).Run in goroutine 1\n\t/usr/local/go/src/testing/testing.go:2101 +0x7c0\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 2,
+          "killed": false,
+          "seconds": 60.01252048,
+          "tail": "...b/grader/ws/server/stree/stree.go:136 +0x58\ngithub.com/nats-io/nats-server/v2/server/stree.(*SubjectTree[...]).match(0x266520, {0x264940, 0xc000426120}, {0xc0000bb8d8, 0x1, 0x1e}, {0xc000358100, 0x7, 0x100}, 0xc000159b88)\n\t/var/lib/grader/ws/server/stree/stree.go:378 +0x914\ngithub.com/nats-io/nats-server/v2/server/stree.(*SubjectTree[...]).match(0x266520, {0x264cf8, 0xc000166f70}, {0xc0000bb8c0, 0x2, 0x1f}, {0xc000358100, 0x6, 0x100}, 0xc000159b88)\n\t/var/lib/grader/ws/server/stree/stree.go:407 +0x708\ngithub.com/nats-io/nats-server/v2/server/stree.(*SubjectTree[...]).match(0x266520, {0x264940, 0xc000426a80}, {0xc0000bb8c0, 0x2, 0x1f}, {0xc000358100, 0x5, 0x100}, 0xc000159b88)\n\t/var/lib/grader/ws/server/stree/stree.go:407 +0x708\ngithub.com/nats-io/nats-server/v2/server/stree.(*SubjectTree[...]).match(0x266520, {0x264cf8, 0xc000167520}, {0xc0000bb8a8, 0x3, 0x20}, {0xc000358100, 0x0, 0x100}, 0xc000159b88)\n\t/var/lib/grader/ws/server/stree/stree.go:407 +0x708\ngithub.com/nats-io/nats-server/v2/server/stree.(*SubjectTree[...]).Match(0x266520, {0xc0003867e8, 0x8, 0x8}, 0xc000159e58)\n\t/var/lib/grader/ws/server/stree/stree.go:135 +0x1d0\ngithub.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent(0xc000150fc8)\n\t/var/lib/grader/ws/server/stree/literal_wildcards_test.go:219 +0x594\ntesting.tRunner(0xc000150fc8, 0x25f068)\n\t/usr/local/go/src/testing/testing.go:2036 +0x168\ncreated by testing.(*T).Run in goroutine 1\n\t/usr/local/go/src/testing/testing.go:2101 +0x7c0\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i83_node48_exact_leaf_twice",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.792546407
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.65437353
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.616754744
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i10_unsynchronized_counter",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.792256427
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 3.300642455,
+          "tail": "...thub.com/nats-io/nats-server/v2/server/stree.(*SubjectTree[go.shape.int]).Match()\n      /var/lib/grader/ws/server/stree/stree.go:126 +0x98\n  github.com/nats-io/nats-server/v2/server/stree.checkLiteralFilter()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:53 +0x230\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent.func3()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:238 +0x20c\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent.gowrap1()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:243 +0x38\n\nGoroutine 94 (running) created at:\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:234 +0x6e4\n  testing.tRunner()\n      /usr/local/go/src/testing/testing.go:2036 +0x164\n  testing.(*T).Run.gowrap1()\n      /usr/local/go/src/testing/testing.go:2101 +0x34\n\nGoroutine 97 (running) created at:\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:234 +0x6e4\n  testing.tRunner()\n      /usr/local/go/src/testing/testing.go:2036 +0x164\n  testing.(*T).Run.gowrap1()\n      /usr/local/go/src/testing/testing.go:2101 +0x34\n==================\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (1.63s)\n    testing.go:1712: race detected during execution of test\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 2.915053563,
+          "tail": "...ub.com/nats-io/nats-server/v2/server/stree.(*SubjectTree[go.shape.int]).Match()\n      /var/lib/grader/ws/server/stree/stree.go:126 +0x98\n  github.com/nats-io/nats-server/v2/server/stree.checkLiteralFilter()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:53 +0x230\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent.func3()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:238 +0x20c\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent.gowrap1()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:243 +0x38\n\nGoroutine 106 (running) created at:\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:234 +0x6e4\n  testing.tRunner()\n      /usr/local/go/src/testing/testing.go:2036 +0x164\n  testing.(*T).Run.gowrap1()\n      /usr/local/go/src/testing/testing.go:2101 +0x34\n\nGoroutine 105 (running) created at:\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:234 +0x6e4\n  testing.tRunner()\n      /usr/local/go/src/testing/testing.go:2036 +0x164\n  testing.(*T).Run.gowrap1()\n      /usr/local/go/src/testing/testing.go:2101 +0x34\n==================\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (1.22s)\n    testing.go:1712: race detected during execution of test\nFAIL\n"
+        }
+      ],
+      "verdict": "mixed",
+      "credit": false
+    },
+    {
+      "member": "i45_terminal_pwc_value_copy",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.423083498,
+          "tail": "...inter for \"root.**.\u003eb\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:201: unexpected outer callback \"root.\u003e\u003e.*\u003e\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:201: unexpected outer callback \"root.\u003e\u003e.\u003e\u003e\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:201: unexpected outer callback \"root.\u003e\u003e.\u003eb\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:239: filter \"KV.*\": unexpected/duplicate subject or value pointer for \"KV.\u003eb\"\n    literal_wildcards_test.go:239: filter \"KV.*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.384468866,
+          "tail": "...inter for \"root.**.\u003eb\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:201: unexpected outer callback \"root.\u003e\u003e.*\u003e\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:201: unexpected outer callback \"root.\u003e\u003e.\u003e\u003e\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:201: unexpected outer callback \"root.\u003e\u003e.\u003eb\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:239: filter \"KV.*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.*\": unexpected/duplicate subject or value pointer for \"KV.\u003eb\"\n    literal_wildcards_test.go:239: filter \"KV.*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\n    literal_wildcards_test.go:239: filter \"KV.*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.410207717,
+          "tail": "...inter for \"root.**.\u003eb\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:201: unexpected outer callback \"root.\u003e\u003e.*\u003e\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:201: unexpected outer callback \"root.\u003e\u003e.\u003e\u003e\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:201: unexpected outer callback \"root.\u003e\u003e.\u003eb\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.\u003eb\"\n    literal_wildcards_test.go:239: filter \"KV.*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\n    literal_wildcards_test.go:239: filter \"KV.*\": unexpected/duplicate subject or value pointer for \"KV.\u003eb\"\n    literal_wildcards_test.go:239: filter \"KV.*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i01_prefix_original",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.339372671,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\": unexpected/duplicate subject or value pointer for \"apple\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:126: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.89s)\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a\u003e\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.332722417,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\": unexpected/duplicate subject or value pointer for \"apple\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:126: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.88s)\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a\u003e\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.345861791,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\": unexpected/duplicate subject or value pointer for \"apple\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:126: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.89s)\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a\u003e\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i72_long_terminal_pwc_value_copy",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.783674219
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.656728254
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.649663081
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i73_long_subject_shared_spill",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 2.8160538600000002,
+          "tail": "...m/nats-io/nats-server/v2/server/stree.(*SubjectTree[go.shape.int]).MatchUntil()\n      /var/lib/grader/ws/server/stree/stree.go:148 +0x15c\n  github.com/nats-io/nats-server/v2/server/stree.checkLiteralFilter()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:55 +0x268\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent.func3()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:238 +0x20c\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent.gowrap1()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:243 +0x38\n\nGoroutine 72 (running) created at:\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:234 +0x6e4\n  testing.tRunner()\n      /usr/local/go/src/testing/testing.go:2036 +0x164\n  testing.(*T).Run.gowrap1()\n      /usr/local/go/src/testing/testing.go:2101 +0x34\n\nGoroutine 73 (finished) created at:\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:234 +0x6e4\n  testing.tRunner()\n      /usr/local/go/src/testing/testing.go:2036 +0x164\n  testing.(*T).Run.gowrap1()\n      /usr/local/go/src/testing/testing.go:2101 +0x34\n==================\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (1.09s)\n    testing.go:1712: race detected during execution of test\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 2.709484148,
+          "tail": "...m/nats-io/nats-server/v2/server/stree.(*SubjectTree[go.shape.int]).MatchUntil()\n      /var/lib/grader/ws/server/stree/stree.go:148 +0x15c\n  github.com/nats-io/nats-server/v2/server/stree.checkLiteralFilter()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:55 +0x268\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent.func3()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:238 +0x20c\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent.gowrap1()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:243 +0x38\n\nGoroutine 95 (running) created at:\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:234 +0x6e4\n  testing.tRunner()\n      /usr/local/go/src/testing/testing.go:2036 +0x164\n  testing.(*T).Run.gowrap1()\n      /usr/local/go/src/testing/testing.go:2101 +0x34\n\nGoroutine 92 (finished) created at:\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:234 +0x6e4\n  testing.tRunner()\n      /usr/local/go/src/testing/testing.go:2036 +0x164\n  testing.(*T).Run.gowrap1()\n      /usr/local/go/src/testing/testing.go:2101 +0x34\n==================\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (1.00s)\n    testing.go:1712: race detected during execution of test\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 2.645812019,
+          "tail": "...nats-io/nats-server/v2/server/stree.(*SubjectTree[go.shape.int]).MatchUntil()\n      /var/lib/grader/ws/server/stree/stree.go:148 +0x15c\n  github.com/nats-io/nats-server/v2/server/stree.checkLiteralFilter()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:55 +0x268\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent.func3()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:238 +0x20c\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent.gowrap1()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:243 +0x38\n\nGoroutine 108 (running) created at:\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:234 +0x6e4\n  testing.tRunner()\n      /usr/local/go/src/testing/testing.go:2036 +0x164\n  testing.(*T).Run.gowrap1()\n      /usr/local/go/src/testing/testing.go:2101 +0x34\n\nGoroutine 106 (finished) created at:\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:234 +0x6e4\n  testing.tRunner()\n      /usr/local/go/src/testing/testing.go:2036 +0x164\n  testing.(*T).Run.gowrap1()\n      /usr/local/go/src/testing/testing.go:2101 +0x34\n==================\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.95s)\n    testing.go:1712: race detected during execution of test\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i97_wide_star_skips_separator_child",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.855076532
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.695881647
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.634663219
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i91_long_filter_until_via_match",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.745586786,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardTreeShapes (0.20s)\n    literal_wildcards_test.go:129: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.*.end\" stop 2: got 2 callbacks, completed true; want 2, false\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (1.09s)\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop 1: got 1 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.\u003e\" stop 1: got 1 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.*.end\" stop 1: got 2 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.\u003e\" stop 1: got 1 callbacks, completed true; want 1, false\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.6212576950000002,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardTreeShapes (0.20s)\n    literal_wildcards_test.go:129: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.*.end\" stop 2: got 2 callbacks, completed true; want 2, false\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.97s)\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.\u003e\" stop 1: got 1 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.*.end\" stop 1: got 2 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.\u003e\" stop 1: got 1 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop 1: got 1 callbacks, completed true; want 1, false\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.565218153,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardTreeShapes (0.19s)\n    literal_wildcards_test.go:129: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.*.end\" stop 2: got 2 callbacks, completed true; want 2, false\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.91s)\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.\u003e\" stop 1: got 1 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\" stop 1: got 1 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.*.end\" stop 1: got 2 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.\u003e\" stop 1: got 1 callbacks, completed true; want 1, false\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i85_wide_gt_skips_exact_leaf",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.7932711340000003
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.6469748600000003
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.610244396
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i88_shared_parts_other_tree",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 2.884257,
+          "tail": "...om/nats-io/nats-server/v2/server/stree.(*SubjectTree[go.shape.int]).MatchUntil()\n      /var/lib/grader/ws/server/stree/stree.go:163 +0x154\n  github.com/nats-io/nats-server/v2/server/stree.checkLiteralFilter()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:55 +0x268\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent.func3()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:238 +0x20c\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent.gowrap1()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:243 +0x38\n\nGoroutine 73 (running) created at:\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:234 +0x6ec\n  testing.tRunner()\n      /usr/local/go/src/testing/testing.go:2036 +0x164\n  testing.(*T).Run.gowrap1()\n      /usr/local/go/src/testing/testing.go:2101 +0x34\n\nGoroutine 74 (running) created at:\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:234 +0x6ec\n  testing.tRunner()\n      /usr/local/go/src/testing/testing.go:2036 +0x164\n  testing.(*T).Run.gowrap1()\n      /usr/local/go/src/testing/testing.go:2101 +0x34\n==================\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (1.14s)\n    testing.go:1712: race detected during execution of test\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 2.6330225240000003,
+          "tail": "...teral_wildcards_test.go:238 +0x20c\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent.gowrap1()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:243 +0x38\n\nGoroutine 95 (running) created at:\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:234 +0x6ec\n  testing.tRunner()\n      /usr/local/go/src/testing/testing.go:2036 +0x164\n  testing.(*T).Run.gowrap1()\n      /usr/local/go/src/testing/testing.go:2101 +0x34\n\nGoroutine 94 (running) created at:\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:234 +0x6ec\n  testing.tRunner()\n      /usr/local/go/src/testing/testing.go:2036 +0x164\n  testing.(*T).Run.gowrap1()\n      /usr/local/go/src/testing/testing.go:2101 +0x34\n==================\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.89s)\n    literal_wildcards_test.go:239: filter \"\u003e\" stop 0: got 158 callbacks, completed true; want 360, true\n    literal_wildcards_test.go:239: filter \"\u003e\" stop -1: got 64 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:239: filter \"*.a.apple\" stop -1: got 0 callbacks, completed true; want 1, true\n    literal_wildcards_test.go:239: filter \"a.a\u003e.\u003e\" stop 2: got 0 callbacks, completed true; want 1, true\n    testing.go:1712: race detected during execution of test\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 2.673174725,
+          "tail": "...erver/stree.TestLiteralWildcardReentrantAndConcurrent.func3()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:238 +0x20c\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent.gowrap1()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:243 +0x38\n\nGoroutine 103 (running) created at:\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:234 +0x6ec\n  testing.tRunner()\n      /usr/local/go/src/testing/testing.go:2036 +0x164\n  testing.(*T).Run.gowrap1()\n      /usr/local/go/src/testing/testing.go:2101 +0x34\n\nGoroutine 105 (running) created at:\n  github.com/nats-io/nats-server/v2/server/stree.TestLiteralWildcardReentrantAndConcurrent()\n      /var/lib/grader/ws/server/stree/literal_wildcards_test.go:234 +0x6ec\n  testing.tRunner()\n      /usr/local/go/src/testing/testing.go:2036 +0x164\n  testing.(*T).Run.gowrap1()\n      /usr/local/go/src/testing/testing.go:2101 +0x34\n==================\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.93s)\n    literal_wildcards_test.go:239: filter \"\u003e\" stop 0: got 159 callbacks, completed true; want 360, true\n    literal_wildcards_test.go:239: filter \"a.\u003e\": unexpected/duplicate subject or value pointer for \"KV.\u003eb\"\n    literal_wildcards_test.go:239: filter \"a.*.end\" stop 0: got 0 callbacks, completed true; want 12, true\n    testing.go:1712: race detected during execution of test\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i19_lookup_then_walk_reports_twice",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.379974383,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\": unexpected/duplicate subject or value pointer for \"a*\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:129: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.93s)\n    literal_wildcards_test.go:239: filter \"a*\": unexpected/duplicate subject or value pointer for \"a*\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*\"\n    literal_wildcards_test.go:239: filter \"a*\": unexpected/duplicate subject or value pointer for \"a*\"\n    literal_wildcards_test.go:239: filter \"*a\": unexpected/duplicate subject or value pointer for \"*a\"\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.347754103,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\": unexpected/duplicate subject or value pointer for \"a*\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:129: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.90s)\n    literal_wildcards_test.go:239: filter \"a*\": unexpected/duplicate subject or value pointer for \"a*\"\n    literal_wildcards_test.go:239: filter \"*a\": unexpected/duplicate subject or value pointer for \"*a\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*\"\n    literal_wildcards_test.go:239: filter \"a*\": unexpected/duplicate subject or value pointer for \"a*\"\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.337603996,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\": unexpected/duplicate subject or value pointer for \"a*\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:129: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.88s)\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*\"\n    literal_wildcards_test.go:239: filter \"a*\": unexpected/duplicate subject or value pointer for \"a*\"\n    literal_wildcards_test.go:239: filter \"a*\": unexpected/duplicate subject or value pointer for \"a*\"\n    literal_wildcards_test.go:239: filter \"*a\": unexpected/duplicate subject or value pointer for \"*a\"\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i67_inner_wildcard_flag_cleared_early",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.895767945,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardTreeShapes (0.33s)\n    literal_wildcards_test.go:139: filter \"*.a.a*\" stop -1: got 0 callbacks, completed true; want 1, true\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.771300057,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardTreeShapes (0.33s)\n    literal_wildcards_test.go:139: filter \"*.a.a*\" stop -1: got 0 callbacks, completed true; want 1, true\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.7203350149999999,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardTreeShapes (0.33s)\n    literal_wildcards_test.go:139: filter \"*.a.a*\" stop -1: got 0 callbacks, completed true; want 1, true\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i13_terminal_pwc_suffix_subject",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 0.926850463,
+          "tail": "....**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:201: unexpected outer callback \"a\"\n    literal_wildcards_test.go:204: duplicate outer subject \"a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:201: unexpected outer callback \"\u003e\"\n    literal_wildcards_test.go:204: duplicate outer subject \"\u003e\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:201: unexpected outer callback \"\u003e\"\n    literal_wildcards_test.go:204: duplicate outer subject \"\u003e\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:201: unexpected outer callback \"b\"\n    literal_wildcards_test.go:204: duplicate outer subject \"b\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:228: nested traversal visited 65, want 156\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 0.912800148,
+          "tail": "....**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:201: unexpected outer callback \"a\"\n    literal_wildcards_test.go:204: duplicate outer subject \"a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:201: unexpected outer callback \"\u003e\"\n    literal_wildcards_test.go:204: duplicate outer subject \"\u003e\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:201: unexpected outer callback \"\u003e\"\n    literal_wildcards_test.go:204: duplicate outer subject \"\u003e\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:201: unexpected outer callback \"b\"\n    literal_wildcards_test.go:204: duplicate outer subject \"b\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:228: nested traversal visited 65, want 156\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 0.918564034,
+          "tail": "....**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:201: unexpected outer callback \"a\"\n    literal_wildcards_test.go:204: duplicate outer subject \"a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:201: unexpected outer callback \"\u003e\"\n    literal_wildcards_test.go:204: duplicate outer subject \"\u003e\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:201: unexpected outer callback \"\u003e\"\n    literal_wildcards_test.go:204: duplicate outer subject \"\u003e\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:201: unexpected outer callback \"b\"\n    literal_wildcards_test.go:204: duplicate outer subject \"b\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"b\"\n    literal_wildcards_test.go:228: nested traversal visited 65, want 156\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i03_lookup_old_walk_for_mixed",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.3931610220000001,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardTreeShapes (0.01s)\n    literal_wildcards_test.go:129: filter \"*.a.a*\": unexpected/duplicate subject or value pointer for \"root.a.a\u003e\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.91s)\n    literal_wildcards_test.go:239: filter \"*.b.a*\": unexpected/duplicate subject or value pointer for \"root.b.a\u003e\"\n    literal_wildcards_test.go:239: filter \"*.a.a*\": unexpected/duplicate subject or value pointer for \"root.a.apple\"\n    literal_wildcards_test.go:239: filter \"*.a.a*\": unexpected/duplicate subject or value pointer for \"root.a.a\u003e\"\n    literal_wildcards_test.go:239: filter \"*.b.a*\": unexpected/duplicate subject or value pointer for \"root.b.apple\"\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.3492943880000001,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardTreeShapes (0.01s)\n    literal_wildcards_test.go:129: filter \"*.a.a*\": unexpected/duplicate subject or value pointer for \"root.a.a\u003e\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.88s)\n    literal_wildcards_test.go:239: filter \"*.a.a*\": unexpected/duplicate subject or value pointer for \"root.a.apple\"\n    literal_wildcards_test.go:239: filter \"*.a.a*\": unexpected/duplicate subject or value pointer for \"root.a.a\u003e\"\n    literal_wildcards_test.go:239: filter \"*.b.a*\": unexpected/duplicate subject or value pointer for \"root.b.apple\"\n    literal_wildcards_test.go:239: filter \"*.b.a*\": unexpected/duplicate subject or value pointer for \"root.b.a\u003e\"\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.357557092,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardTreeShapes (0.01s)\n    literal_wildcards_test.go:129: filter \"*.a.a*\": unexpected/duplicate subject or value pointer for \"root.a.a\u003e\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.88s)\n    literal_wildcards_test.go:239: filter \"*.a.a*\": unexpected/duplicate subject or value pointer for \"root.a.a\u003e\"\n    literal_wildcards_test.go:239: filter \"*.a.a*\": unexpected/duplicate subject or value pointer for \"root.a.apple\"\n    literal_wildcards_test.go:239: filter \"*.b.a*\": unexpected/duplicate subject or value pointer for \"root.b.a\u003e\"\n    literal_wildcards_test.go:239: filter \"*.b.a*\": unexpected/duplicate subject or value pointer for \"root.b.apple\"\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i47_literal_misses_survive_insert",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.56797579,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:129: filter \"KV.a*\" stop -1: got 0 callbacks, completed true; want 1, true\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.439063832,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardTreeShapes (0.01s)\n    literal_wildcards_test.go:129: filter \"KV.a*\" stop -1: got 0 callbacks, completed true; want 1, true\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.421177092,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:129: filter \"KV.a*\" stop -1: got 0 callbacks, completed true; want 1, true\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i15_literal_memo_survives_delete",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.904307395
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.74084385
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.702969081
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i56_exact_leaf_ignores_stop",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.341789218,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\" stop 1: got 1 callbacks, completed true; want 1, false\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:126: filter \"KV.*\" stop 2: got 2 callbacks, completed true; want 2, false\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.89s)\n    literal_wildcards_test.go:239: filter \"*\" stop 1: got 12 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"KV.a*\" stop 1: got 1 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"*\" stop 2: got 12 callbacks, completed true; want 2, false\n    literal_wildcards_test.go:239: filter \"KV.a\" stop 1: got 1 callbacks, completed true; want 1, false\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.31542586,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\" stop 1: got 1 callbacks, completed true; want 1, false\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:126: filter \"KV.*\" stop 2: got 2 callbacks, completed true; want 2, false\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.87s)\n    literal_wildcards_test.go:239: filter \"*\" stop 2: got 12 callbacks, completed true; want 2, false\n    literal_wildcards_test.go:239: filter \"*\" stop 1: got 12 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"KV.a\" stop 1: got 1 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"KV.a*\" stop 1: got 1 callbacks, completed true; want 1, false\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.317162612,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\" stop 1: got 1 callbacks, completed true; want 1, false\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:126: filter \"KV.*\" stop 2: got 2 callbacks, completed true; want 2, false\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.87s)\n    literal_wildcards_test.go:239: filter \"*\" stop 2: got 12 callbacks, completed true; want 2, false\n    literal_wildcards_test.go:239: filter \"KV.a\" stop 1: got 1 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"*\" stop 1: got 12 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"KV.a*\" stop 1: got 1 callbacks, completed true; want 1, false\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i11_terminal_pwc_ignores_stop",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.982411114,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"*\" stop 1: got 2 callbacks, completed true; want 1, false\n--- FAIL: TestLiteralWildcardTreeShapes (0.62s)\n    literal_wildcards_test.go:129: filter \"KV.*\" stop 2: got 3 callbacks, completed false; want 2, false\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.92s)\n    literal_wildcards_test.go:239: filter \"KV.*\" stop 1: got 2 callbacks, completed false; want 1, false\n    literal_wildcards_test.go:239: filter \"root.b.*\" stop 1: got 2 callbacks, completed false; want 1, false\n    literal_wildcards_test.go:239: filter \"root.a*.*\" stop 1: got 2 callbacks, completed false; want 1, false\n    literal_wildcards_test.go:239: filter \"root.apple.*\" stop 1: got 2 callbacks, completed false; want 1, false\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.932161916,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"*\" stop 1: got 2 callbacks, completed true; want 1, false\n--- FAIL: TestLiteralWildcardTreeShapes (0.61s)\n    literal_wildcards_test.go:129: filter \"KV.*\" stop 2: got 3 callbacks, completed false; want 2, false\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.88s)\n    literal_wildcards_test.go:239: filter \"root.b.*\" stop 1: got 2 callbacks, completed false; want 1, false\n    literal_wildcards_test.go:239: filter \"root.apple.*\" stop 1: got 2 callbacks, completed false; want 1, false\n    literal_wildcards_test.go:239: filter \"KV.*\" stop 1: got 2 callbacks, completed false; want 1, false\n    literal_wildcards_test.go:239: filter \"root.a*.*\" stop 1: got 2 callbacks, completed false; want 1, false\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.924821454,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"*\" stop 1: got 2 callbacks, completed true; want 1, false\n--- FAIL: TestLiteralWildcardTreeShapes (0.61s)\n    literal_wildcards_test.go:129: filter \"KV.*\" stop 2: got 3 callbacks, completed false; want 2, false\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.87s)\n    literal_wildcards_test.go:239: filter \"KV.*\" stop 1: got 2 callbacks, completed false; want 1, false\n    literal_wildcards_test.go:239: filter \"root.b.*\" stop 1: got 2 callbacks, completed false; want 1, false\n    literal_wildcards_test.go:239: filter \"root.apple.*\" stop 1: got 2 callbacks, completed false; want 1, false\n    literal_wildcards_test.go:239: filter \"root.a*.*\" stop 1: got 2 callbacks, completed false; want 1, false\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i94_wide_terminal_pwc_reports_twice",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.835092783
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.643988002
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.651949094
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i69_inner_wildcard_cache_survives_empty",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 2.002857179,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardTreeShapes (0.43s)\n    literal_wildcards_test.go:142: filter \"*.a.a*\": unexpected/duplicate subject or value pointer for \"root.a.a*\"\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.887968522,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardTreeShapes (0.42s)\n    literal_wildcards_test.go:142: filter \"*.a.a*\": unexpected/duplicate subject or value pointer for \"root.a.a*\"\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.8429547670000002,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardTreeShapes (0.43s)\n    literal_wildcards_test.go:142: filter \"*.a.a*\": unexpected/duplicate subject or value pointer for \"root.a.a*\"\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i89_parts_cache_aliases_filter",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.921065368
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.769692806
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.7572843049999998
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i30_terminal_pwc_subject_256",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.785739511
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.693395523
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.644836551
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i09_partial_wildcard_glob",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 3.691420689,
+          "tail": "...ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp.a*.end\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"a.apple.end\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a\u003e\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a\"\n--- FAIL: TestLiteralWildcardCallbackWrites (0.00s)\n    literal_wildcards_test.go:175: filter \"a*.\u003e\": unexpected/duplicate subject or value pointer for \"apple.one\"\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 3.53051393,
+          "tail": "...ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp.a*.end\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"a.apple.end\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a\u003e\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a\"\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 3.57727308,
+          "tail": "...ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp.a*.end\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"a.apple.end\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a\u003e\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i02_lookup_in_match_only",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.346918872,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\": unexpected/duplicate subject or value pointer for \"apple\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:126: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.89s)\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\n    literal_wildcards_test.go:239: filter \"*.a.a*\": unexpected/duplicate subject or value pointer for \"root.a.a\u003e\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.349276299,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\": unexpected/duplicate subject or value pointer for \"apple\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:126: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.89s)\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\n    literal_wildcards_test.go:239: filter \"*.a.a*\": unexpected/duplicate subject or value pointer for \"root.a.a\u003e\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.361774707,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\": unexpected/duplicate subject or value pointer for \"apple\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:126: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.90s)\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\n    literal_wildcards_test.go:239: filter \"*.a.a*\": unexpected/duplicate subject or value pointer for \"root.a.a\u003e\"\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i93_wide_terminal_pwc_subject_from_node",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.79202584
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.667622643
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.636259583
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i07_star_only",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.368041984,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a\u003e\": unexpected/duplicate subject or value pointer for \"apple\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.01s)\n    literal_wildcards_test.go:129: filter \"*.a.a\u003e\": unexpected/duplicate subject or value pointer for \"root.a.a\u003eb\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.91s)\n    literal_wildcards_test.go:239: filter \"*.a.a\u003e\": unexpected/duplicate subject or value pointer for \"root.a.a\u003eb\"\n    literal_wildcards_test.go:239: filter \"*.a.a\u003e\": unexpected/duplicate subject or value pointer for \"root.a.apple\"\n    literal_wildcards_test.go:239: filter \"*.b.a\u003e\": unexpected/duplicate subject or value pointer for \"root.b.apple\"\n    literal_wildcards_test.go:239: filter \"*.b.a\u003e\": unexpected/duplicate subject or value pointer for \"root.b.a\u003eb\"\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.34936059,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a\u003e\": unexpected/duplicate subject or value pointer for \"apple\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.01s)\n    literal_wildcards_test.go:129: filter \"*.a.a\u003e\": unexpected/duplicate subject or value pointer for \"root.a.a\u003eb\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.88s)\n    literal_wildcards_test.go:239: filter \"*.a.a\u003e\": unexpected/duplicate subject or value pointer for \"root.a.apple\"\n    literal_wildcards_test.go:239: filter \"*.b.a\u003e\": unexpected/duplicate subject or value pointer for \"root.b.a\u003eb\"\n    literal_wildcards_test.go:239: filter \"*.a.a\u003e\": unexpected/duplicate subject or value pointer for \"root.a.a\u003eb\"\n    literal_wildcards_test.go:239: filter \"*.b.a\u003e\": unexpected/duplicate subject or value pointer for \"root.b.apple\"\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.3459740359999999,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a\u003e\": unexpected/duplicate subject or value pointer for \"apple\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.01s)\n    literal_wildcards_test.go:129: filter \"*.a.a\u003e\": unexpected/duplicate subject or value pointer for \"root.a.a\u003eb\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.88s)\n    literal_wildcards_test.go:239: filter \"*.a.a\u003e\": unexpected/duplicate subject or value pointer for \"root.a.a\u003eb\"\n    literal_wildcards_test.go:239: filter \"*.a.a\u003e\": unexpected/duplicate subject or value pointer for \"root.a.apple\"\n    literal_wildcards_test.go:239: filter \"*.b.a\u003e\": unexpected/duplicate subject or value pointer for \"root.b.a\u003eb\"\n    literal_wildcards_test.go:239: filter \"*.b.a\u003e\": unexpected/duplicate subject or value pointer for \"root.b.apple\"\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i21_wildcard_skips_wildcard_char_child",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 0.494763304,
+          "tail": "...rue\n    literal_wildcards_test.go:210: filter \"a*.\u003e\" stop -1: got 4 callbacks, completed true; want 13, true\n    literal_wildcards_test.go:210: filter \"a*.\u003e\" stop 0: got 4 callbacks, completed true; want 13, true\n    literal_wildcards_test.go:210: filter \"*.**.*\" stop -1: got 11 callbacks, completed true; want 25, true\n    literal_wildcards_test.go:210: filter \"*.**.*\" stop 0: got 11 callbacks, completed true; want 25, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 218 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 218 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"a*.\u003e\" stop -1: got 4 callbacks, completed true; want 13, true\n    literal_wildcards_test.go:210: filter \"a*.\u003e\" stop 0: got 4 callbacks, completed true; want 13, true\n    literal_wildcards_test.go:210: filter \"*.**.*\" stop -1: got 11 callbacks, completed true; want 25, true\n    literal_wildcards_test.go:210: filter \"*.**.*\" stop 0: got 11 callbacks, completed true; want 25, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 218 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 218 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:228: nested traversal visited 24, want 156\n--- FAIL: TestLiteralWildcardCallbackWrites (0.00s)\n    literal_wildcards_test.go:175: filter \"\u003e\" stop 0: got 1 callbacks, completed true; want 5, true\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 0.497941294,
+          "tail": "...: got 218 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 218 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"a*.\u003e\" stop -1: got 4 callbacks, completed true; want 13, true\n    literal_wildcards_test.go:210: filter \"a*.\u003e\" stop 0: got 4 callbacks, completed true; want 13, true\n    literal_wildcards_test.go:210: filter \"*.**.*\" stop -1: got 11 callbacks, completed true; want 25, true\n    literal_wildcards_test.go:210: filter \"*.**.*\" stop 0: got 11 callbacks, completed true; want 25, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 218 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 218 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"a*.\u003e\" stop -1: got 4 callbacks, completed true; want 13, true\n    literal_wildcards_test.go:210: filter \"a*.\u003e\" stop 0: got 4 callbacks, completed true; want 13, true\n    literal_wildcards_test.go:210: filter \"*.**.*\" stop -1: got 11 callbacks, completed true; want 25, true\n    literal_wildcards_test.go:210: filter \"*.**.*\" stop 0: got 11 callbacks, completed true; want 25, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 218 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 218 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:228: nested traversal visited 24, want 156\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 0.497047743,
+          "tail": "...: got 218 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 218 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"a*.\u003e\" stop -1: got 4 callbacks, completed true; want 13, true\n    literal_wildcards_test.go:210: filter \"a*.\u003e\" stop 0: got 4 callbacks, completed true; want 13, true\n    literal_wildcards_test.go:210: filter \"*.**.*\" stop -1: got 11 callbacks, completed true; want 25, true\n    literal_wildcards_test.go:210: filter \"*.**.*\" stop 0: got 11 callbacks, completed true; want 25, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 218 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 218 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"a*.\u003e\" stop -1: got 4 callbacks, completed true; want 13, true\n    literal_wildcards_test.go:210: filter \"a*.\u003e\" stop 0: got 4 callbacks, completed true; want 13, true\n    literal_wildcards_test.go:210: filter \"*.**.*\" stop -1: got 11 callbacks, completed true; want 25, true\n    literal_wildcards_test.go:210: filter \"*.**.*\" stop 0: got 11 callbacks, completed true; want 25, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 218 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 218 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:228: nested traversal visited 24, want 156\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i86_wide_terminal_snapshot_on_tree",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.791193702
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.662483415
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.651963365
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i16_lookup_subject_256",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.8805064310000001,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardTreeShapes (0.33s)\n    literal_wildcards_test.go:129: filter \"ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp.a*.end\": unexpected/duplicate subject or value pointer for \"pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp\"\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.794336998,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardTreeShapes (0.34s)\n    literal_wildcards_test.go:129: filter \"ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp.a*.end\": unexpected/duplicate subject or value pointer for \"pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp\"\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.7322546559999998,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardTreeShapes (0.34s)\n    literal_wildcards_test.go:129: filter \"ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp.a*.end\": unexpected/duplicate subject or value pointer for \"pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp\"\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i41_parts_capped_at_32",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.7745163870000003
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.626109128
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.603196985
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i55_stop_flag_on_tree",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.768015444,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.00s)\n    literal_wildcards_test.go:228: nested traversal visited 1, want 156\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.7470536110000001,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.00s)\n    literal_wildcards_test.go:228: nested traversal visited 1, want 156\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.763056062,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.00s)\n    literal_wildcards_test.go:228: nested traversal visited 1, want 156\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i78_node256_printable_slots",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.77522071
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.660765174
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.680845438
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i76_terminal_pwc_snapshot_16",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.8203167430000002
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.6932774630000003
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.625027253
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i79_wide_terminal_pwc_iter_loses_stop",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 4.076574563
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.811582983
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.785555981
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i81_wide_terminal_pwc_skips_child_nodes",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.782815947
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.6676434369999997
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.690694389
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i08_gt_only",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.369993085,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\": unexpected/duplicate subject or value pointer for \"apple\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:126: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.91s)\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a\u003e\"\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.362641147,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\": unexpected/duplicate subject or value pointer for \"apple\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:126: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.89s)\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a\u003e\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.376517767,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\": unexpected/duplicate subject or value pointer for \"apple\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:126: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.90s)\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a\u003e\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.avocado\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.apple\"\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i95_mid_token_wide_gt_ignores_stop",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.791382042
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.672172661
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.676435589
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i49_terminal_fwc_subject_256",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.807619287
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.677939634
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.775468542
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i43_gt_iteration_stops_at_hole",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.230241311,
+          "tail": "... completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:239: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:239: filter \"\u003e\" stop 0: got 178 callbacks, completed true; want 360, true\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.149424561,
+          "tail": "... completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:239: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:239: filter \"\u003e\" stop 0: got 178 callbacks, completed true; want 360, true\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.186742407,
+          "tail": "... completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:210: filter \"\u003e\" stop 0: got 354 callbacks, completed true; want 718, true\n    literal_wildcards_test.go:239: filter \"\u003e\" stop 0: got 178 callbacks, completed true; want 360, true\n    literal_wildcards_test.go:239: filter \"\u003e\" stop -1: got 354 callbacks, completed true; want 718, true\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i04_terminal_fwc_by_first_byte",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.526334861,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardSmallTrees (0.01s)\n    literal_wildcards_test.go:261: filter \"\u003eb\" stop -1: got 0 callbacks, completed true; want 1, true\n--- FAIL: TestLiteralWildcardTreeShapes (0.09s)\n    literal_wildcards_test.go:129: filter \"\u003eb\" stop -1: got 0 callbacks, completed true; want 1, true\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.98s)\n    literal_wildcards_test.go:239: filter \"\u003eb\" stop 0: got 0 callbacks, completed true; want 1, true\n    literal_wildcards_test.go:239: filter \"\u003eb\" stop 1: got 0 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"\u003eb\" stop 2: got 0 callbacks, completed true; want 1, true\n    literal_wildcards_test.go:239: filter \"\u003eb\" stop -1: got 0 callbacks, completed true; want 1, true\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.508047567,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"\u003eb\" stop -1: got 0 callbacks, completed true; want 1, true\n--- FAIL: TestLiteralWildcardTreeShapes (0.08s)\n    literal_wildcards_test.go:129: filter \"\u003eb\" stop -1: got 0 callbacks, completed true; want 1, true\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.97s)\n    literal_wildcards_test.go:239: filter \"\u003eb\" stop 0: got 0 callbacks, completed true; want 1, true\n    literal_wildcards_test.go:239: filter \"\u003eb\" stop -1: got 0 callbacks, completed true; want 1, true\n    literal_wildcards_test.go:239: filter \"\u003eb\" stop 2: got 0 callbacks, completed true; want 1, true\n    literal_wildcards_test.go:239: filter \"\u003eb\" stop 1: got 0 callbacks, completed true; want 1, false\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.530855353,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"\u003eb\" stop -1: got 0 callbacks, completed true; want 1, true\n--- FAIL: TestLiteralWildcardTreeShapes (0.09s)\n    literal_wildcards_test.go:129: filter \"\u003eb\" stop -1: got 0 callbacks, completed true; want 1, true\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.99s)\n    literal_wildcards_test.go:239: filter \"\u003eb\" stop -1: got 0 callbacks, completed true; want 1, true\n    literal_wildcards_test.go:239: filter \"\u003eb\" stop 1: got 0 callbacks, completed true; want 1, false\n    literal_wildcards_test.go:239: filter \"\u003eb\" stop 0: got 0 callbacks, completed true; want 1, true\n    literal_wildcards_test.go:239: filter \"\u003eb\" stop 2: got 0 callbacks, completed true; want 1, true\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i05_terminal_pwc_by_value",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.358393034,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\": unexpected/duplicate subject or value pointer for \"a*suffix\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:129: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*b\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.90s)\n    literal_wildcards_test.go:239: filter \"*.b.a*\": unexpected/duplicate subject or value pointer for \"root.b.a*b\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*b\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*b\"\n    literal_wildcards_test.go:239: filter \"*.b.a*\": unexpected/duplicate subject or value pointer for \"root.b.a*b\"\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.3435799990000001,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\": unexpected/duplicate subject or value pointer for \"a*suffix\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.01s)\n    literal_wildcards_test.go:129: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*b\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.89s)\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*b\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*b\"\n    literal_wildcards_test.go:239: filter \"*.b.a*\": unexpected/duplicate subject or value pointer for \"root.b.a*b\"\n    literal_wildcards_test.go:239: filter \"*.b.a*\": unexpected/duplicate subject or value pointer for \"root.b.a*b\"\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.334475703,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardSmallTrees (0.00s)\n    literal_wildcards_test.go:261: filter \"a*\": unexpected/duplicate subject or value pointer for \"a*suffix\"\n--- FAIL: TestLiteralWildcardTreeShapes (0.00s)\n    literal_wildcards_test.go:129: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*b\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.88s)\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*b\"\n    literal_wildcards_test.go:239: filter \"KV.a*\": unexpected/duplicate subject or value pointer for \"KV.a*b\"\n    literal_wildcards_test.go:239: filter \"*.b.a*\": unexpected/duplicate subject or value pointer for \"root.b.a*b\"\n    literal_wildcards_test.go:239: filter \"*.b.a*\": unexpected/duplicate subject or value pointer for \"root.b.a*b\"\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i96_mid_token_wide_gt_value_copy",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.832330331
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.750199732
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.827222191
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i58_exact_leaf_subject_misses_prefix",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 0.947562863,
+          "tail": "...d/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:228: nested traversal visited 144, want 156\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 0.990749897,
+          "tail": "...d/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:228: nested traversal visited 144, want 156\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.000837284,
+          "tail": "...d/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:210: filter \"*.**.*\": unexpected/duplicate subject or value pointer for \"root.**.a\"\n    literal_wildcards_test.go:228: nested traversal visited 144, want 156\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i87_parts_cache_locked_per_tree",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 4.016044958
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.864321417
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": true,
+          "exit_code": 0,
+          "killed": false,
+          "seconds": 3.871217288
+        }
+      ],
+      "verdict": "accepted",
+      "credit": false
+    },
+    {
+      "member": "i90_long_filter_scan_first_byte",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.804752767,
+          "tail": "....21s)\n    literal_wildcards_test.go:129: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.end\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (1.12s)\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.end\"\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.end\"\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.end\"\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.end\"\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.698580762,
+          "tail": "....19s)\n    literal_wildcards_test.go:129: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.end\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (1.02s)\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.end\"\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.end\"\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.end\"\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.end\"\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.64544036,
+          "tail": "....19s)\n    literal_wildcards_test.go:129: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.end\"\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.98s)\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.end\"\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.end\"\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.end\"\n    literal_wildcards_test.go:239: filter \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.**.*\": unexpected/duplicate subject or value pointer for \"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.\u003eb.end\"\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    },
+    {
+      "member": "i12_tree_scratch_parts",
+      "kind": "incorrect",
+      "built": true,
+      "runs": [
+        {
+          "seed": 20261030,
+          "cpu": 1,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.7160064849999999,
+          "tail": "-test.shuffle 20261030\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.01s)\n    literal_wildcards_test.go:228: nested traversal visited 2, want 156\nFAIL\n"
+        },
+        {
+          "seed": 8765,
+          "cpu": 2,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.729543654,
+          "tail": "-test.shuffle 8765\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.01s)\n    literal_wildcards_test.go:228: nested traversal visited 2, want 156\nFAIL\n"
+        },
+        {
+          "seed": 6619,
+          "cpu": 4,
+          "pass": false,
+          "exit_code": 1,
+          "killed": false,
+          "seconds": 1.7432918179999999,
+          "tail": "-test.shuffle 6619\n--- FAIL: TestLiteralWildcardReentrantAndConcurrent (0.01s)\n    literal_wildcards_test.go:228: nested traversal visited 2, want 156\nFAIL\n"
+        }
+      ],
+      "verdict": "rejected",
+      "credit": true
+    }
+  ]
+}

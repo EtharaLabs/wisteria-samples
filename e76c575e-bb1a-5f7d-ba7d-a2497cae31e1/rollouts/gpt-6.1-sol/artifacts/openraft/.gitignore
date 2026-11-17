@@ -1,0 +1,15 @@
+
+# Directory Ignores ##########################################################
+guide/book
+target
+vendor
+.idea
+.zed
+tests/_log
+**/__pycache__
+
+# File Ignores ###############################################################
+**/*.rs.bk
+Cargo.lock
+.DS_Store
+.vscode

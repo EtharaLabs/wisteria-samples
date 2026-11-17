@@ -1,0 +1,55 @@
+use anyhow::Result;
+use openraft::Config;
+
+use crate::fixtures::RaftRouter;
+use crate::fixtures::ut_harness;
+
+/// With "allow_log_reversion", the leader allows follower to revert its log to an
+/// earlier state.
+#[tracing::instrument]
+#[test_harness::test(harness = ut_harness)]
+async fn feature_loosen_follower_log_revert() -> Result<()> {
+    let config = Config {
+        enable_tick: false,
+        enable_heartbeat: false,
+        // Make sure the replication is done in more than one steps
+        max_payload_entries: 1,
+        allow_log_reversion: Some(true),
+        ..Default::default()
+    };
+
+    let mut router = RaftRouter::new(config)?;
+
+    tracing::info!("--- initializing cluster");
+    let mut log_index = router.new_cluster([0, 1, 2], [3]).await?;
+
+    tracing::info!(log_index, "--- write 10 logs");
+    {
+        let written = router.client_request_many(0, "0", 10).await?;
+        log_index += written.count;
+        for i in [0, 1, 2, 3] {
+            router.wait(&i).applied_index(Some(log_index), format!("{} writes", 10)).await?;
+        }
+    }
+
+    tracing::info!(log_index, "--- erase node 3 and restart");
+    {
+        router.stop_node(3).await?;
+        let (log, sm) = openraft_memstore::new_mem_store();
+
+        router.new_raft_node_with_sto(3, log, sm).await?;
+        router.add_learner(0, 3).await?;
+        log_index += 1; // add learner
+    }
+
+    tracing::info!(log_index, "--- write another 10 logs, leader should not panic");
+    {
+        let written = router.client_request_many(0, "0", 10).await?;
+        log_index += written.count;
+        for i in [0, 1, 2, 3] {
+            router.wait(&i).applied_index(Some(log_index), format!("{} writes", 10)).await?;
+        }
+    }
+
+    Ok(())
+}

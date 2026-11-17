@@ -1,0 +1,31 @@
+{
+  "absent": [],
+  "exit_code": 1,
+  "failure_output": {
+    "TestJetStreamDurableStreamSourcingStaleDeliveryAfterReset/Mirror": [
+      "=== RUN   TestJetStreamDurableStreamSourcingStaleDeliveryAfterReset/Mirror",
+      "    jetstream_test.go:25681: require uint64 equal, but got: 3 != 1",
+      "--- FAIL: TestJetStreamDurableStreamSourcingStaleDeliveryAfterReset/Mirror (0.22s)"
+    ],
+    "TestJetStreamDurableStreamSourcingStaleDeliveryAfterReset/Source": [
+      "=== RUN   TestJetStreamDurableStreamSourcingStaleDeliveryAfterReset/Source",
+      "    jetstream_test.go:25679: require uint64 equal, but got: 1 != 2",
+      "--- FAIL: TestJetStreamDurableStreamSourcingStaleDeliveryAfterReset/Source (0.17s)"
+    ],
+    "TestJetStreamMirrorResetWithDeliveriesInFlight": [
+      "=== RUN   TestJetStreamMirrorResetWithDeliveriesInFlight",
+      "    jetstream_mirror_reset_inflight_test.go:174: mirror does not hold s4..s7 the origin holds: {Msgs:1 Bytes:34 FirstSeq:7 FirstTime:2026-11-16 18:01:06.209205733 +0000 UTC LastSeq:7 LastTime:2026-11-16 18:01:06.209205733 +0000 UTC NumSubjects:1 Subjects:map[] NumDeleted:0 Deleted:[] Lost:<nil> Consumers:0}",
+      "--- FAIL: TestJetStreamMirrorResetWithDeliveriesInFlight (0.19s)"
+    ]
+  },
+  "ok": true,
+  "reason": "",
+  "step": "graded",
+  "tests": {
+    "TestJetStreamConsumerResetPendingHoldsDeliveries": "pass",
+    "TestJetStreamDurableStreamSourcingStaleDeliveryAfterReset/Mirror": "fail",
+    "TestJetStreamDurableStreamSourcingStaleDeliveryAfterReset/Source": "fail",
+    "TestJetStreamMirrorResetWithDeliveriesInFlight": "fail"
+  },
+  "unparsed_lines": []
+}

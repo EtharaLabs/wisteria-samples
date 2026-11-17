@@ -1,0 +1,267 @@
+{
+  "reward": {
+    "kind": "group",
+    "score": 0.5806,
+    "aggregation": "weighted-mean",
+    "components": [
+      {
+        "name": "test_output",
+        "weight": 1.0,
+        "detail": {
+          "score": 0.5806,
+          "criteria": [
+            {
+              "name": "R-GOLD",
+              "value": 1.0,
+              "raw": 1.0,
+              "weight": 5.0,
+              "description": "R-GOLD",
+              "reasoning": "R-GOLD:gold:all-pass"
+            },
+            {
+              "name": "R-COR-A1",
+              "value": 1.0,
+              "raw": 1.0,
+              "weight": 5.0,
+              "description": "R-COR-A1",
+              "reasoning": "R-COR-A1:cor-A1:all-pass"
+            },
+            {
+              "name": "R-COR-A3",
+              "value": 1.0,
+              "raw": 1.0,
+              "weight": 5.0,
+              "description": "R-COR-A3",
+              "reasoning": "R-COR-A3:cor-A3:all-pass"
+            },
+            {
+              "name": "R-COR-A4",
+              "value": 1.0,
+              "raw": 1.0,
+              "weight": 5.0,
+              "description": "R-COR-A4",
+              "reasoning": "R-COR-A4:cor-A4:all-pass"
+            },
+            {
+              "name": "R-COR-A5",
+              "value": 1.0,
+              "raw": 1.0,
+              "weight": 5.0,
+              "description": "R-COR-A5",
+              "reasoning": "R-COR-A5:cor-A5:all-pass"
+            },
+            {
+              "name": "R-COR-R3e1f",
+              "value": 1.0,
+              "raw": 1.0,
+              "weight": 5.0,
+              "description": "R-COR-R3e1f",
+              "reasoning": "R-COR-R3e1f:cor-R3e1f:all-pass"
+            },
+            {
+              "name": "R-INC-I2",
+              "value": 1.0,
+              "raw": 1.0,
+              "weight": 5.0,
+              "description": "R-INC-I2",
+              "reasoning": "R-INC-I2:inc-I2:any-fail"
+            },
+            {
+              "name": "R-INC-I3a",
+              "value": 1.0,
+              "raw": 1.0,
+              "weight": 5.0,
+              "description": "R-INC-I3a",
+              "reasoning": "R-INC-I3a:inc-I3a:any-fail"
+            },
+            {
+              "name": "R-INC-I4",
+              "value": 1.0,
+              "raw": 1.0,
+              "weight": 5.0,
+              "description": "R-INC-I4",
+              "reasoning": "R-INC-I4:inc-I4:any-fail"
+            },
+            {
+              "name": "R-INC-I7",
+              "value": 0.0,
+              "raw": 0.0,
+              "weight": 5.0,
+              "description": "R-INC-I7",
+              "reasoning": "R-INC-I7:inc-I7:any-fail"
+            },
+            {
+              "name": "R-INC-I9",
+              "value": 0.0,
+              "raw": 0.0,
+              "weight": 5.0,
+              "description": "R-INC-I9",
+              "reasoning": "R-INC-I9:inc-I9:any-fail"
+            },
+            {
+              "name": "R-INC-I10",
+              "value": 1.0,
+              "raw": 1.0,
+              "weight": 5.0,
+              "description": "R-INC-I10",
+              "reasoning": "R-INC-I10:inc-I10:any-fail"
+            },
+            {
+              "name": "R-INC-I11",
+              "value": 1.0,
+              "raw": 1.0,
+              "weight": 5.0,
+              "description": "R-INC-I11",
+              "reasoning": "R-INC-I11:inc-I11:any-fail"
+            },
+            {
+              "name": "R-INC-I13",
+              "value": 0.0,
+              "raw": 0.0,
+              "weight": 5.0,
+              "description": "R-INC-I13",
+              "reasoning": "R-INC-I13:inc-I13:any-fail"
+            },
+            {
+              "name": "R-INC-I15",
+              "value": 0.0,
+              "raw": 0.0,
+              "weight": 5.0,
+              "description": "R-INC-I15",
+              "reasoning": "R-INC-I15:inc-I15:any-fail"
+            },
+            {
+              "name": "R-INC-R8f2c",
+              "value": 0.0,
+              "raw": 0.0,
+              "weight": 5.0,
+              "description": "R-INC-R8f2c",
+              "reasoning": "R-INC-R8f2c:inc-R8f2c:any-fail"
+            },
+            {
+              "name": "R-INC-R51da",
+              "value": 0.0,
+              "raw": 0.0,
+              "weight": 5.0,
+              "description": "R-INC-R51da",
+              "reasoning": "R-INC-R51da:inc-R51da:any-fail"
+            },
+            {
+              "name": "R-INC-I3br",
+              "value": 1.0,
+              "raw": 1.0,
+              "weight": 5.0,
+              "description": "R-INC-I3br",
+              "reasoning": "R-INC-I3br:inc-I3br:any-fail"
+            },
+            {
+              "name": "R-INC-I3cr",
+              "value": 1.0,
+              "raw": 1.0,
+              "weight": 5.0,
+              "description": "R-INC-I3cr",
+              "reasoning": "R-INC-I3cr:inc-I3cr:any-fail"
+            },
+            {
+              "name": "R-INC-I14r",
+              "value": 1.0,
+              "raw": 1.0,
+              "weight": 5.0,
+              "description": "R-INC-I14r",
+              "reasoning": "R-INC-I14r:inc-I14r:any-fail"
+            },
+            {
+              "name": "R-INC-I8r",
+              "value": 0.0,
+              "raw": 0.0,
+              "weight": 5.0,
+              "description": "R-INC-I8r",
+              "reasoning": "R-INC-I8r:inc-I8r:any-fail"
+            },
+            {
+              "name": "R-INC-I16",
+              "value": 1.0,
+              "raw": 1.0,
+              "weight": 5.0,
+              "description": "R-INC-I16",
+              "reasoning": "R-INC-I16:inc-I16:any-fail"
+            },
+            {
+              "name": "R-INC-I17",
+              "value": 0.0,
+              "raw": 0.0,
+              "weight": 5.0,
+              "description": "R-INC-I17",
+              "reasoning": "R-INC-I17:inc-I17:any-fail"
+            },
+            {
+              "name": "R-INC-I18",
+              "value": 0.0,
+              "raw": 0.0,
+              "weight": 5.0,
+              "description": "R-INC-I18",
+              "reasoning": "R-INC-I18:inc-I18:any-fail"
+            },
+            {
+              "name": "R-INC-I19",
+              "value": 0.0,
+              "raw": 0.0,
+              "weight": 5.0,
+              "description": "R-INC-I19",
+              "reasoning": "R-INC-I19:inc-I19:any-fail"
+            },
+            {
+              "name": "R-INC-I20",
+              "value": 1.0,
+              "raw": 1.0,
+              "weight": 5.0,
+              "description": "R-INC-I20",
+              "reasoning": "R-INC-I20:inc-I20:any-fail"
+            },
+            {
+              "name": "R-INC-I21",
+              "value": 1.0,
+              "raw": 1.0,
+              "weight": 5.0,
+              "description": "R-INC-I21",
+              "reasoning": "R-INC-I21:inc-I21:any-fail"
+            },
+            {
+              "name": "R-INC-I22",
+              "value": 1.0,
+              "raw": 1.0,
+              "weight": 5.0,
+              "description": "R-INC-I22",
+              "reasoning": "R-INC-I22:inc-I22:any-fail"
+            },
+            {
+              "name": "R-INC-I23",
+              "value": 0.0,
+              "raw": 0.0,
+              "weight": 5.0,
+              "description": "R-INC-I23",
+              "reasoning": "R-INC-I23:inc-I23:any-fail"
+            },
+            {
+              "name": "R-INC-I24",
+              "value": 0.0,
+              "raw": 0.0,
+              "weight": 5.0,
+              "description": "R-INC-I24",
+              "reasoning": "R-INC-I24:inc-I24:any-fail"
+            },
+            {
+              "name": "R-INC-I25",
+              "value": 0.0,
+              "raw": 0.0,
+              "weight": 5.0,
+              "description": "R-INC-I25",
+              "reasoning": "R-INC-I25:inc-I25:any-fail"
+            }
+          ],
+          "kind": "programmatic"
+        }
+      }
+    ]
+  }
+}

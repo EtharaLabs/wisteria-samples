@@ -1,0 +1,667 @@
+# OpenRaft Jepsen Tests
+
+This directory contains Jepsen black-box tests for OpenRaft and the dedicated
+RocksDB-backed application they exercise. The tests target the application
+through its external APIs rather than OpenRaft's internal Rust APIs, so they
+can validate externally observable behavior through real client requests,
+process lifecycle, and network behavior.
+
+These tests cover a different layer from OpenRaft's deterministic simulation tests. Simulation tests run inside a controlled Rust environment. Jepsen drives a running KV service through its external API and records a client history for later checking. Jepsen runs are not deterministic, and a Jepsen failure is not expected to replay directly in the simulation harness.
+
+## Organization
+
+The Clojure/Leiningen harness and its Rust test application are self-contained
+inside the OpenRaft repository. The Rust crate is excluded from the root Cargo
+workspace, so normal Rust builds and tests do not depend on Jepsen. The Jepsen
+Docker environment builds the application explicitly from its own manifest.
+
+The Docker test environment separates the Jepsen control plane from the OpenRaft data plane:
+
+```text
+                     control container
+                     Jepsen + Leiningen
+                              |
+              SSH: setup / start / stop / logs
+                              |
+          +---------+---------+---------+---------+
+          |         |         |         |         |
+          v         v         v         v         v
+         n1        n2        n3        n4        n5
+      db node   db node   db node   db node   db node
+          |         |         |         |         |
+          +------ app_http API and Raft RPC mesh --+
+```
+
+The control container is not an OpenRaft member. It runs the Jepsen process,
+controls the db nodes over SSH, and sends client operations to the KV service
+API. Every db node exposes the same `app_http` endpoints, and the leader-aware
+client may contact any of them. The default OpenRaft cluster contains all five
+Docker nodes, which communicate over the Raft RPC port.
+
+The `openraft-test-app` crate is derived from the RocksDB example but belongs to
+the Jepsen harness. It uses string node IDs so each Docker hostname can also be
+the corresponding OpenRaft node ID. Test-specific application changes can be
+made there without increasing the complexity of the general-purpose example.
+
+Storage uses the shared `log-rocks` and `sm-rocks` crates in separate `log/`
+and `sm/` directories under the application's data directory. Reads go through
+the Raft state-machine worker, and checkpoint snapshots use the RocksDB
+example's HTTP directory-transfer module. Each Jepsen run starts with clean
+storage; process restarts within a run retain it. The old single-database
+layout is not migrated, so a manual upgrade must start with a fresh directory.
+
+The `jepsen.openraft` namespace contains the OpenRaft-specific Jepsen code:
+
+- `await.clj`: bounded polling helpers for scenario conditions.
+- `checker.clj`: run metadata, unhandled exception, and node log checkers.
+- `cli.clj`: command-line entry point.
+- `client.clj`: HTTP client for the OpenRaft KV example APIs.
+- `clock.clj`: clock-fault setup and cleanup helpers.
+- `cluster.clj`: cluster bootstrap helpers.
+- `db.clj`: Jepsen DB lifecycle for starting and stopping OpenRaft nodes.
+- `generator.clj`: generators that react to harness failures.
+- `harness.clj`: shared harness-failure state and reporting.
+- `history.clj`: shared Jepsen history queries used by scenario checkers.
+- `interruption.clj`: shared thread-interruption classification.
+- `nemesis.clj`: fault scheduling, composition, and final recovery.
+- `nemesis/clock.clj`: wall-clock faults.
+- `nemesis/membership.clj`: membership growth, shrink, and final restoration.
+- `nemesis/outcome.clj`: shared fault-outcome classification.
+- `nemesis/packet.clj`: packet delay and loss faults.
+- `nemesis/partition.clj`: leader-aware network partition faults and recovery.
+- `nemesis/process.clj`: process kill/restart and pause/resume faults.
+- `quorum.clj`: stable and joint-consensus quorum calculations.
+- `scenario/bridge_partition.clj`: old-leader bridge liveness scenario.
+- `scenario/leader_removal_recovery.clj`: interrupted leader-removal recovery scenario.
+- `scenario/two_leaf_partition.clj`: stable-leader two-leaf scenario.
+- `worker.clj`: bounded concurrent operation workers.
+- `workload.clj`: generators and checkers for client operations.
+
+## Running
+
+### Prerequisites
+
+- Docker with Compose support
+
+### Run The Harness
+
+From the repository root:
+
+```bash
+# Format and lint the dedicated Rust test application.
+$ make -C jepsen app-lint
+
+# Build images, start containers, then run unit, safety, and liveness tests.
+$ make -C jepsen jepsen
+
+# Generate the local Docker SSH key and build the Jepsen images.
+$ make -C jepsen build
+
+# Start or recreate the Jepsen containers.
+$ make -C jepsen up
+
+# Run safety and all liveness scenarios independently, in sequence.
+$ make -C jepsen test
+
+# Run only the network partition test.
+$ make -C jepsen safety NEMESIS=partition
+
+# Run only the process crash/restart test.
+$ make -C jepsen safety NEMESIS=process
+
+# Run only the process pause/resume test.
+$ make -C jepsen safety NEMESIS=pause
+
+# Run pause/resume for 180 seconds to cover more complete pause episodes.
+$ make -C jepsen safety NEMESIS=pause TIME_LIMIT=180
+
+# Run only the membership change test.
+$ make -C jepsen safety NEMESIS=membership
+
+# Run only the wall-clock fault test.
+$ make -C jepsen safety NEMESIS=clock
+
+# Run only one Packet mode; MODE must be slow or flaky.
+$ make -C jepsen safety NEMESIS=packet PACKET_MODE=slow
+
+# Compose selected fault classes with overlapping schedules.
+$ make -C jepsen safety NEMESIS=partition,process,pause
+
+# Reuse a recorded seed for Jepsen random choices.
+$ make -C jepsen safety NEMESIS=partition SEED=123456
+
+# Override the committed-log threshold that triggers snapshots.
+$ make -C jepsen test SNAPSHOT_THRESHOLD=250
+
+# Run only the bridge-partition liveness scenario.
+$ make -C jepsen liveness SCENARIO=bridge-partition
+
+# Run only the two-leaf-partition liveness scenario.
+$ make -C jepsen liveness SCENARIO=two-leaf-partition
+
+# Run only the leader-removal-recovery liveness scenario.
+$ make -C jepsen liveness SCENARIO=leader-removal-recovery
+
+# Stop and remove the Jepsen containers.
+$ make -C jepsen down
+```
+
+Use `make -C jepsen liveness` (equivalent to `SCENARIO=all`) to run all
+available liveness scenarios. Available scenarios are `bridge-partition`,
+`two-leaf-partition`, and `leader-removal-recovery`. `SCENARIO` also accepts a
+comma-separated list; each selected scenario runs independently with its own
+setup, teardown, and results.
+Unknown scenarios are rejected before any liveness run starts.
+
+`make -C jepsen safety` runs the default chaos safety test; use `NEMESIS=...`
+to select faults. `make -C jepsen test` runs safety followed by liveness,
+sequentially even with `make -j`. It attempts both categories and fails if
+either fails. `NEMESIS`, `PACKET_MODE`, and `TIME_LIMIT` apply only to safety,
+including when it is run through `test` or `jepsen`. `TIME_LIMIT` is in seconds;
+when unset, Jepsen defaults to 60 seconds. Liveness scenarios keep their fixed
+observation windows. `SEED` and `SNAPSHOT_THRESHOLD` apply to both categories.
+`ARGS` replaces the common CLI arguments for both categories; use the dedicated
+Make variables for safety-only options when running combined targets.
+The `jepsen` target builds
+and starts the containers, runs unit tests, then runs this combined test target.
+
+The harness uses each Jepsen node's container hostname, such as `n1`, directly
+as its OpenRaft node ID.
+
+This starts the five-node Docker environment, then runs the Jepsen control
+process from the control container. Every test checks a concurrent mix of
+linearizable reads, writes, and compare-and-set operations across independent
+registers with Knossos. `NEMESIS` accepts a comma-separated subset when a
+narrower combination is needed.
+
+## Safety tests
+
+Safety runs check linearizable reads, writes, and compare-and-set operations
+under process, network, membership, and clock faults. They include focused
+single-Nemesis runs and the default Chaos composition described below. Focused
+runs also enforce their fault-specific progress and coverage requirements;
+all runs require cleanup and final recovery. The separate Liveness scenario
+below retains these common safety checks while testing progress under a fixed
+network topology.
+
+### Nemesis Design
+
+Target policies are specific to each fault class. Network Partition and Packet
+faults preserve a voter quorum so focused runs can require continuous progress.
+Process Kill, Process Pause, and Clock faults may target any non-empty node
+subset, including a voter majority or every node. Their focused runs do not
+require progress while no usable quorum remains, but safety and final recovery
+remain mandatory. Membership changes retain their own legality and
+quorum-preserving rules.
+
+The `chaos` profile composes these faults without reserving one common survivor
+quorum across fault classes. Their active intervals may overlap and temporarily
+remove the global quorum. Safety and eventual recovery remain mandatory in that
+case, but continuous availability does not.
+
+#### Network Partition Nemesis
+
+The partition Nemesis installs a hard network partition between two components.
+It exercises two leader-aware cases:
+
+- `leader-in-majority`: the current quorum-supported leader remains with a
+  majority of the voters;
+- `leader-in-minority`: the leader is isolated with a minority while the other
+  component retains a quorum and can elect a replacement.
+
+A focused partition run requires both cases to be installed and healed. If no
+quorum-supported leader or safe partition target is observable, the operation
+is skipped and retried later without counting as coverage.
+
+#### Process Kill Nemesis
+
+The process Nemesis randomly stops any non-empty subset of the test nodes. It
+does not filter targets by quorum or leader placement, so an episode may stop a
+single node, a voter minority, a voter majority, learners, or every node. The
+history records the selected nodes, initial leader, and effective voter
+configuration, together with the voters reachable before the kill, so the
+checker can determine whether a usable quorum remained.
+
+When a quorum remains, a focused Process run requires an `:ok` client operation
+or a CAS `:version-mismatch` within three maximum election timeouts; either
+result proves the service responded. Losing quorum permits a temporary lack of
+progress, but never relaxes safety. The target set is fixed for one fault
+episode. Each episode restarts the selected processes, and final recovery waits
+for every node to rejoin a healthy cluster.
+
+#### Process Pause Nemesis
+
+The pause Nemesis suspends a uniformly random non-empty subset of reachable
+nodes without terminating their processes. Like Process Kill, it may retain or
+remove the voter quorum and records enough evidence for the focused checker to
+apply the matching availability expectation.
+
+Paused processes retain their memory and open TCP connections, so peers observe
+unresponsive processes rather than closed connections. Resume operations target
+every test node as an idempotent cleanup and record the complete resumed node
+set in history. When a quorum remains, the focused checker requires an `:ok`
+client operation or a CAS `:version-mismatch` that starts after the pause is
+installed and completes before resume begins. This uses the complete fault
+episode because a request to a paused leader can remain blocked until the
+client timeout.
+
+#### Membership Nemesis
+
+The membership Nemesis exercises these membership-change cases:
+
+- `shrink`: remove a voter only when the resulting configuration retains a
+  quorum;
+- `grow`: add a non-voter back through learner initialization and committed
+  membership change;
+- `shrink-twice` (at least five voters): send two consecutive changes directly
+  to the same leader A: `{A,B,C,D,E} -> {B,C,D,E} -> {C,D,E}`. Before the second
+  request, confirm the first configuration is committed and A remains leader
+  despite being neither a voter nor a learner. Neither request follows leader
+  redirects.
+
+Each run selects the removed-leader step-down policy from its seed: even seeds
+use OpenRaft's default policy (currently `After(150)`), and odd seeds use `Never`.
+The selected policy is stored in the test configuration and logged at every node
+start, including restarts. `Never` is passed to the test app with
+`--disable-removed-leader-step-down`; without that flag the app keeps OpenRaft's
+default. Either policy still allows a leader to step down on a higher term.
+Use `SEED=0` and `SEED=1` to exercise both policies in membership runs.
+
+The generator starts with shrink and grow, then attempts shrink-twice on clusters
+of at least five nodes, before randomly mixing the applicable operations. On
+these clusters the initial grow phase repeats until it completes (or membership
+is already full), so starting a wiped node cannot consume the double-shrink step.
+Pending changes are resolved before starting another operation. A focused
+membership run on five or more nodes requires successful shrink-twice coverage
+only with `Never`. Default-policy runs accept ordinary shrink recovery when the
+removed leader steps down before the second request, and also accept successful
+shrink-twice operations. Chaos retains its existing policy of reporting missing
+per-class coverage.
+Timeouts or a changed leader can be recovered through ordinary membership
+operations, but do not count as successful shrink-twice coverage.
+
+Removed nodes are stopped and wiped only after the target configuration commits;
+shrink-twice keeps both removed nodes running until the second change completes.
+Final recovery restores all configured nodes as voters and waits for every node
+to agree on a leader.
+
+#### Packet Nemesis
+
+The Packet Nemesis models traffic that remains reachable but is degraded. Hard
+packet drops that create a partition remain the responsibility of the Network
+Partition Nemesis. Packet provides two mutually exclusive modes:
+
+- `slow`: 300 ms latency with 50 ms normally distributed jitter;
+- `flaky`: Jepsen's default 20% packet loss with 75% correlation.
+
+The `slow` parameters are derived from the test application's timing
+configuration. Its election timeout is approximately 299 ms and its heartbeat
+interval is 50 ms. A 300 ms base delay with a 50 ms normal jitter scale
+therefore concentrates delays around the election threshold, with substantial
+probability on either side of it. This deliberately exercises the boundary
+where some messages arrive before an election timeout and others arrive after
+it, without requiring every fault episode to trigger an election. The
+distribution is not bounded to 250--350 ms; values farther from the base delay
+are less likely but possible. Every scenario also enables the quorum-loss
+heartbeat gate with `quorum_loss_probe_interval: Some(700)`, above the 600 ms
+minimum of the leader lease plus maximum election timeout.
+
+A focused run explicitly selects one mode. Within that mode it exercises two
+quorum-safe target cases:
+
+- `leader-included`: the fixed target set includes the quorum-supported leader;
+- `leader-excluded`: the fixed target set contains only non-leader voters.
+
+Targets are selected once per fault episode and do not follow a newly elected
+leader. If no supported leader or safe target for the requested case is
+observable, the operation is skipped and retried without counting as coverage.
+
+Both modes use Jepsen's `shape!` wrapper around Linux `tc netem`. The first
+version applies one mode in both directions across the selected target boundary,
+at node-IP granularity and across DB-to-DB ports. It does not provide one-way,
+per-RPC, or per-port shaping. Because both modes own the same root qdisc, they
+are never active at the same time.
+
+The same Packet package and checker are used in focused and chaos runs. A
+focused Packet run requires the selected mode and both leader-target cases to be
+installed and later cleared successfully. It does not require an election, timeout, or
+indeterminate mutation, because those observations depend on timing, TCP
+retransmission, and kernel packet selection. Partial installation or cleanup is
+a Harness failure; final recovery and teardown must attempt idempotent cleanup
+on every node.
+
+#### Clock Nemesis
+
+The Clock Nemesis changes the wall clock observed by OpenRaft application
+processes. It uses node-local `libfaketime` control files and never changes the
+container or host clock. A focused run cycles through multi-scale forward or
+backward jumps, fast and slow rates sampled between 0.5x and 2x, rapid strobe
+jumps, and resets in a fixed order. Targets and fault parameters remain random.
+The order is fixed so that one default 60-second run covers every mode the
+Clock checker requires for `:valid?`; randomising it would make short runs fail
+on missing coverage.
+Each operation replaces the complete clock state, and final cleanup restores
+every node to `+0 x1`. Rate changes may also jump the wall clock because libfaketime
+rebases the reported time when the multiplier changes; those jumps are part of
+the injected wall-clock fault. Monotonic-clock readings remain unscaled, but
+libfaketime rate settings still scale syscall waits such as `epoll_wait`. Slow
+rates may therefore delay Tokio runtime timers, so a rate-fault failure is not
+evidence of a wall-clock dependency alone.
+
+Targets are arbitrary non-empty subsets and can include a minority, majority,
+or every node. History records the targets, generated parameters, initial
+leader, and whether that leader was selected. The Clock checker validates fault
+coverage and cleanup; the common workload checker remains responsible for
+linearizability and final data recovery.
+
+#### Chaos Composition
+
+The default `chaos` profile independently schedules partition, process, pause,
+membership, packet, and clock faults. It composes the package, generator, final
+recovery, and checker supplied by each Nemesis, and changes only how the
+composed verdict treats per-class coverage. Packet chooses one of `slow` or
+`flaky` for each independent Packet episode, and never overlaps those two modes
+with each other. Different fault classes may remain active at the same time.
+
+A chaos run does not require every fault class to install. All six classes draw
+from one 60-second random schedule, so whether a class ever meets a healthy
+cluster depends on wall-clock timing. `results.edn` therefore records
+`:fault-class-executed?` next to the observed and missing entries of each class,
+and a class that never installed does not reject the run. Coverage stays a hard
+requirement in the focused CI jobs, which run one Nemesis at a time. A chaos run
+still rejects fault errors, incomplete cleanup, and failed recovery.
+
+Only an absent or explicitly skipped fault is relaxed. Three shapes are Nemesis
+defects rather than a schedule that never reached the class: an installed fault
+without the evidence its checker reads, such as a `:start-partition` outcome
+carrying no mode; an outcome carrying no `:status`; and an outcome whose
+`:status` is none of `:installed`, `:skipped` and `:indeterminate`. `results.edn`
+counts those under `:malformed-outcomes`, and a positive count rejects the run,
+in a chaos run and in a focused run alike.
+
+A chaos run must still install one fault. Relaxing every class on its own would
+otherwise let a run in which all six classes were absent or skipped pass on the
+workload, the cleanup and the final recovery alone, so an entirely inert Nemesis
+would look successful. `results.edn` reports how many classes installed a
+recognized fault under `:fault-classes-executed`, and zero rejects the run.
+Cleanup, clock reset and recovery operations do not count toward it.
+
+Every Jepsen node builds a snapshot after 100 newly committed logs by default.
+The regular write workload therefore exercises snapshot construction during
+short fault tests without a snapshot-specific Nemesis. Set
+`SNAPSHOT_THRESHOLD` to override the threshold for a run.
+
+After the fault schedule ends, Jepsen heals partitions, restarts killed
+processes, resumes paused processes, restores membership, and then performs one
+shared readiness check. Client operations continue while faults are active and
+during recovery. Final recovery performs one write and one read per register;
+every operation must succeed.
+
+A restarted test application keeps its Raft RPC service running while it waits
+for local recovery, but does not open the client API until recovery completes.
+This wait has no node-local deadline: Jepsen's shared readiness check provides
+the external 60-second recovery bound, reports a recovery timeout, and leaves
+the process alive for diagnosis and teardown.
+
+## Liveness tests
+
+### Partial network: old leader connected through a bridge
+
+With freshly built, running containers, run
+`make -C jepsen liveness SCENARIO=bridge-partition` from the repository root. This
+uses the same five data nodes (`n1` through `n5`) plus the control container as
+the normal safety tests. This is a fixed five-voter Jepsen scenario, not a
+random Chaos combination. It uses the normal Jepsen client, History, linearizability,
+panic, harness-error and final workload checks, plus a phase-specific liveness
+checker. CI runs it as the `Jepsen (liveness)` matrix entry alongside the existing
+Jepsen scenarios on pushes to main and manual workflow dispatches. Pull requests
+run lint and unit tests only. Liveness failures fail the job; they are not
+treated as expected successes. Results and failure diagnostics are uploaded,
+and Docker cleanup runs regardless of the test result.
+
+The test chooses the established leader and waits for all logs to be applied.
+All five voters stay running throughout; no Kill or Restart is injected. Quorum
+is three votes. Three nodes stay mutually connected; the old leader stays
+connected to only one of them (the bridge). The fifth voter is isolated from
+all other voters. Only Raft-port traffic is filtered, not SSH or client HTTP.
+
+The installed topology is:
+
+```text
+       a -------- b             isolated
+        \        /
+         \      /
+          bridge
+             |
+         old leader
+```
+
+Lines represent retained bidirectional Raft connections; all other Raft
+connections are cut. In particular, the old leader cannot reach `a` or `b`,
+and the isolated voter cannot reach any peer. These are roles assigned at
+runtime, not fixed node names. All five processes remain running and remain
+voters, so the connected group `{a, bridge, b}` needs all three votes for a
+quorum. The bridge can still receive heartbeats from the old leader, which is
+the condition this test exercises.
+
+Client operations begin 600 ms after installation, allowing the old leader's
+initial quorum lease to expire before a client can follow a redirect to it.
+The liveness deadline still starts at installation. This prevents an early
+uncommitted write from independently making the bridge's log newer.
+
+The test observes the original topology for ten seconds and requires a new
+write to complete within 1.5 seconds of installation. This budget includes the
+old leader's lease expiry, a first election that the bridge may reject while
+its follower lease remains valid, a retry, the wait for the next write attempt,
+and the client write. The workload issues read, write, and CAS operations in
+rotation, 100 ms apart, so write attempts are at most 300 ms apart while a
+client worker is free. In nine local runs with an earlier random operation mix,
+the first successful write completed 618--942 ms after installation,
+leaving 558--882 ms of margin. This is an engineering bound, not a Raft timing
+theorem. Leader and Vote metrics are retained for diagnosis, not used as a
+stability requirement.
+One successful write proves progress, not sustained availability. The topology remains
+unchanged throughout the observation period. Final cleanup heals the network
+and waits for recovery before the final read/write checks. Success during or
+after cleanup cannot excuse failure in the fault observation period.
+
+The Jepsen test application enables the quorum-loss heartbeat gate with
+`quorum_loss_probe_interval: Some(700)`. The scenario is expected to pass:
+the connected quorum can elect a leader and complete a write under
+`:original-topology`. A liveness failure here indicates a regression of the
+fix for #2080. A command failure, missing phase, or missing recovery also
+fails the run.
+
+### Two-leaf partition with a reachable leader quorum
+
+Run `make -C jepsen liveness SCENARIO=two-leaf-partition` with freshly built, running containers.
+The CLI selects one scenario with `--liveness=two-leaf-partition`; Make expands
+`SCENARIO=all` or a comma-separated list into independent runs.
+The scenario requires five distinct nodes. Their order assigns the roles below;
+the default order is `n1,n2,n3,n4,n5`, with `n1` as the bootstrap leader.
+CI runs the scenarios in the `Jepsen (liveness)` matrix entry on pushes to main
+and manual workflow dispatches, using `make -C jepsen liveness`.
+
+```text
+  n5 ---- n1 ---- n3
+           \      /
+            \    /
+              n2 ---- n4
+```
+
+The retained bidirectional Raft links are `{1-2, 1-3, 2-3, 2-4, 1-5}`.
+Every other pair is blocked on the Raft port; client HTTP and SSH remain
+reachable. The scenario enables pre-vote using the real HTTP pre-vote RPC.
+Other scenarios retain their existing election configuration.
+
+After ordinary bootstrap completes, the test retains its committed vote and
+term T. There is no additional baseline wait or idle phase. The test installs
+and verifies the fixed topology, then immediately runs the normal read/write
+workload through the first three nodes for 20 seconds, scheduling read, write,
+and CAS attempts in rotation so write attempts recur regularly. The topology
+remains unchanged until healing. Node 5 continues receiving heartbeats directly
+from node 1.
+
+Acceptance requires node 1 to remain leader and every node's term to remain T
+from bootstrap through installation, the workload, healing, and recovery. It
+compares leadership-transition log counters as well as metrics to catch
+transitions between samples. It also requires recurring successful writes during
+the fault: the maximum gap between successful writes, including the start and end
+of the 20-second phase,
+must not exceed 1.5 seconds. This provisional tolerance is an engineering
+bound for workload and environment delays, not an election timeout requirement.
+The common linearizability, panic, harness-error, and final workload checks
+still apply. Recovery reads each register before writing new values, so recovery
+writes cannot conceal lost acknowledged values. Healing must let node 4 catch up;
+successful recovery cannot excuse a stability or progress failure during the partition.
+
+### Leader removal interrupted before final membership commits
+
+Run `make -C jepsen liveness SCENARIO=leader-removal-recovery`. This scenario
+uses the first two configured nodes as A and B; other containers do not participate.
+It covers [#2091](https://github.com/databendlabs/openraft/issues/2091).
+
+After acknowledging a sentinel write, explicitly append joint membership
+J = joint({A,B},{B}) and wait until both nodes commit/apply it. Block Raft traffic,
+then explicitly append final membership F = {B}, retaining A as a learner. Verify
+A has effective F but committed J, and B has not received F. Kill A with SIGKILL,
+restart it with unchanged storage, and remove the partition. Leader restoration
+is disabled only in this scenario; pre-vote and snapshot settings are unchanged.
+
+Within 60 seconds after healing, the leader that B follows must commit/apply the same F
+(including its log ID). That leader may be A: A stays a learner in F, and B, the only
+voter in F, does not take over from the leader it voted for. A fresh write and its
+linearizable read must succeed through that leader, and
+another linearizable read must return the pre-crash sentinel. Recovery uses automatic
+elections, without resubmitting membership commands. The deadline is an engineering
+bound, not a Raft guarantee. No intermediate restart metrics or temporary leadership
+observations are required.
+
+This focused scenario records its direct client checks in Nemesis history instead
+of running the random register workload. The scenario checker, panic checks, and
+harness-error checks determine the result. Missing setup evidence or recovery timeout
+fails the run; partition cleanup runs even after an error.
+
+## Results and Stored Evidence
+
+[Jepsen error-handling semantics](error-handling-semantics.md) defines the
+Outcome and Harness-failure contract. The sections below explain how to read
+the resulting checker verdicts and stored artifacts.
+
+### Checker Verdicts
+
+Checkers turn the collected evidence into separate verdicts. Property checkers
+decide whether OpenRaft satisfies a property: for example, the linearizability
+checker may prove that no legal sequential execution explains the Client
+history, or the crash checker may find the stable panic marker in an OpenRaft
+node log. Coverage checkers instead decide whether the run produced enough
+evidence that required scenarios were successfully exercised, such as all
+required Nemesis modes and successful main-phase operations. Nemesis checkers
+also verify a separate lifecycle postcondition: after fault cleanup, the cluster
+must return to the required state within the recovery deadline.
+
+The `final-workload` checker separately rejects a run when its final reads or
+writes fail. These modeled failures are not unexpected-SUT-response markers.
+
+A coverage failure rejects a focused run but does not by itself identify an
+OpenRaft failure or its root cause. Missing coverage is recorded in `results.edn` under
+fields such as `:missing-modes` or `:missing-target-roles`. The mode or target
+role may be absent from `history.edn`, skipped by an outcome such as
+`:no-supported-leader`, or blocked by a Harness failure recorded in
+`jepsen.log`. Start with the nested checker result, inspect the corresponding
+operations in `history.edn`, and then use `jepsen.log` for Harness diagnostics.
+
+The top-level `:valid?` combines these independent verdicts and answers only
+whether the entire run can be accepted. It does not by itself identify an
+OpenRaft property violation or the state of the Harness.
+
+### Stored Evidence
+
+A run normally stores its artifacts under
+`jepsen/store/<test-name>/<timestamp>/`:
+
+- `history.edn` is the structured Client and Nemesis history used by the
+  workload, Nemesis, statistics, and unhandled-exception checkers. `history.txt`
+  is a human-readable rendering of the same history.
+- `jepsen.log` records Harness activity and diagnostics from setup, workers,
+  fault injection, teardown, and analysis. Checkers do not use it as an
+  observation source.
+- `<node>/openraft.log` is the collected runtime log of the OpenRaft test
+  application on that node. The crash checker scans it for the test
+  application's stable panic marker.
+- `results.edn` contains the composed checker results and top-level verdict. It
+  is a summary, not the raw execution record.
+- `test.jepsen` contains the original test map, including run options and the
+  random seed. It remains useful when a Harness failure prevents `results.edn`
+  from being written.
+
+Use `history.edn` to reconstruct requests and the fault schedule, `jepsen.log`
+to diagnose the Harness, and each node's `openraft.log` to investigate the
+OpenRaft process. Start with `results.edn` when the run reached analysis and a
+checker verdict is available.
+
+### Interpreting Results
+
+Each run writes its checker output to
+`jepsen/store/<test-name>/<timestamp>/results.edn`. The top-level `:valid?` has
+three possible values:
+
+- `true` exits with status 0. Every checker accepted the run.
+- `false` exits with status 1. At least one checker established a failing
+  condition. Inspect `:workload`, `:nemesis`, `:crash`, and `:stats` to identify
+  it. Only `[:workload :linearizable :valid?]` being `false` means one or more
+  register histories were not linearizable.
+- `:unknown` exits with status 2. The harness could not establish a conclusive
+  result, so the run must not be treated as passing. Unhandled worker or Nemesis
+  exceptions appear at `[:exceptions :exceptions]`. Missing node logs appear at
+  `[:crash :missing-nodes]`. Individual workload and Nemesis checkers may also
+  report `:unknown`; locate the nested checker with that validity for its
+  diagnostic fields.
+
+Safety test names begin with `openraft linearizable registers`; liveness tests
+are named `openraft bridge-partition`, `openraft two-leaf-partition`, and
+`openraft leader-removal-recovery`. Each
+name also identifies its directory under `jepsen/store`. The independent linearizability checker
+lists failing keys at `[:workload :linearizable :failures]` and stores each
+key's result at `[:workload :linearizable :results <key>]`. Per-key histories
+and checker output are written under
+`jepsen/store/<test-name>/<timestamp>/independent/<key>/`.
+
+Every run also records its random seed in `results.edn`, in a checker result of
+the following form:
+
+```clojure
+:seed {:valid? true, :seed 123456}
+```
+
+The original test map in `test.jepsen` is the fallback when `results.edn` is not
+available. Supplying the seed again repeats choices made through
+`jepsen.random`, including the random node selection used by the partition,
+process, pause, and membership nemeses. It does not make the whole run
+deterministic: client operation mixing and timing use separate generator
+randomness, and thread, network, and election timing can still differ. The
+recorded history and Nemesis operations are therefore the authoritative account
+of the fault schedule; the seed is only an aid for rerunning similar conditions.
+
+## Implemented coverage
+
+- [x] Add the Leiningen project definition and CLI skeleton.
+- [x] Add Docker-based Jepsen control and node containers.
+- [x] Add a multi-stage node image for the RocksDB KV test application.
+- [x] Add an HTTP client for the OpenRaft KV APIs.
+- [x] Add Jepsen process lifecycle management for OpenRaft nodes.
+- [x] Bootstrap a five-node OpenRaft cluster.
+- [x] Record phase-aware ok, fail, and info counts for read, write, and CAS.
+- [x] Add a network partition nemesis.
+- [x] Add nemeses for process kill/restart and pause/resume.
+- [x] Add a membership grow/shrink nemesis.
+- [x] Add a Packet nemesis for delay and probabilistic loss.
+- [x] Add a read, write, and compare-and-set workload.
+- [x] Add linearizability checking with Knossos.
+- [x] Exercise snapshot construction during ordinary workloads.
+- [x] Add a five-voter partial-network liveness regression that checks timely
+  successful writes while the old leader remains connected through a bridge.
+
+
+## References
+[Raft does not Guarantee Liveness in the face of Network Faults](https://decentralizedthoughts.github.io/2020-12-12-raft-liveness-full-omission/)

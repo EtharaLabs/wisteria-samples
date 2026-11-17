@@ -1,0 +1,47 @@
+use openraft::Config;
+
+use crate::fixtures::RaftRouter;
+use crate::fixtures::log_id;
+use crate::fixtures::ut_harness;
+
+/// Manually trigger a snapshot with `Raft::trigger_snapshot()` on Leader and Follower.
+#[tracing::instrument]
+#[test_harness::test(harness = ut_harness)]
+async fn trigger_snapshot() -> anyhow::Result<()> {
+    let config = Config {
+        enable_heartbeat: false,
+        ..Default::default()
+    };
+
+    let mut router = RaftRouter::new(config)?;
+
+    tracing::info!("--- initializing cluster");
+    let mut log_index = router.new_cluster([0, 1], []).await?;
+
+    tracing::info!(log_index, "--- trigger snapshot for node-1");
+    {
+        let n1 = router.get_raft_handle(&1)?;
+        n1.trigger().snapshot().await?;
+
+        router.wait(&1).snapshot(log_id(1, 0, log_index), "node-1 snapshot").await?;
+    }
+
+    tracing::info!(log_index, "--- send some logs");
+    {
+        let written = router.client_request_many(0, "0", 10).await?;
+        let last_log_id = written.last_log_id.expect("nonempty workload");
+        log_index = last_log_id.index();
+
+        router.wait_applied_at_least([0, 1], log_index, "write logs").await?;
+    }
+
+    tracing::info!(log_index, "--- trigger snapshot for node-0");
+    {
+        let n0 = router.get_raft_handle(&0)?;
+        n0.trigger().snapshot().await?;
+
+        router.wait(&0).snapshot(log_id(1, 0, log_index), "node-0 snapshot").await?;
+    }
+
+    Ok(())
+}

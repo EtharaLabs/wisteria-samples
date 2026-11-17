@@ -1,0 +1,23 @@
+# Ignore everything, then re-admit exactly what the Dockerfile's COPY lines name.
+*
+**/.*
+!workbench-go/
+!nats-server/
+!pristine/
+!requirements.txt
+!test.sh
+!test_output.py
+!report.py
+!reward.toml
+!judge.toml
+!cheat-checks.json
+!reference/
+# `**/.*` above would drop .gate/; re-admit it explicitly (the last matching pattern decides).
+!.gate/
+!.gate/**
+**/__pycache__
+**/*.pyc
+nats-server/**/.git
+nats-server/**/.git/**
+workbench-go/**/.git
+workbench-go/**/.git/**

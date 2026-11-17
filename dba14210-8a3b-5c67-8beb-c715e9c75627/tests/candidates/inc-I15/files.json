@@ -1,0 +1,7 @@
+{
+  "class": "incorrect",
+  "files": {
+    "internal/kube/client.go": "0df84e0a5b393fa7da38344a2f938b9debbdde0a4a569c62535fb039b627cccb",
+    "internal/kube/kube.go": "382345b8edc9393278ae28aeae8b5fe5ef384347584ffa3fc2449433f72209f9"
+  }
+}

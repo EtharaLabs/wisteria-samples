@@ -1,0 +1,176 @@
+# The judged channel for D2, the root-cause note the solver writes to /app/diagnosis.md, graded
+# against the private reference note tests/reference/diagnosis.md. Each criterion is one yes/no
+# question about one fact of that note; every fact traces to the upstream record (issue 2167, PR 2236
+# and, for C07, C09 and C14, the closed PR 2172 thread), as solution/TRUTH.md records.
+#
+# `reference` is absolute: Reward Kit resolves it against the verifier's working directory, not
+# against this file's directory. `files` is the path the separate verifier re-materializes the
+# collected artifact at; tests/test.sh puts an empty note there when the solver wrote none.
+# samples = 3: each criterion is asked three times and Reward Kit keeps the median of the answers
+# that came back (the lower one when only two did).
+[judge]
+judge = "anthropic/claude-sonnet-5-5"
+mode = "individual"
+timeout = 300
+files = ["/app/diagnosis.md"]
+reference = "/tests/reference/diagnosis.md"
+weight = 1.0
+guard = "penalize"
+samples = 3
+
+[scoring]
+aggregation = "weighted-mean"
+
+[[criterion]]
+id = "C01"
+description = "Does /app/diagnosis.md state that after the restart the leader writes a different entry at the same index under the same log id (same term, same leader, same index) as an entry it lost?"
+type = "binary"
+weight = 5
+[criterion.annotations]
+mode = "judged"
+type = "diagnosis"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+
+[[criterion]]
+id = "C02"
+description = "Does /app/diagnosis.md state that the lost entry had already been replicated to a follower before the leader's own local flush of it completed, so the crash removed it only from the leader?"
+type = "binary"
+weight = 5
+[criterion.annotations]
+mode = "judged"
+type = "diagnosis"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+
+[[criterion]]
+id = "C03"
+description = "Does /app/diagnosis.md state that the follower holding the lost entry keeps it because an equal log id is taken to mean an equal entry, so nodes apply different entries without any error?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "diagnosis"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "C04"
+description = "Does /app/diagnosis.md identify leader restore, which resumes leadership at start-up in the same term with the same leader id and without an election, as what lets the log id be reused?"
+type = "binary"
+weight = 5
+[criterion.annotations]
+mode = "judged"
+type = "reasoning"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+
+[[criterion]]
+id = "C05"
+description = "Does /app/diagnosis.md state that the repair makes a former leader win an election for a higher term before it accepts proposals, instead of resuming leadership in its old term?"
+type = "binary"
+weight = 5
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+
+[[criterion]]
+id = "C06"
+description = "Does /app/diagnosis.md explain that the higher term gives the former leader a new leader id, so no entry it writes afterwards can carry the lost entry's log id?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "reasoning"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "C07"
+description = "Does /app/diagnosis.md explain that a re-election or quorum probe within the same term is not enough, because a follower that is down during that round can still hold the lost entry?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "reasoning"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "C08"
+description = "Does /app/diagnosis.md state that the former leader's vote is demoted in memory only and the stored committed vote is not overwritten, so vote storage never moves backwards? An equivalent mechanism of the submitted repair counts."
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "C09"
+description = "Does /app/diagnosis.md state that the repair keeps log appends asynchronous (append may return before entries are persisted), rather than requiring entries to be durable before they are replicated?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "C10"
+description = "Does /app/diagnosis.md state that with enable_leader_restore set to false a former leader starts as a follower (or learner), keeps its stored vote and waits for a normal election?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "C11"
+description = "Does /app/diagnosis.md state that the start-up election begins at once, without waiting for an election timeout and independently of enable_tick and enable_elect?"
+type = "binary"
+weight = 1
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "helpful"
+
+[[criterion]]
+id = "C12"
+description = "Does /app/diagnosis.md state that on winning the start-up election the former leader appends a blank entry under its new leader id before any client write?"
+type = "binary"
+weight = 1
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "helpful"
+
+[[criterion]]
+id = "C13"
+description = "Does /app/diagnosis.md state that start-up of nodes that were followers, learners or unfinished candidates is left unchanged by the repair?"
+type = "binary"
+weight = 1
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "helpful"
+
+[[criterion]]
+id = "C14"
+description = "Does /app/diagnosis.md state that leader restore stays enabled by default, so turning it off by default is not the repair?"
+type = "binary"
+weight = 1
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "helpful"

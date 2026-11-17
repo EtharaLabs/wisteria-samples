@@ -1,0 +1,75 @@
+use std::time::Duration;
+
+use openraft::Config;
+use openraft::RaftLogReader;
+use openraft::ServerState;
+use openraft::Vote;
+use openraft::storage::RaftLogStorage;
+use openraft::vote::RaftLeaderId;
+use openraft::vote::RaftLeaderIdExt;
+
+use crate::fixtures::Node;
+use crate::fixtures::RaftRouter;
+use crate::fixtures::ut_harness;
+
+/// Brings up a cluster of 1 node and restart it, when it is a follower.
+///
+/// The single follower should become leader very quickly. Because it does not need to wait for an
+/// active leader to replicate to it.
+#[tracing::instrument]
+#[test_harness::test(harness = ut_harness)]
+async fn single_follower_restart() -> anyhow::Result<()> {
+    let config = Config {
+        enable_heartbeat: false,
+        election_timeout_min: 3_000,
+        election_timeout_max: 4_000,
+        ..Default::default()
+    };
+
+    let mut router = RaftRouter::new(config)?;
+
+    tracing::info!("--- bring up cluster of 1 node");
+    let mut log_index = router.new_cluster([0], []).await?;
+
+    tracing::info!(log_index, "--- write to 1 log");
+    {
+        let response = router.client_request(0, "foo", 0).await?;
+        log_index = response.log_id.index();
+    }
+
+    tracing::info!(log_index, "--- stop and restart node-0");
+    {
+        let Node {
+            log_store: mut sto,
+            state_machine: sm,
+            ..
+        } = router.stop_node(0).await?;
+        let v = sto.read_vote().await?;
+
+        if let Some(v) = v {
+            // Set a non-committed vote so that the node restarts as a follower.
+            sto.save_vote(&Vote::new(v.leader_id.term() + 1, v.leader_id.to_node_id())).await?;
+        }
+
+        tracing::info!(log_index, "--- restart node-0");
+
+        router.new_raft_node_with_sto(0, sto, sm).await?;
+        router
+            .wait_with_timeout(&0, Duration::from_millis(1_000))
+            .state(ServerState::Leader, "single node restarted an became leader quickly")
+            .await?;
+
+        // Leader blank log
+        log_index += 1;
+    }
+
+    tracing::info!(log_index, "--- write to 1 log after restart");
+    {
+        let response = router.client_request(0, "foo", 0).await?;
+        log_index = response.log_id.index();
+
+        router.wait(&0).applied_index(Some(log_index), "node-0 works").await?;
+    }
+
+    Ok(())
+}

@@ -1,0 +1,86 @@
+schema_version = "1.4"
+reward_type = "bounded_continuous"
+artifacts = ["/app/server/stree"]
+
+[task]
+name = "ethara/b4321f39-1196-5335-9087-ad4c9a0fba23"
+version = "2.1.2"
+description = "Test generation on nats-server server/stree (PR #8765, wildcard characters inside a token): write Go tests that accept every correct fix and reject every incorrect fix in a hidden pool of implementations."
+authors = [{ name = "kaustubh.bhargava", email = "kaustubh.bhargava@ethara.ai" }]
+keywords = ["test-generation", "go", "nats-server", "radix-tree", "race-detector"]
+
+[metadata]
+category = "software-engineering"
+null_floor = 0.0
+discrimination_weight = 1.0
+platforms = ["linux/amd64", "linux/arm64"]
+
+[metadata.contamination]
+public_source = "github.com/nats-io/nats-server"
+public_reference = "pull request 8765 (merge commit d163ae747ad050ea89054f8fb03c43e64e737aea)"
+note = "The task derives from this public upstream change: its fix is the pool's correct member c01_upstream; the reference test suite is written for the task. The working environment has no network access to it."
+
+[upstream_provenance]
+origin = "original"
+source_kind = "public_repository"
+provenance_date = "2026-10-30"
+
+[upstream_provenance.source]
+canonical_repo = "github.com/nats-io/nats-server"
+fork_ancestry_digest = "sha256:e163c9ba4f75df75cb591bfe6aa2ba1b738cae2e3e911644dc6172720f4084f8"
+base_commit = "6619d7f7d7211f37479d13a8a8cd104a6acbaed1"
+event_timestamp = "2026-10-14T14:49:32Z"
+
+[agent]
+timeout_sec = 10800.0
+# The user "dev" that environment/Dockerfile creates (useradd --uid 1000, group 1000, home
+# /home/dev), named by its uid.
+user = "1000"
+network_mode = "allowlist"
+allowed_hosts = ["api.openai.com", "api.anthropic.com"]
+
+[environment]
+build_timeout_sec = 3600.0
+cpus = 2
+memory_mb = 4096
+storage_mb = 10240
+gpus = 0
+network_mode = "no-network"
+
+[verifier]
+# The pool grader's worst case fits 19800 s; the judge (tests/judge.toml: 9 criteria and the guard,
+# 3 samples each, all 30 calls concurrent, at most 3 attempts of at most 300 s) runs beside it inside
+# Reward Kit, and 900 s more covers it running after the grader: 20700 s.
+timeout_sec = 20700.0
+# The verifier starts as root; the grader runs submitted test code as uid 10002 with a fixed
+# environment that holds no credential.
+user = "root"
+environment_mode = "separate"
+# the judge is anthropic/claude-sonnet-5-5 (tests/judge.toml); the agent reaches nothing new.
+network_mode = "allowlist"
+allowed_hosts = ["api.anthropic.com"]
+
+[verifier.env]
+# The judge endpoint and key come from the runner's environment, never literals. An empty
+# ANTHROPIC_API_KEY (the default) means no judge key: tests/test.sh then skips the judge. The judge
+# is advisory (weight 0 in the reward); without the key the reward is the same compiled score, and
+# tests/test.sh records judge-skipped.json (solution/TRUTH.md).
+ANTHROPIC_BASE_URL = "${ANTHROPIC_BASE_URL:-https://api.anthropic.com}"
+ANTHROPIC_API_KEY = "${ANTHROPIC_API_KEY:-}"
+# litellm reads only its packaged model map, which tests/Dockerfile patches (solution/TRUTH.md).
+LITELLM_LOCAL_MODEL_COST_MAP = "True"
+# Reward Kit 0.2.4 always sends reasoning_effort; dropping unsupported params keeps the judge's
+# result defined for a model litellm's bundled map does not list as a reasoning model.
+LITELLM_DROP_PARAMS = "True"
+# litellm uses its packaged Anthropic beta-header table instead of fetching one.
+LITELLM_LOCAL_ANTHROPIC_BETA_HEADERS = "True"
+
+[verifier.environment]
+# built from tests/Dockerfile
+build_timeout_sec = 3600.0
+cpus = 2
+memory_mb = 4096
+storage_mb = 10240
+gpus = 0
+network_mode = "allowlist"
+allowed_hosts = ["api.anthropic.com"]

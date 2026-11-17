@@ -1,0 +1,23 @@
+# The gate's zero route.  This file is the root tests/reward.toml with
+# `reward` set to all-pass, and with the `compiled` table giving the
+# judged_gate criterion weight 0.
+#
+# tests/test.sh copies /tests into a scratch directory, puts this file there as
+# reward.toml and writes a judged_gate criterion that scores 0 and names every
+# failed gate.  Under all-pass that zero is enough to score the run 0, which is
+# what a failed gate must do; weight 0 could not remove it from an all-pass
+# table.  `compiled` keeps its own weights and gives judged_gate weight 0, so a
+# judged verdict never moves the judge-free compiled score.
+
+[[reward]]
+name = "reward"
+aggregation = "all-pass"
+weights = { test_output = 0.01, judge = 0.5 }
+
+[[reward]]
+name = "compiled"
+aggregation = "weighted-sum"
+weights = { test_output = 0.02, judge = 0.0, judged_gate = 0.0 }
+
+[scoring.test_output]
+aggregation = "weighted-sum"

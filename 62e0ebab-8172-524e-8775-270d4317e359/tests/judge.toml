@@ -1,0 +1,178 @@
+# The judged channel for D2, the root-cause and design note the solver writes to
+# /app/diagnosis.md, graded against the private reference note.
+# Each criterion is one yes/no question about that note; none repeats a fact
+# the compiled channel in tests/test_output.py already observes.  Each is
+# asked three times (samples = 3, as in the gate) and scores the median vote.
+#
+# To move the judge, change it here, then the verifier's allowed host in task.toml and
+# its [verifier.env] mapping.
+#
+# `reference` is absolute: Reward Kit resolves it against the verifier's working
+# directory, not against this file's directory, so a relative path would reach
+# no file and the judge would silently be shown '[not found]'.
+[judge]
+judge = "anthropic/claude-sonnet-5-5"
+mode = "individual"
+timeout = 300
+samples = 3
+files = ["/app/diagnosis.md"]
+reference = "/tests/reference/diagnosis.md"
+weight = 1.0
+guard = "penalize"
+
+[scoring]
+aggregation = "weighted-mean"
+
+[[criterion]]
+id = "O1"
+description = "In /app/diagnosis.md, does the note identify that the flow-controlled push consumer delivers a message before replicating its delivered state, so that after a consumer leadership change a delivery issued before the change can still arrive after it?"
+type = "binary"
+weight = 5
+[criterion.annotations]
+mode = "judged"
+type = "diagnosis"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+
+[[criterion]]
+id = "O2"
+description = "Does /app/diagnosis.md state that after the consumer is reset its delivery sequence restarts at 1, so a stale delivery from before the reset can take the delivery number a new delivery needs?"
+type = "binary"
+weight = 5
+[criterion.annotations]
+mode = "judged"
+type = "diagnosis"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+
+[[criterion]]
+id = "O3"
+description = "Does /app/diagnosis.md explain the downstream consequence: the source drops the new message as a duplicate and the mirror marks its sequence deleted, leaving interior gaps the origin still holds?"
+type = "binary"
+weight = 5
+[criterion.annotations]
+mode = "judged"
+type = "diagnosis"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+
+[[criterion]]
+id = "O4"
+description = "Does /app/diagnosis.md rule out ordinary message redelivery as the cause, on the grounds that the messages are lost rather than re-sent?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "reasoning"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "O5"
+description = "Does /app/diagnosis.md rule out legitimate duplicate suppression as the cause, recognising that a genuinely new message is being misclassified as a duplicate?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "reasoning"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "O6"
+description = "Does /app/diagnosis.md rule out acknowledgement lag as the cause, noting that lag does not delete interior sequences or lose messages permanently?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "reasoning"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "O7"
+description = "Does /app/diagnosis.md justify that deliveries must be held while a reset is pending, because a delivery proposed before the reset applies must not mix into the delivered state after it?"
+type = "binary"
+weight = 5
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+
+[[criterion]]
+id = "O8"
+description = "Does /app/diagnosis.md explain how, after a reset, the downstream agrees with the consumer on which delivery number comes next, and why that agreement must hold even when delivery resumes before the post-reset state is gathered? An equivalent mechanism of the submitted repair counts."
+type = "binary"
+weight = 5
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+
+[[criterion]]
+id = "O9"
+description = "Does /app/diagnosis.md explain how its repair keeps a delivery that arrives after a reset, carrying a stale or reused delivery number, from being counted as a new delivery?"
+type = "binary"
+weight = 5
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "critically_important"
+
+[[criterion]]
+id = "O10"
+description = "Does /app/diagnosis.md explain how its repair keeps a genuinely new message from being dropped as a duplicate when a stale delivery has already taken its delivery number?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "O11"
+description = "Does /app/diagnosis.md explain why repairing only the consumer side, or only the downstream accounting, leaves the defect in place?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "design_justification"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "O12"
+description = "Does /app/diagnosis.md explain why restarting the servers does not fix it (the defect is in delivery/reset accounting, not transient runtime state)?"
+type = "binary"
+weight = 1
+[criterion.annotations]
+mode = "judged"
+type = "reasoning"
+evaluation_target = "workspace_state"
+importance = "helpful"
+
+[[criterion]]
+id = "O13"
+description = "Does /app/diagnosis.md explain why purging/truncating/re-reading a downstream stream, or deleting and recreating the consumer, mirror or source, does not fix it?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "reasoning"
+evaluation_target = "workspace_state"
+importance = "important"
+
+[[criterion]]
+id = "O14"
+description = "Does /app/diagnosis.md explain why turning off flow control on the consumer does not fix it (the race is independent of flow control, which must stay active)?"
+type = "binary"
+weight = 3
+[criterion.annotations]
+mode = "judged"
+type = "reasoning"
+evaluation_target = "workspace_state"
+importance = "important"

@@ -1,0 +1,6 @@
+judge input: 1 staged, 3 unchanged left out
+/tests/grade.py:232: DeprecationWarning: Python 3.14 will, by default, filter extracted tar archives and reject files or modify their metadata. Use the filter argument to control this behavior.
+  tar.extractall(dest)  # noqa: S202 - members validated above
+reward: 0.5806
+judge model: judge.toml; judge exit status: 0
+reward 0.5806 (compiled, unchanged); advisory judged 0.5789473684210527

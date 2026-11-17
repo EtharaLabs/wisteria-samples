@@ -1,0 +1,54 @@
+use std::collections::BTreeMap;
+use std::collections::BTreeSet;
+use std::sync::Arc;
+
+use openraft::alias::ErrorSourceOf;
+use openraft::async_runtime::WatchReceiver;
+use openraft::errors::MembershipError;
+use openraft::errors::decompose::DecomposeResult;
+
+use crate::StateMachineStore;
+use crate::app::App;
+use crate::typ::*;
+
+pub async fn read(app: Arc<App>, key: String) -> Result<types_kv::Response, Infallible> {
+    let value = get(&app, key).await;
+
+    Ok(types_kv::Response { value })
+}
+
+pub async fn linearizable_read(app: Arc<App>, key: String) -> Result<types_kv::Response, LinearizableReadError> {
+    app.ensure_linearizable().await?;
+
+    let value = get(&app, key).await;
+
+    Ok(types_kv::Response { value })
+}
+
+/// Read through the worker so snapshot installation cannot leave a stale database handle.
+async fn get(app: &App, key: String) -> Option<types_kv::VersionedValue> {
+    let read = app.raft.with_state_machine(move |sm: &mut StateMachineStore| Box::pin(async move { sm.get(&key) }));
+    let value = read.await.expect("raft is running");
+    value.expect("the state machine database is readable")
+}
+
+/// Append one explicit membership, allowing a test to separate joint and final entries.
+pub(crate) async fn append_membership(
+    app: Arc<App>,
+    configs: Vec<BTreeSet<crate::NodeId>>,
+) -> Result<ClientWriteResponse, ClientWriteError> {
+    let metrics = app.raft.metrics().borrow_watched().clone();
+    let nodes = metrics
+        .membership_config
+        .membership()
+        .nodes()
+        .map(|(id, node)| (id.clone(), node.clone()))
+        .collect::<BTreeMap<_, _>>();
+    let membership = openraft::Membership::new(configs, nodes);
+    let membership = membership.map_err(|error| {
+        let membership_error = MembershipError::<_, ErrorSourceOf<TypeConfig>>::from(error);
+        let change_error = membership_error.into();
+        ClientWriteError::ChangeMembershipError(change_error)
+    })?;
+    app.raft.append_membership(membership, openraft::EntryPayload::Blank, []).await.decompose().unwrap()
+}

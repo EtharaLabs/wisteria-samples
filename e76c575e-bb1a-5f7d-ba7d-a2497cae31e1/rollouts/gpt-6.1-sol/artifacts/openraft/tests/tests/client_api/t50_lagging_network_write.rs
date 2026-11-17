@@ -1,0 +1,49 @@
+use anyhow::Result;
+use openraft::Config;
+use openraft::ServerState;
+
+use crate::fixtures::RaftRouter;
+use crate::fixtures::ut_harness;
+
+/// Lagging network test.
+///
+/// What does this test do?
+///
+/// - Setup a network with <=50 ms random delay of messages.
+/// - bring a single-node cluster online.
+/// - add two Learner and then try to commit one log.
+/// - change config to a 3 members cluster and commit another log.
+#[tracing::instrument]
+#[test_harness::test(harness = ut_harness)]
+async fn lagging_network_write() -> Result<()> {
+    let config = Config {
+        heartbeat_interval: 100,
+        election_timeout_min: 300,
+        election_timeout_max: 600,
+        enable_tick: false,
+        ..Default::default()
+    };
+    let mut router = RaftRouter::builder(config)?.send_delay(50).build();
+
+    tracing::info!("--- initializing cluster");
+    router.new_cluster([0], [1, 2]).await?;
+
+    let response = router.client_request(0, "client", 0).await?;
+    let mut log_index = response.log_id.index();
+    router.wait_applied_at_least([0, 1, 2], log_index, "write one log").await?;
+
+    let node = router.get_raft_handle(&0)?;
+    node.change_membership([0, 1, 2], false).await?;
+    log_index += 2;
+    router.wait(&0).state(ServerState::Leader, "changed").await?;
+    for node in [1, 2] {
+        router.wait(&node).state(ServerState::Follower, "changed").await?;
+    }
+    router.wait_applied_at_least([0, 1, 2], log_index, "3 candidates").await?;
+
+    let response = router.client_request(0, "client", 0).await?;
+    log_index = response.log_id.index();
+    router.wait_applied_at_least([0, 1, 2], log_index, "write 2nd log").await?;
+
+    Ok(())
+}

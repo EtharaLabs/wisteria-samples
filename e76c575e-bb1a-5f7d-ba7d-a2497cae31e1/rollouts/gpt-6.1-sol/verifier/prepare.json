@@ -1,0 +1,380 @@
+{
+  "deleted_ignored": [],
+  "discarded_test_files": 7,
+  "ok": true,
+  "out": "/work/submission",
+  "refused": [
+    {
+      "path": "openraft/src/lib_readme.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/docs.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/features.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/cluster_control/cluster-control.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/cluster_control/cluster-formation.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/cluster_control/dynamic-membership.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/cluster_control/joint-consensus.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/cluster_control/monitoring-maintenance.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/cluster_control/node-lifecycle.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/components/engine-runtime.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/components/state-machine.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/data/effective-membership.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/data/extended-membership.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/data/io_id.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/data/leader-lease.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/data/leader_id.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/data/log_io_id.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/data/log_io_progress.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/data/log_pointers.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/data/replication-session.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/data/vote.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/Makefile",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/README.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/build_faq.py",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/faq-toc.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/faq.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/01-getting-started/01-initialize-cluster.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/01-getting-started/02-single-node.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/01-getting-started/03-initialize-multiple-nodes.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/01-getting-started/README.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/02-core-concepts/01-differences-from-raft.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/02-core-concepts/02-log-id-tuple.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/02-core-concepts/README.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/03-configuration/01-election-triggers.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/03-configuration/02-snapshot-policy.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/03-configuration/03-frequent-elections.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/03-configuration/04-slow-replication.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/03-configuration/05-custom-serialization.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/03-configuration/README.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/04-storage/01-state-machine-persistence.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/04-storage/02-snapshot-building.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/04-storage/03-snapshot-synchronization.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/04-storage/README.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/05-monitoring/01-state-change-notifications.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/05-monitoring/02-valid-leader.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/05-monitoring/03-detect-unreachable.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/05-monitoring/04-minimize-error-logs.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/05-monitoring/05-leader-change-services.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/05-monitoring/README.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/06-operations/01-node-restart.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/06-operations/02-remove-node.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/06-operations/03-parallel-membership-change.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/06-operations/04-custom-node-info.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/06-operations/05-forward-to-leader-missing.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/06-operations/06-error-after-shutdown.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/06-operations/07-leader-rejects-write.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/06-operations/08-restore-from-snapshot.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/06-operations/09-reuse-node-id.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/06-operations/README.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/07-troubleshooting/01-panic-is-following.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/07-troubleshooting/02-metrics-blocks-node.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/07-troubleshooting/03-data-loss.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/07-troubleshooting/04-wipe-node-data.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/07-troubleshooting/05-incorrect-config.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/07-troubleshooting/06-excessive-network-errors.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/faq/07-troubleshooting/README.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/feature_flags/Makefile",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/feature_flags/feature-flags-toc.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/feature_flags/feature-flags.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/getting_started/getting-started.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/internal/architecture.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/internal/internal.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/internal/threading.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/obsolete/blank-log-heartbeat.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/obsolete/fast_commit.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/protocol/check_quorum.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/protocol/commit.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/protocol/election_quorum.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/protocol/io_ordering.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/protocol/leader_lease.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/protocol/log_replication.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/protocol/log_stream.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/protocol/pre_vote.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/protocol/read.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/protocol/replication.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/protocol/snapshot_replication.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/upgrade_guide/upgrade-v08-v09.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/upgrade_guide/upgrade-v09-v10.md",
+      "status": "not_rust_source"
+    },
+    {
+      "path": "openraft/src/docs/upgrade_guide/upgrade.md",
+      "status": "not_rust_source"
+    }
+  ],
+  "source": "/app/openraft",
+  "status": "ok",
+  "taken": [
+    {
+      "added": false,
+      "base_sha256": "3112de34b19a5d31ba2a86e2858e7e7608e1c7ec8ebb993e7d77db53851b9082",
+      "path": "openraft/src/config/config.rs",
+      "sha256": "52777386935ad80f5cb8d32fbd11352ee76ea53540ee20e179753ba80752efe4"
+    },
+    {
+      "added": false,
+      "base_sha256": "5edd26501445baf67b55932a5980134dbd9b0f2b6e58242a6e98ca0f9bfbb313",
+      "path": "openraft/src/engine/engine_impl.rs",
+      "sha256": "207620ca4f8839ff4fc28ad88921b4c5662552004715b63b97cc6161f32906fd"
+    }
+  ]
+}

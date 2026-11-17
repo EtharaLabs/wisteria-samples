@@ -1,0 +1,15 @@
+judge input: 1 file(s) staged, 2 unchanged left out
+judge input exit status: 0
+reward=0.5333333333333333 gate=true sound=true correct=8/8 incorrect_rejected=32/60 isolated=true
+grader exit status: 0
+cheat: cheat_no_verifier_paths passed: no harvested file names a verifier path
+cheat: cheat_reward_carrier_intact passed: the reward directory and its files belong to the verifier alone
+cheat: cheat_no_escaped_processes passed: no runner-uid process outlived the grader
+reward: 0.5333
+compiled: 0.5333
+judged: 1.0
+blended: 0.6033
+rewardkit exit status: 0
+reward: 0.5333333333333333 = compiled ({"correct": 8, "correct_accepted": 8, "incorrect": 60, "incorrect_rejected": 32, "reason": "graded"}); advisory judged 1.0, blended 0.6033333333333333
+carrier exit status: 0
+0.5333333333333333

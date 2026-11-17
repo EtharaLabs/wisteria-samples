@@ -1,0 +1,7 @@
+# Ignore everything, then re-admit only what the build needs.
+*
+**/.*
+!nats-server/
+nats-server/**/.git
+nats-server/**/.git/**
+nats-server/**/*.patch

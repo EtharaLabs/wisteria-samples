@@ -1,0 +1,78 @@
+schema_version = "1.4"
+artifacts = ["/app/opentelemetry-collector-contrib/processor/k8sattributesprocessor/internal/kube"]
+reward_type = "bounded_continuous"
+
+[task]
+name = "ethara/dba14210-8a3b-5c67-8beb-c715e9c75627"
+version = "1.1.6"
+description = "Write Go tests that tell correct fixes of a k8sattributes pod-cache leak from incorrect ones."
+authors = [{ name = "kaustubh.bhargava", email = "kaustubh.bhargava@ethara.ai" }]
+keywords = ["go", "test-generation", "kubernetes", "opentelemetry-collector", "memory-leak", "rewardkit"]
+
+[metadata]
+category = "software-engineering"
+null_floor = 0.0
+discrimination_weight = 0.5
+platforms = ["linux/amd64", "linux/arm64"]
+
+[metadata.contamination]
+public_source = "github.com/open-telemetry/opentelemetry-collector-contrib"
+public_reference = "pull request 49760 (commit 28d4468bd4fc2f0d21032b0d95942a20ecd49f21)"
+note = "The reference solution derives from this public upstream change. The working environment has no network access to it."
+
+[agent]
+timeout_sec = 10800.0
+network_mode = "allowlist"
+allowed_hosts = ["api.anthropic.com", "api.openai.com"]
+user = "10001:10001"
+
+[verifier]
+# Grading, plus the advisory judge's 900 s cap and its kill margin, plus staging and merging.
+timeout_sec = 9400.0
+# Only the judge APIs are reachable; the judge has weight 0; submitted tests run with no credential.
+network_mode = "allowlist"
+allowed_hosts = ["api.anthropic.com", "api.openai.com"]
+environment_mode = "separate"
+# test.sh runs as root; every go test child runs as uid 20002 (tests/grade.py run_once).
+user = "root"
+
+[verifier.env]
+# Endpoints and keys come from the runner's environment. Anthropic key: the Anthropic judge; only an
+# OpenAI key: the same rubric judged by an OpenAI model; neither: the judge is skipped. The judge has
+# weight 0, so the reward is the same in every case.
+ANTHROPIC_BASE_URL = "${ANTHROPIC_BASE_URL:-https://api.anthropic.com}"
+ANTHROPIC_API_KEY = "${ANTHROPIC_API_KEY:-}"
+OPENAI_API_KEY = "${OPENAI_API_KEY:-}"
+OPENAI_BASE_URL = "${OPENAI_BASE_URL:-https://api.openai.com/v1}"
+LITELLM_LOCAL_MODEL_COST_MAP = "${LITELLM_LOCAL_MODEL_COST_MAP:-True}"
+# Reward Kit always sends reasoning_effort; drop it for models litellm does not list as reasoning models.
+LITELLM_DROP_PARAMS = "True"
+LITELLM_LOCAL_ANTHROPIC_BETA_HEADERS = "True"
+
+[verifier.environment]
+network_mode = "allowlist"
+allowed_hosts = ["api.anthropic.com", "api.openai.com"]
+build_timeout_sec = 1800.0
+cpus = 1
+memory_mb = 8192
+storage_mb = 10240
+gpus = 0
+
+[environment]
+network_mode = "no-network"
+build_timeout_sec = 1800.0
+cpus = 1
+memory_mb = 8192
+storage_mb = 10240
+gpus = 0
+
+[upstream_provenance]
+origin = "original"
+provenance_date = "2026-11-03"
+source_kind = "public_repository"
+
+[upstream_provenance.source]
+canonical_repo = "github.com/open-telemetry/opentelemetry-collector-contrib"
+fork_ancestry_digest = "sha256:1df2326b51d0303cf056f8cde2f1bc7427f57db253effe4ec2407786b23370bf"
+base_commit = "bd71eee5197f6cf5869d9958ea9ff67782296a69"
+event_timestamp = "2026-05-22T09:06:39Z"
