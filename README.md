@@ -1,8 +1,8 @@
-<p align="center"><img src="images/hero.svg" alt="wisteria" width="720"></p>
+<p align="center"><img src="images/hero.svg" alt="Wisteria" width="720"></p>
 
-# wisteria: samples
+# Wisteria: samples
 
-<p align="center"><b>Five sample tasks from wisteria, a Harbor dataset of terminal tasks across the software DevOps cycle.</b></p>
+<p align="center"><b>Five sample tasks from Wisteria, a Harbor dataset of terminal tasks across the software DevOps cycle.</b></p>
 
 <p align="center"><a href="#summary"><img src="https://img.shields.io/badge/tasks-5-845EF7" alt="tasks: 5"></a> <a href="#summary"><img src="https://img.shields.io/badge/harbor_schema-1.4-845EF7" alt="harbor schema: 1.4"></a> <a href="#trials"><img src="https://img.shields.io/badge/mean_reward-0.4780-845EF7" alt="mean reward: 0.4780"></a></p>
 
@@ -10,7 +10,7 @@
 
 ## Abstract
 
-wisteria is a dataset of terminal tasks in [Harbor](https://github.com/laude-institute/harbor) format across the software DevOps cycle: build and configuration, monitoring, issue resolving, test generation, and end-to-end pipelines. Its task mix follows [DevOps-Gym](https://arxiv.org/abs/2601.20882) (arXiv:2601.20882), and a task's difficulty comes only from measured frontier-model pass rates.
+Wisteria is a dataset of terminal tasks in [Harbor](https://github.com/laude-institute/harbor) format across the software DevOps cycle: build and configuration, monitoring, issue resolving, test generation, and end-to-end pipelines. Its task mix follows [DevOps-Gym](https://arxiv.org/abs/2601.20882) (arXiv:2601.20882), and a task's difficulty comes only from measured frontier-model pass rates.
 
 Every task runs in an offline container and carries a reference solution, a verifier that runs in its own container, and a continuous reward from 0 to 1. Where a task asks for a written root-cause diagnosis, an LLM judge scores it against a rubric, and that score is half of the reward.
 
@@ -139,7 +139,7 @@ The verifier's LLM judge uses `ANTHROPIC_API_KEY` (Claude Sonnet 5.5) or, when o
 
 ```bibtex
 @misc{wisteria2026,
-  title        = {wisteria: Harbor-format terminal tasks across the DevOps cycle},
+  title        = {Wisteria: Harbor-format terminal tasks across the DevOps cycle},
   author       = {{Ethara.AI}},
   year         = {2026}
 }
@@ -147,6 +147,6 @@ The verifier's LLM judge uses `ANTHROPIC_API_KEY` (Claude Sonnet 5.5) or, when o
 
 ## Contact
 
-wisteria is built by [Ethara.AI](https://github.com/Ethara-Ai).
+Wisteria DevOps-Gym is built by [Ethara.AI](https://github.com/Ethara-Ai). For questions about the benchmark or dataset, contact [research@ethara.ai](mailto:research@ethara.ai).
 
 Copyright (c) 2026 Green Rider Technology LLP (Ethara AI). All rights reserved.
